@@ -30,6 +30,7 @@ const IoclSidebar = () => {
     <>
       {isLargeScreen ? (
         <>
+          {/* sidebar - desktop */}
           <div
             className=" h-full text-white"
             style={{
@@ -37,22 +38,23 @@ const IoclSidebar = () => {
                 "linear-gradient(90deg, rgba(2,22,79,255) 0%, #02306b 100%)",
             }}
           >
-            <div className="h-[25%]  p-4 flex justify-center items-center">
+            <div className="h-[25%]  p-4 flex flex-col justify-center items-center text-white font-semibold text-2xl">
               <img
                 src={ioclLogo}
                 className="max-w-[100px] object-cover"
                 alt="ioclLogo"
               />
+              IndianOil
             </div>
             <div className="h-[55%]  font-medium p-4 flex flex-col justify-around">
               <Link to="/">
                 <div
-                  className={`  flex items-center gap-2 py-4 px-2 rounded-lg hover:bg-white hover:text-[#08174e] duration-200 ${
-                    location.pathname === "/" ? "bg-white text-[#08174e]" : ""
+                  className={`  flex items-center gap-2 py-2 2xl:py-4 px-2 rounded-lg hover:bg-white hover:text-[#f47424] duration-200 ${
+                    location.pathname === "/" ? "bg-white text-[#f47424]" : ""
                   }`}
                 >
                   {location.pathname === "/" && (
-                    <div className="text-[#08174e]">
+                    <div className="text-[#f47424]">
                       <FaAnglesRight size={20} />
                     </div>
                   )}
@@ -64,14 +66,14 @@ const IoclSidebar = () => {
               </Link>
               <Link to="/ioclGraphs">
                 <div
-                  className={`  flex items-center gap-2 py-4 px-2 rounded-lg hover:bg-white hover:text-[#08174e] ${
+                  className={`  flex items-center gap-2 py-2 2xl:py-4 px-2 rounded-lg hover:bg-white hover:text-[#f47424] ${
                     location.pathname === "/ioclGraphs"
-                      ? "bg-white text-[#08174e]"
+                      ? "bg-white text-[#f47424]"
                       : ""
                   } duration-200`}
                 >
                   {location.pathname === "/ioclGraphs" && (
-                    <div className="text-[#08174e]">
+                    <div className="text-[#f47424]">
                       <FaAnglesRight size={20} />
                     </div>
                   )}
@@ -83,14 +85,14 @@ const IoclSidebar = () => {
               </Link>
               <Link to="/ioclReports">
                 <div
-                  className={` flex items-center gap-2 py-4 px-2 rounded-lg hover:bg-white hover:text-[#08174e] duration-200 ${
+                  className={` flex items-center gap-2 py-2 2xl:py-4 px-2 rounded-lg hover:bg-white hover:text-[#f47424] duration-200 ${
                     location.pathname === "/ioclReports"
-                      ? "bg-white text-[#08174e]"
+                      ? "bg-white text-[#f47424]"
                       : ""
                   }`}
                 >
                   {location.pathname === "/ioclReports" && (
-                    <div className="text-[#08174e]">
+                    <div className="text-[#f47424]">
                       <FaAnglesRight size={20} />
                     </div>
                   )}
@@ -102,14 +104,14 @@ const IoclSidebar = () => {
               </Link>
               <Link to="/ioclSettings">
                 <div
-                  className={`  flex items-center gap-2 py-4 px-2 rounded-lg hover:bg-white hover:text-[#08174e] duration-200 ${
+                  className={`  flex items-center gap-2 py-2 2xl:py-4 px-2 rounded-lg hover:bg-white hover:text-[#f47424] duration-200 ${
                     location.pathname === "/ioclSettings"
-                      ? "bg-white text-[#08174e]"
+                      ? "bg-white text-[#f47424]"
                       : ""
                   }`}
                 >
                   {location.pathname === "/ioclSettings" && (
-                    <div className="text-[#08174e]">
+                    <div className="text-[#f47424]">
                       <FaAnglesRight size={20} />
                     </div>
                   )}
@@ -132,8 +134,9 @@ const IoclSidebar = () => {
           </div>
         </>
       ) : (
+        // sidebar - mobile view
         <div
-          className="bg-white w-full fixed bottom-0 text-white p-2 flex justify-evenly"
+          className="bg-white w-full fixed bottom-0 text-white p-2 flex justify-evenly items-center z-10 h-[8vh]"
           style={{
             background:
               "linear-gradient(90deg, rgba(2,22,79,255) 0%, #02306b 100%)",
@@ -141,56 +144,52 @@ const IoclSidebar = () => {
         >
           <Link to="/">
             <div
-              className={`  flex flex-col items-center gap-1 p-1 rounded-lg hover:bg-white hover:text-[#08174e] duration-200 ${
-                location.pathname === "/" ? "bg-white text-[#08174e]" : ""
+              className={`  flex flex-col items-center gap-1 p-1 md:p-2 rounded-lg hover:bg-white hover:text-[#f47424] duration-200 ${
+                location.pathname === "/" ? "bg-white text-[#f47424]" : ""
               }`}
             >
               <div>
                 <AiOutlineDashboard size={25} />
               </div>
-              {/* <div className="text-[10px]">Dashboard</div> */}
             </div>
           </Link>
           <Link to="/ioclGraphs">
             <div
-              className={` flex flex-col items-center gap-1 p-1 rounded-lg hover:bg-white hover:text-[#08174e] ${
+              className={` flex flex-col items-center gap-1 p-1 md:p-2 rounded-lg hover:bg-white hover:text-[#f47424] ${
                 location.pathname === "/ioclGraphs"
-                  ? "bg-white text-[#08174e]"
+                  ? "bg-white text-[#f47424]"
                   : ""
               } duration-200`}
             >
               <div>
                 <PiChartLineUp size={25} />
               </div>
-              {/* <div className="text-[10px]">Graphs</div> */}
             </div>
           </Link>
           <Link to="/ioclReports">
             <div
-              className={` flex flex-col items-center gap-1 p-1 rounded-lg hover:bg-white hover:text-[#08174e] duration-200 ${
+              className={` flex flex-col items-center gap-1 p-1 md:p-2 rounded-lg hover:bg-white hover:text-[#f47424] duration-200 ${
                 location.pathname === "/ioclReports"
-                  ? "bg-white text-[#08174e]"
+                  ? "bg-white text-[#f47424]"
                   : ""
               }`}
             >
               <div>
                 <TbReportSearch size={25} />
               </div>
-              {/* <div className="text-[10px]">Reports</div> */}
             </div>
           </Link>
           <Link to="/ioclSettings">
             <div
-              className={`  flex flex-col items-center gap-1 p-1 rounded-lg hover:bg-white hover:text-[#08174e] duration-200 ${
+              className={`  flex flex-col items-center gap-1 p-1 md:p-2 rounded-lg hover:bg-white hover:text-[#f47424] duration-200 ${
                 location.pathname === "/ioclSettings"
-                  ? "bg-white text-[#08174e]"
+                  ? "bg-white text-[#f47424]"
                   : ""
               }`}
             >
               <div>
                 <MdOutlineSettings size={25} />
               </div>
-              {/* <div className="text-[10px]">Settings</div> */}
             </div>
           </Link>
         </div>

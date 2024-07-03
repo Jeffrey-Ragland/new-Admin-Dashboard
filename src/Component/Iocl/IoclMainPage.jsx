@@ -92,22 +92,22 @@ const IoclMainPage = () => {
 
 
   return (
-    <div className="flex h-screen">
+    <div className="flex md:h-screen text-sm md:text-base 2xl:text-2xl">
       {/* sidebar */}
-      <div className="lg:w-[15%] h-full">
+      <div className="lg:w-[20%] xl:w-[15%] h-full">
         <IoclSidebar />
       </div>
 
       {/* main content */}
-      <div className="w-full lg:w-[85%]  p-4 h-full">
+      <div className="w-full lg:w-[80%] xl:w-[85%]  p-4 h-full">
         {/* header */}
-        <div className="flex justify-between h-[5%] px-2">
-          <div className='hidden md:invisible'>Activity Status</div>
-          <div className='flex gap-2 md:hidden'>
-            <img src={ioclLogo} alt='iocl' />
-            <img src={xymaLogo} alt='xyma' />
+        <div className="flex justify-between items-center md:h-[5%] px-2 mb-2">
+          {/* logo for mobile and tab view */}
+          <div className="flex gap-2 md:hidden">
+            <img src={ioclLogo} alt="iocl" className="max-h-8" />
+            <img src={xymaLogo} alt="xyma" className="max-h-8" />
           </div>
-          <div className='font-semibold'>IOCL Dashboard</div>
+          <div className="font-semibold">IOCL Dashboard</div>
           <Link to="/login">
             <span
               className=" py-1 px-2 text-white font-medium text-sm rounded-md"
@@ -126,51 +126,55 @@ const IoclMainPage = () => {
         </div>
 
         {/* content */}
-        <div className="flex h-[95%]  ">
+        <div className="xl:flex md:h-[95%]  ">
           {/* cards */}
-          <div className="w-[20%]  flex flex-col gap-2 p-2 text-white">
-            <div
-              className="h-1/4 rounded-md p-4"
-              style={{
-                background:
-                  "linear-gradient(90deg, rgba(2,22,79,255) 0%, #02306b 100%)",
-              }}
-            >
-              Sensor 1
+          <div className="w-full xl:w-[20%] md:h-[20%] xl:h-auto flex flex-col gap-2 p-2 text-white">
+            <div className="h-1/2 flex flex-col md:flex-row xl:flex-col gap-2">
+              <div
+                className="xl:h-1/2 md:w-1/2 xl:w-auto rounded-md p-4"
+                style={{
+                  background:
+                    "linear-gradient(90deg, rgba(2,22,79,255) 0%, #02306b 100%)",
+                }}
+              >
+                Sensor 1
+              </div>
+              <div
+                className="xl:h-1/2 md:w-1/2 xl:w-auto rounded-md p-4"
+                style={{
+                  background:
+                    "linear-gradient(90deg, rgba(2,22,79,255) 0%, #02306b 100%)",
+                }}
+              >
+                Sensor 2
+              </div>
             </div>
-            <div
-              className="h-1/4 rounded-md p-4"
-              style={{
-                background:
-                  "linear-gradient(90deg, rgba(2,22,79,255) 0%, #02306b 100%)",
-              }}
-            >
-              Sensor 2
-            </div>
-            <div
-              className="h-1/4 rounded-md p-4"
-              style={{
-                background:
-                  "linear-gradient(90deg, rgba(2,22,79,255) 0%, #02306b 100%)",
-              }}
-            >
-              Sensor 3
-            </div>
-            <div
-              className="h-1/4 rounded-md p-4"
-              style={{
-                background:
-                  "linear-gradient(90deg, rgba(2,22,79,255) 0%, #02306b 100%)",
-              }}
-            >
-              Last Update
+            <div className="h-1/2 flex flex-col md:flex-row xl:flex-col gap-2">
+              <div
+                className="xl:h-1/2 md:w-1/2 xl:w-auto rounded-md p-4"
+                style={{
+                  background:
+                    "linear-gradient(90deg, rgba(2,22,79,255) 0%, #02306b 100%)",
+                }}
+              >
+                Sensor 3
+              </div>
+              <div
+                className="xl:h-1/2 md:w-1/2 xl:w-auto rounded-md p-4"
+                style={{
+                  background:
+                    "linear-gradient(90deg, rgba(2,22,79,255) 0%, #02306b 100%)",
+                }}
+              >
+                Last Update
+              </div>
             </div>
           </div>
 
           {/* graphs and table */}
-          <div className="w-[80%]  p-2 flex flex-col gap-2">
+          <div className="w-full xl:w-[80%] md:h-[80%] xl:h-auto  p-2 flex flex-col gap-2">
             {/* line graph */}
-            <div className="h-[60%]  bg-white flex flex-col rounded-md">
+            <div className="md:h-[50%] lg:h-[60%] bg-white flex flex-col rounded-md">
               <div className="flex justify-between">
                 <div
                   className="py-1 px-2 flex flex-1 text-white rounded-tl-md"
@@ -195,10 +199,10 @@ const IoclMainPage = () => {
                 <Line data={lineData} options={lineOptions} width={"100%"} />
               </div>
             </div>
-            <div className="h-[40%] flex gap-2 ">
+            <div className="md:h-[50%] lg:md:h-[40%] flex flex-col-reverse md:flex-row gap-2 ">
               {/* table */}
               <div
-                className="w-1/2  bg-white overflow-auto rounded-md"
+                className="w-full md:w-1/2 h-60 md:h-auto bg-white overflow-auto rounded-md mb-[6vh] md:mb-[8vh] lg:mb-0"
                 style={{ scrollbarWidth: "none" }}
               >
                 <table className=" w-full text-center">
@@ -211,9 +215,9 @@ const IoclMainPage = () => {
                   >
                     <tr className="">
                       <th className="w-1/5 p-1">S.No</th>
-                      <th className="w-1/5 p-1">Sensor 1</th>
-                      <th className="w-1/5 p-1">Sensor 2</th>
-                      <th className="w-1/5 p-1">Sensor 3</th>
+                      <th className="w-1/5 p-1">Sensor&nbsp;1</th>
+                      <th className="w-1/5 p-1">Sensor&nbsp;2</th>
+                      <th className="w-1/5 p-1">Sensor&nbsp;3</th>
                       <th className="w-1/5 p-1">Last&nbsp;Updated</th>
                     </tr>
                   </thead>
@@ -327,7 +331,7 @@ const IoclMainPage = () => {
                   </tbody>
                 </table>
               </div>
-              <div className="w-1/2  bg-white rounded-md">
+              <div className="w-full md:w-1/2 flex flex-col  bg-white rounded-md md:mb-[8vh] lg:mb-0">
                 <div
                   className="py-1 px-2 text-white rounded-t-md"
                   style={{
@@ -338,7 +342,7 @@ const IoclMainPage = () => {
                   Peak Analysis
                 </div>
                 <div className="flex flex-1">
-                  <Bar data={barData} options={barOptions} width={"100%"} />
+                  <Bar data={barData} options={barOptions} height={"100%"} />
                 </div>
               </div>
             </div>
