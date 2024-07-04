@@ -32,7 +32,8 @@ const App = () => {
 const [Tof_data,setTofdata]=useState('')
 const [projectData, setProjectData] = useState([]);
 const[chartdata,setChartData]=useState([]);
-const[ReportData,setReportData]=useState([])
+const[ReportData,setReportData]=useState([]);
+const [ioclData, setIoclData] = useState([]);
 
   let controls =localStorage.getItem("Controles");
 
@@ -41,15 +42,20 @@ const[ReportData,setReportData]=useState([])
     fetch_tof_fata();
     fetchProductData();
     chartdatafetch();
-  const data = setInterval(fetch_tof_fata,2000)
-  const sensors =setInterval(fetchProductData,5000)
+    getIOCLData();
+  const data = setInterval(fetch_tof_fata,2000);
+  const sensors =setInterval(fetchProductData,5000);
   const chartdata =setInterval(chartdatafetch,2000);
+  const ioclData = setInterval(getIOCLData,5000);
   return()=>{
-    clearInterval(data)
-    clearInterval(sensors)
+    clearInterval(data);
+    clearInterval(sensors);
     clearInterval(chartdata);
+    clearInterval(ioclData);
   }
   },[])
+
+  console.log('iocl data',ioclData);
 
 
 const fetch_tof_fata =async()=>{
@@ -135,6 +141,19 @@ const chartdatafetch =async()=>{
     console.error("Error Fetching Data: ",error)
   }
 }
+
+const getIOCLData = async () => {
+  try {
+    const response = await axios.get('http://localhost:4000/sensor/getIOCLData');
+    if(response.data.success) {
+      setIoclData(response.data.data);
+    } else {
+      toast.error('No Data Found!');
+    }
+  } catch(error) {
+    console.error('Error fetching IOCL data', error);
+  }
+};
 
   return (
     <>

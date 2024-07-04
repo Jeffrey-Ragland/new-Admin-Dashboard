@@ -222,7 +222,7 @@ const IoclMainPage = () => {
                     </tr>
                   </thead>
 
-                  <tbody className="text-sm">
+                  <tbody className="text-xs md:text-sm">
                     <tr className=" ">
                       <td>1</td>
                       <td>55</td>
