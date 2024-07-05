@@ -38,10 +38,10 @@ const IoclSidebar = () => {
                 "linear-gradient(90deg, rgba(2,22,79,255) 0%, #02306b 100%)",
             }}
           >
-            <div className="h-[25%]  p-4 flex flex-col justify-center items-center text-white font-semibold text-2xl">
+            <div className="h-[25%]  p-4 flex flex-col justify-center items-center text-white font-semibold text-2xl 2xl:text-3xl">
               <img
                 src={ioclLogo}
-                className="max-w-[100px] object-cover"
+                className="max-w-[100px] 2xl:max-w-[150px] object-cover"
                 alt="ioclLogo"
               />
               IndianOil
@@ -49,24 +49,29 @@ const IoclSidebar = () => {
             <div className="h-[55%]  font-medium p-4 flex flex-col justify-around">
               <Link to="/">
                 <div
-                  className={`  flex items-center gap-2 py-2 2xl:py-4 px-2 rounded-lg hover:bg-white hover:text-[#f47424] duration-200 ${
+                  className={`  flex items-center gap-2 py-2 2xl:py-5 px-2 rounded-lg hover:bg-white hover:text-[#f47424] duration-200 ${
                     location.pathname === "/" ? "bg-white text-[#f47424]" : ""
                   }`}
                 >
                   {location.pathname === "/" && (
                     <div className="text-[#f47424]">
-                      <FaAnglesRight size={20} />
+                      <FaAnglesRight size={20} className="2xl:hidden" />
+                      <FaAnglesRight size={25} className="hidden 2xl:block" />
                     </div>
                   )}
                   <div>
-                    <AiOutlineDashboard size={25} />
+                    <AiOutlineDashboard size={25} className="2xl:hidden" />
+                    <AiOutlineDashboard
+                      size={30}
+                      className="hidden 2xl:block"
+                    />
                   </div>
                   <div>Dashboard</div>
                 </div>
               </Link>
               <Link to="/ioclGraphs">
                 <div
-                  className={`  flex items-center gap-2 py-2 2xl:py-4 px-2 rounded-lg hover:bg-white hover:text-[#f47424] ${
+                  className={`  flex items-center gap-2 py-2 2xl:py-5 px-2 rounded-lg hover:bg-white hover:text-[#f47424] ${
                     location.pathname === "/ioclGraphs"
                       ? "bg-white text-[#f47424]"
                       : ""
@@ -74,18 +79,20 @@ const IoclSidebar = () => {
                 >
                   {location.pathname === "/ioclGraphs" && (
                     <div className="text-[#f47424]">
-                      <FaAnglesRight size={20} />
+                      <FaAnglesRight size={20} className="2xl:hidden" />
+                      <FaAnglesRight size={25} className="hidden 2xl:block" />
                     </div>
                   )}
                   <div>
-                    <PiChartLineUp size={25} />
+                    <PiChartLineUp size={25} className="2xl:hidden" />
+                    <PiChartLineUp size={30} className="hidden 2xl:block" />
                   </div>
                   <div>Graphs</div>
                 </div>
               </Link>
               <Link to="/ioclReports">
                 <div
-                  className={` flex items-center gap-2 py-2 2xl:py-4 px-2 rounded-lg hover:bg-white hover:text-[#f47424] duration-200 ${
+                  className={` flex items-center gap-2 py-2 2xl:py-5 px-2 rounded-lg hover:bg-white hover:text-[#f47424] duration-200 ${
                     location.pathname === "/ioclReports"
                       ? "bg-white text-[#f47424]"
                       : ""
@@ -93,18 +100,20 @@ const IoclSidebar = () => {
                 >
                   {location.pathname === "/ioclReports" && (
                     <div className="text-[#f47424]">
-                      <FaAnglesRight size={20} />
+                      <FaAnglesRight size={20} className="2xl:hidden" />
+                      <FaAnglesRight size={25} className="hidden 2xl:block" />
                     </div>
                   )}
                   <div>
-                    <TbReportSearch size={25} />
+                    <TbReportSearch size={25} className="2xl:hidden" />
+                    <TbReportSearch size={30} className="hidden 2xl:block" />
                   </div>
                   <div>Reports</div>
                 </div>
               </Link>
               <Link to="/ioclSettings">
                 <div
-                  className={`  flex items-center gap-2 py-2 2xl:py-4 px-2 rounded-lg hover:bg-white hover:text-[#f47424] duration-200 ${
+                  className={`  flex items-center gap-2 py-2 2xl:py-5 px-2 rounded-lg hover:bg-white hover:text-[#f47424] duration-200 ${
                     location.pathname === "/ioclSettings"
                       ? "bg-white text-[#f47424]"
                       : ""
@@ -112,23 +121,29 @@ const IoclSidebar = () => {
                 >
                   {location.pathname === "/ioclSettings" && (
                     <div className="text-[#f47424]">
-                      <FaAnglesRight size={20} />
+                      <FaAnglesRight size={20} className="2xl:hidden" />
+                      <FaAnglesRight size={25} className="hidden 2xl:block" />
                     </div>
                   )}
                   <div>
-                    <MdOutlineSettings size={25} />
+                    <MdOutlineSettings size={25} className="2xl:hidden" />
+                    <MdOutlineSettings size={30} className="hidden 2xl:block" />
                   </div>
                   <div>Settings</div>
                 </div>
               </Link>
             </div>
             <div className="flex flex-col items-center justify-center gap-2 min-h-[20%]  p-4">
-              <div className="text-sm text-center">
+              <div className="text-sm 2xl:text-lg text-center">
                 {" "}
                 &copy; All Rights Reserved By
               </div>
               <div>
-                <img src={xymaLogo} className="max-w-[100px]" alt="xymaLogo" />
+                <img
+                  src={xymaLogo}
+                  className="max-w-[100px] 2xl:max-w-[150px]"
+                  alt="xymaLogo"
+                />
               </div>
             </div>
           </div>

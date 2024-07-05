@@ -1,5 +1,5 @@
-import React from 'react'
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react'
+import { Link, useSearchParams } from 'react-router-dom';
 import IoclSidebar from './IoclSidebar';
 import {
   Chart as ChartJS,
@@ -7,55 +7,101 @@ import {
   CategoryScale,
   LinearScale,
   Tooltip,
-  Legend
+  Legend,
+  scales
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { Bar } from 'react-chartjs-2';
 import { LiaChartLineSolid } from "react-icons/lia";
+import { BsThermometerHalf } from "react-icons/bs";
+import { FaHistory } from "react-icons/fa";
 import ioclLogo from "../Assets/ioclRound.png";
 import xymaLogo from '../Assets/xyma.png';
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
-const IoclMainPage = () => {
+const IoclMainPage = (dataFromApp) => {
 
-  // line chart data
-  const lineData = {
-    labels: ["10", "20", "30", "40","50"],
-    datasets: [
-      {
-        label: "Dataset 1",
-        data: [65, 59, 80, 81, 56],
-        borderColor: "rgb(75, 192, 192)",
-        backgroundColor: "rgba(75, 192, 192, 0.2)",
-      },
-      {
-        label: "Dataset 2",
-        data: [45, 49, 60, 71, 46],
-        borderColor: "rgb(255, 99, 132)",
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
-      },
-      {
-        label: "Dataset 3",
-        data: [35, 39, 50, 61, 36],
-        borderColor: "rgb(54, 162, 235)",
-        backgroundColor: "rgba(54, 162, 235, 0.2)",
-      },
-    ],
+  const [lineData, setLineData] = useState({
+    labels:[],
+    datasets: []
+  });
+  // const [selectedLineLimit, setSelectedLineLimit] = useState(100);
+  
+
+  const handleLineLimit = (e) => {
+    const limit = parseInt(e.target.value);
+    // setSelectedLineLimit(limit);
+    localStorage.setItem("IOCLLimit", limit.toString());
   };
+
+  
+
+  useEffect(() => {
+    console.log("data from app file", dataFromApp.dataFromApp);
+    if (
+      Array.isArray(dataFromApp.dataFromApp) &&
+      dataFromApp.dataFromApp.length > 0
+    ) {
+      const reversedData = [...dataFromApp.dataFromApp].reverse();
+
+      const lineLabels = reversedData.map((item) => {
+        const createdAt = new Date(item.createdAt).toLocaleString('en-GB');
+        return createdAt;
+       });
+      const sensor1Data = reversedData.map((item) => item.Sensor1);
+      const sensor2Data = reversedData.map((item) => item.Sensor2);
+      const sensor3Data = reversedData.map((item) => item.Sensor3);
+
+      setLineData({
+        labels: lineLabels,
+        datasets: [
+          {
+            label: "Sensor 1",
+            data: sensor1Data,
+            borderColor: "rgb(255, 99, 132)",
+            backgroundColor: "rgba(255, 99, 132, 0.2)",
+          },
+          {
+            label: "Sensor 2",
+            data: sensor2Data,
+            borderColor: "rgb(54, 162, 235)",
+            backgroundColor: "rgba(54, 162, 235, 0.2)",
+          },
+          {
+            label: "Sensor 3",
+            data: sensor3Data,
+            borderColor: "rgb(75, 192, 192)",
+            backgroundColor: "rgba(75, 192, 192, 0.2)",
+          },
+        ],
+      });
+    }
+  }, [dataFromApp]);
+
+  console.log('line data',lineData);
 
   const lineOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: "top",
+        position: "left",
       },
       title: {
         display: true,
         text: "Sensor Temperature Measurement",
       },
     },
+      scales: {
+        x: {
+          ticks: {
+            font: {
+              size: 6
+            }
+          }
+        }
+      }
   };
 
   // bar chart data
@@ -71,12 +117,14 @@ const IoclMainPage = () => {
           "rgba(255, 206, 86, 0.6)",
         ],
         borderWidth: 1,
+        barPercentage: 1,
+        categoryPercentage: 1
       },
     ],
   };
 
    const barOptions = {
-     indexAxis: "y",
+     indexAxis: "x",
      responsive: true,
      maintainAspectRatio: false,
      plugins: {
@@ -107,10 +155,10 @@ const IoclMainPage = () => {
             <img src={ioclLogo} alt="iocl" className="max-h-8" />
             <img src={xymaLogo} alt="xyma" className="max-h-8" />
           </div>
-          <div className="font-semibold">IOCL Dashboard</div>
-          <Link to="/login">
+          <div className="font-semibold text-[#08174e]">IOCL Dashboard</div>
+          <Link to="/login" className="hover:scale-110 duration-200">
             <span
-              className=" py-1 px-2 text-white font-medium text-sm rounded-md"
+              className=" py-1 px-2 2xl:py-2 2xl:px-4 text-white font-medium text-sm 2xl:text-lg rounded-md "
               style={{
                 background: "linear-gradient(90deg, #f22213 0%, #f03f32 100%)",
               }}
@@ -118,6 +166,7 @@ const IoclMainPage = () => {
                 localStorage.removeItem("Project");
                 localStorage.removeItem("token");
                 localStorage.removeItem("Controles");
+                localStorage.removeItem("IOCLLimit");
               }}
             >
               Logout
@@ -128,45 +177,94 @@ const IoclMainPage = () => {
         {/* content */}
         <div className="xl:flex md:h-[95%]  ">
           {/* cards */}
-          <div className="w-full xl:w-[20%] md:h-[20%] xl:h-auto flex flex-col gap-2 p-2 text-white">
+          <div className="w-full xl:w-[20%] md:h-[20%] xl:h-auto flex flex-col gap-2 p-2 text-white font-medium">
             <div className="h-1/2 flex flex-col md:flex-row xl:flex-col gap-2">
               <div
-                className="xl:h-1/2 md:w-1/2 xl:w-auto rounded-md p-4"
+                className="xl:h-1/2 md:w-1/2 xl:w-auto rounded-md 2xl:rounded-xl p-4 flex justify-center items-center"
                 style={{
                   background:
                     "linear-gradient(90deg, rgba(2,22,79,255) 0%, #02306b 100%)",
                 }}
               >
-                Sensor 1
+                <BsThermometerHalf size={35} className="md:hidden" />
+                <BsThermometerHalf
+                  size={45}
+                  className="hidden md:block 2xl:hidden"
+                />
+                <BsThermometerHalf size={65} className="hidden 2xl:block" />
+                <div className="flex gap-2 md:flex-col md:gap-0">
+                  <div>Sensor 1:</div>
+                  <div>
+                    {dataFromApp.dataFromApp.length > 0 &&
+                      dataFromApp.dataFromApp[0].Sensor1}{" "}
+                    °C
+                  </div>
+                </div>
               </div>
               <div
-                className="xl:h-1/2 md:w-1/2 xl:w-auto rounded-md p-4"
+                className="xl:h-1/2 md:w-1/2 xl:w-auto rounded-md 2xl:rounded-xl p-4 flex justify-center items-center"
                 style={{
                   background:
                     "linear-gradient(90deg, rgba(2,22,79,255) 0%, #02306b 100%)",
                 }}
               >
-                Sensor 2
+                <BsThermometerHalf size={35} className="md:hidden" />
+                <BsThermometerHalf
+                  size={45}
+                  className="hidden md:block 2xl:hidden"
+                />
+                <BsThermometerHalf size={65} className="hidden 2xl:block" />
+                <div className="flex gap-2 md:flex-col md:gap-0">
+                  <div>Sensor 2:</div>
+                  <div>
+                    {dataFromApp.dataFromApp.length > 0 &&
+                      dataFromApp.dataFromApp[0].Sensor1}{" "}
+                    °C
+                  </div>
+                </div>
               </div>
             </div>
             <div className="h-1/2 flex flex-col md:flex-row xl:flex-col gap-2">
               <div
-                className="xl:h-1/2 md:w-1/2 xl:w-auto rounded-md p-4"
+                className="xl:h-1/2 md:w-1/2 xl:w-auto rounded-md 2xl:rounded-xl p-4 flex justify-center items-center"
                 style={{
                   background:
                     "linear-gradient(90deg, rgba(2,22,79,255) 0%, #02306b 100%)",
                 }}
               >
-                Sensor 3
+                <BsThermometerHalf size={35} className="md:hidden" />
+                <BsThermometerHalf
+                  size={45}
+                  className="hidden md:block 2xl:hidden"
+                />
+                <BsThermometerHalf size={65} className="hidden 2xl:block" />
+                <div className="flex gap-2 md:flex-col md:gap-0">
+                  <div>Sensor 3:</div>
+                  <div>
+                    {dataFromApp.dataFromApp.length > 0 &&
+                      dataFromApp.dataFromApp[0].Sensor1}{" "}
+                    °C
+                  </div>
+                </div>
               </div>
               <div
-                className="xl:h-1/2 md:w-1/2 xl:w-auto rounded-md p-4"
+                className="xl:h-1/2 md:w-1/2 xl:w-auto rounded-md 2xl:rounded-xl p-4 flex md:flex-col gap-2 md:gap-1 justify-center items-center"
                 style={{
                   background:
                     "linear-gradient(90deg, rgba(2,22,79,255) 0%, #02306b 100%)",
                 }}
               >
-                Last Update
+                <div className="flex items-center gap-2">
+                  <FaHistory size={25} className="2xl:hidden" />
+                  <FaHistory size={35} className="hidden 2xl:block" />
+                  <div>Last Update:</div>
+                </div>
+                <div>
+                  {dataFromApp.dataFromApp.length > 0 &&
+                    new Date(
+                      dataFromApp.dataFromApp[0].createdAt
+                    ).toLocaleString("en-GB")}
+                </div>
               </div>
             </div>
           </div>
@@ -174,10 +272,10 @@ const IoclMainPage = () => {
           {/* graphs and table */}
           <div className="w-full xl:w-[80%] md:h-[80%] xl:h-auto  p-2 flex flex-col gap-2">
             {/* line graph */}
-            <div className="md:h-[50%] lg:h-[60%] bg-white flex flex-col rounded-md">
+            <div className="md:h-[50%] lg:h-[60%] bg-white flex flex-col rounded-md overflow-x-auto">
               <div className="flex justify-between">
                 <div
-                  className="py-1 px-2 flex flex-1 text-white rounded-tl-md"
+                  className="py-1 px-2 2xl:py-2 2xl:px-4 flex flex-1 text-white rounded-tl-md font-medium"
                   style={{
                     background:
                       "linear-gradient(90deg, rgba(2,22,79,255) 0%, #02306b 100%)",
@@ -186,7 +284,7 @@ const IoclMainPage = () => {
                   Line Representation of Temperature
                 </div>
                 <div
-                  className=" py-1 px-2  text-[#08174e] rounded-tr-md"
+                  className=" py-1 px-2 2xl:py-2 2xl:px-4 flex justify-center items-center text-[#08174e] rounded-tr-md"
                   style={{
                     background:
                       "linear-gradient(90deg, #f47424 0%, #f58a47 100%)",
@@ -195,15 +293,77 @@ const IoclMainPage = () => {
                   <LiaChartLineSolid size={20} />
                 </div>
               </div>
-              <div className="flex flex-1  rounded-b-md px-2">
+
+              <div className="flex items-center px-2 py-1 text-sm font-medium">
+                <div className="mr-2">Set Limit:</div>
+                <input
+                  type="radio"
+                  id="option1"
+                  name="options"
+                  value={100}
+                  className="cursor-pointer mt-0.5"
+                  defaultChecked
+                  onChange={handleLineLimit}
+                />
+                <label htmlFor="option1" className="mr-2 cursor-pointer">
+                  100
+                </label>
+                <input
+                  type="radio"
+                  id="option2"
+                  name="options"
+                  value={500}
+                  className="cursor-pointer mt-0.5"
+                  onChange={handleLineLimit}
+                />
+                <label htmlFor="option2" className="mr-2 cursor-pointer">
+                  500
+                </label>
+                <input
+                  type="radio"
+                  id="option3"
+                  name="options"
+                  value={1000}
+                  className="cursor-pointer mt-0.5"
+                  onChange={handleLineLimit}
+                />
+                <label htmlFor="option3" className="mr-2 cursor-pointer">
+                  1000
+                </label>
+                <input
+                  type="radio"
+                  id="option4"
+                  name="options"
+                  value={1500}
+                  className="cursor-pointer mt-0.5"
+                  onChange={handleLineLimit}
+                />
+                <label htmlFor="option4" className="mr-2 cursor-pointer">
+                  1500
+                </label>
+                <input
+                  type="radio"
+                  id="option5"
+                  name="options"
+                  value={2000}
+                  className="cursor-pointer mt-0.5"
+                  onChange={handleLineLimit}
+                />
+                <label htmlFor="option5" className="mr-2 cursor-pointer">
+                  2000
+                </label>
+              </div>
+
+              <div className="flex flex-1 rounded-b-md px-2 w-[30000px]">
                 <Line data={lineData} options={lineOptions} width={"100%"} />
               </div>
             </div>
+
             <div className="md:h-[50%] lg:md:h-[40%] flex flex-col-reverse md:flex-row gap-2 ">
               {/* table */}
               <div
                 className="w-full md:w-1/2 h-60 md:h-auto bg-white overflow-auto rounded-md mb-[6vh] md:mb-[8vh] lg:mb-0"
-                style={{ scrollbarWidth: "none" }}
+                // style={{ scrollbarWidth: "none" }}
               >
                 <table className=" w-full text-center">
                   <thead
@@ -214,126 +374,35 @@ const IoclMainPage = () => {
                     }}
                   >
                     <tr className="">
-                      <th className="w-1/5 p-1">S.No</th>
-                      <th className="w-1/5 p-1">Sensor&nbsp;1</th>
-                      <th className="w-1/5 p-1">Sensor&nbsp;2</th>
-                      <th className="w-1/5 p-1">Sensor&nbsp;3</th>
-                      <th className="w-1/5 p-1">Last&nbsp;Updated</th>
+                      <th className="w-1/5 p-1 2xl:p-2">S.No</th>
+                      <th className="w-1/5 p-1 2xl:p-2">Sensor&nbsp;1</th>
+                      <th className="w-1/5 p-1 2xl:p-2">Sensor&nbsp;2</th>
+                      <th className="w-1/5 p-1 2xl:p-2">Sensor&nbsp;3</th>
+                      <th className="w-1/5 p-1 2xl:p-2">Last&nbsp;Updated</th>
                     </tr>
                   </thead>
 
                   <tbody className="text-xs md:text-sm">
-                    <tr className=" ">
-                      <td>1</td>
-                      <td>55</td>
-                      <td>65</td>
-                      <td>75</td>
-                      <td>1</td>
-                    </tr>
-                    <tr className=" ">
-                      <td>2</td>
-                      <td>55</td>
-                      <td>65</td>
-                      <td>75</td>
-                      <td>1</td>
-                    </tr>
-                    <tr className=" ">
-                      <td>3</td>
-                      <td>55</td>
-                      <td>65</td>
-                      <td>75</td>
-                      <td>1</td>
-                    </tr>
-                    <tr className=" ">
-                      <td>4</td>
-                      <td>55</td>
-                      <td>65</td>
-                      <td>75</td>
-                      <td>1</td>
-                    </tr>
-                    <tr className=" ">
-                      <td>5</td>
-                      <td>55</td>
-                      <td>65</td>
-                      <td>75</td>
-                      <td>1</td>
-                    </tr>
-                    <tr className=" ">
-                      <td>6</td>
-                      <td>55</td>
-                      <td>65</td>
-                      <td>75</td>
-                      <td>1</td>
-                    </tr>
-                    <tr className=" ">
-                      <td>7</td>
-                      <td>55</td>
-                      <td>65</td>
-                      <td>75</td>
-                      <td>1</td>
-                    </tr>
-                    <tr className=" ">
-                      <td>8</td>
-                      <td>55</td>
-                      <td>65</td>
-                      <td>75</td>
-                      <td>1</td>
-                    </tr>
-                    <tr className=" ">
-                      <td>9</td>
-                      <td>55</td>
-                      <td>65</td>
-                      <td>75</td>
-                      <td>1</td>
-                    </tr>
-                    <tr className=" ">
-                      <td>10</td>
-                      <td>55</td>
-                      <td>65</td>
-                      <td>75</td>
-                      <td>1</td>
-                    </tr>
-                    <tr className=" ">
-                      <td>11</td>
-                      <td>55</td>
-                      <td>65</td>
-                      <td>75</td>
-                      <td>1</td>
-                    </tr>
-                    <tr className=" ">
-                      <td>12</td>
-                      <td>55</td>
-                      <td>65</td>
-                      <td>75</td>
-                      <td>1</td>
-                    </tr>
-                    <tr className=" ">
-                      <td>13</td>
-                      <td>55</td>
-                      <td>65</td>
-                      <td>75</td>
-                      <td>1</td>
-                    </tr>
-                    <tr className=" ">
-                      <td>14</td>
-                      <td>55</td>
-                      <td>65</td>
-                      <td>75</td>
-                      <td>1</td>
-                    </tr>
-                    <tr className=" ">
-                      <td>15</td>
-                      <td>55</td>
-                      <td>65</td>
-                      <td>75</td>
-                      <td>1</td>
-                    </tr>
+                    {dataFromApp.dataFromApp.length > 0 &&
+                      dataFromApp.dataFromApp.map((data, index) => (
+                        <tr>
+                          <td className='border border-black '>{index + 1}</td>
+                          <td className='border border-black '>{data.Sensor1}</td>
+                          <td className='border border-black '>{data.Sensor2}</td>
+                          <td className='border border-black '>{data.Sensor3}</td>
+                          <td className='text-[10px] border border-black '>
+                            {new Date(
+                              data.createdAt
+                            ).toLocaleString("en-GB")}
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               </div>
               <div className="w-full md:w-1/2 flex flex-col  bg-white rounded-md md:mb-[8vh] lg:mb-0">
                 <div
-                  className="py-1 px-2 text-white rounded-t-md"
+                  className="py-1 px-2 2xl:py-2 2xl:px-4 text-white rounded-t-md font-medium"
                   style={{
                     background:
                       "linear-gradient(90deg, rgba(2,22,79,255) 0%, #02306b 100%)",

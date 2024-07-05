@@ -28,6 +28,8 @@ import IoclGraphs from './Component/Iocl/IoclGraphs';
 import IoclReports from './Component/Iocl/IoclReports';
 import IoclSettings from './Component/Iocl/IoclSettings';
 
+let limit = 0;
+
 const App = () => {
 const [Tof_data,setTofdata]=useState('')
 const [projectData, setProjectData] = useState([]);
@@ -36,6 +38,15 @@ const[ReportData,setReportData]=useState([]);
 const [ioclData, setIoclData] = useState([]);
 
   let controls =localStorage.getItem("Controles");
+
+  // localStorage.setItem('IOCLLimit', '100');
+
+  
+  if(limit === 0) {
+
+    localStorage.setItem("IOCLLimit", "100");
+    limit +=1;
+  }
 
 
   useEffect(()=>{
@@ -46,7 +57,7 @@ const [ioclData, setIoclData] = useState([]);
   const data = setInterval(fetch_tof_fata,2000);
   const sensors =setInterval(fetchProductData,5000);
   const chartdata =setInterval(chartdatafetch,2000);
-  const ioclData = setInterval(getIOCLData,5000);
+  const ioclData = setInterval(getIOCLData,2000);
   return()=>{
     clearInterval(data);
     clearInterval(sensors);
@@ -144,7 +155,8 @@ const chartdatafetch =async()=>{
 
 const getIOCLData = async () => {
   try {
-    const response = await axios.get('http://localhost:4000/sensor/getIOCLData');
+    const ioclLimit = localStorage.getItem('IOCLLimit');
+    const response = await axios.get(`http://localhost:4000/sensor/getIOCLData?limit=${ioclLimit}`);
     if(response.data.success) {
       setIoclData(response.data.data);
     } else {
@@ -186,7 +198,7 @@ const getIOCLData = async () => {
           ) : null}
           {controls === "IOCL" ? (
             <Route path="/" element={<IoclOutlet />}>
-              <Route index element={<IoclMainPage />} />
+              <Route index element={<IoclMainPage dataFromApp={ioclData}/>} />
               <Route path="ioclGraphs" element={<IoclGraphs />} />
               <Route path="ioclReports" element={<IoclReports />} />
               <Route path="ioclSettings" element={<IoclSettings />} />
