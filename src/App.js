@@ -28,7 +28,7 @@ import IoclGraphs from './Component/Iocl/IoclGraphs';
 import IoclReports from './Component/Iocl/IoclReports';
 import IoclSettings from './Component/Iocl/IoclSettings';
 
-let limit = 0;
+// let iocl = 0;
 
 const App = () => {
 const [Tof_data,setTofdata]=useState('')
@@ -37,16 +37,31 @@ const[chartdata,setChartData]=useState([]);
 const[ReportData,setReportData]=useState([]);
 const [ioclData, setIoclData] = useState([]);
 
+const getInitialCondition = () => {
+  const storedLimit = localStorage.getItem("IOCLLimit");
+  return storedLimit ? 1 : 0;
+}
+
+const [ioclCondition, setIoclCondition] = useState(getInitialCondition);
+
   let controls =localStorage.getItem("Controles");
+
+  useEffect(() => {
+    if(ioclCondition === 0) {
+      localStorage.setItem('IOCLLimit', "100");
+      setIoclCondition(1);
+    }
+  }, []);
+
 
   // localStorage.setItem('IOCLLimit', '100');
 
   
-  if(limit === 0) {
+  // if(iocl === 0) {
 
-    localStorage.setItem("IOCLLimit", "100");
-    limit +=1;
-  }
+  //   localStorage.setItem("IOCLLimit", "100");
+  //   iocl +=1;
+  // }
 
 
   useEffect(()=>{

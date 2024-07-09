@@ -7,7 +7,7 @@ const Source_Outlet = () => {
         <div>
             <Sidebar/>
         </div>
-         <div className='w-full md:w-[96%]'>
+         <div className='w-full'>
              <Outlet>
              </Outlet>
         </div>

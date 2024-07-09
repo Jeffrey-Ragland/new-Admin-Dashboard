@@ -169,7 +169,7 @@ const handleSubmit = async(e) =>
                 (
                   <div className='flex mb-1' key={parameterIndex}>
                     <label className='w-1/2' htmlFor={`parameter${parameterIndex}`}>Parameter {parameterIndex}</label>
-                    <input type='text' id={`parameter${parameterIndex}`} name={`parameter${parameterIndex}`} autoComplete='off' className='border border-black w-1/2 rounded-md px-2' ></input>
+                    <input type='text' id={`parameter${parameterIndex}`} name={`parameter${parameterIndex}`} autoComplete='off' required className='border border-black w-1/2 rounded-md px-2' ></input>
                   </div>
                 ))}
             </div>

@@ -129,9 +129,7 @@ const MainPage = (all_sensor_data) => {
     };
 
   
-    const chartStyle = {
-        height: 250,
-      }
+    
 
 
 
@@ -221,247 +219,352 @@ const MainPage = (all_sensor_data) => {
   );
   return (
     <>
-    <div className='flex'>
-        <div className='w-full'>
-            <div>
-                <Navbar/>
-            </div>
-            {/* main content */}
-            <div className='px-2'>
-                <div className='sm:flex sm:h-[41vh] 2xl:h-[44vh] xxs:h-screen gap-4 mb-4'>
-                <div className='sm:w-1/2 xxs:h-1/2 sm:h-full w-full'>
-                    <div className='h-[15%] bg-gray-600 flex justify-between align-middle'>
-                            <div className='flex justify-center items-center'>
-                                <h5 className='font-bold text-white ml-2'>Sensor Data</h5>
-                            </div>
-                            <div className='bg-[#e9903d] flex items-center justify-center w-[5%] rounded-sm m-1 '>
-                                <MdOutlineSensors  className='text-white'/>
-                            </div>
-                    </div>
-                    <div className='h-[85%] bg-gray-500 grid grid-cols-3 gap-2 p-2 overflow-auto shadow-ls' style={customScrollbarStyle} >
-                        {Object.keys(cardData)
-                        .filter(key => key !== '_id' && key !== '__v' && key !== 'Time')
-                        .map(key =>(
-                           
-                            <div key={key} className='grid grid-rows-2 h-[15vh] font-medium border-2 bg-[#fcb599] text-gray-700 hover:scale-105 duration-200 cursor-pointer shadow-lg  rounded-md'>
-                                <div className='flex justify-center items-center'>
-                                    <div className=''>
-                                        <FaTemperatureArrowDown className='text-2xl mt-2 mr-4'/>
-                                    </div>
-                                    <div className='text-2xl font-bold'>
-                                        {`${cardData[key]}`}
-                                    </div>
-                                </div>
-                                <div className='flex items-center justify-center'>
-                                    {`${key} `}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                </div>
-                    
-                    <div className='sm:w-1/2 xxs:h-1/2 sm:h-full mb-4 flex gap-2'>
-                        {/* pie chart */}
-                        <div className='w-1/2 shadow-xl '>
-                            <div className='h-[15%] bg-gray-600 flex justify-between align-middle'>
-                                <div className='flex justify-center items-center'>
-                                    <h5 className='font-bold text-white ml-2'>Pie Visualization</h5>
-                                </div>
-                                <div className='bg-[#e9903d] flex items-center justify-center w-[10%] rounded-sm m-1 '>
-                                    <FaChartPie   className='text-white'/>
-                                </div>
-                            </div>
-                            <div className='h-[85%] bg-gray-500'>
-                                <div className='h-6/6'>
-                                    <Chart chartType='PieChart' width={'100%'} height={'100%'} data={pieData} options={pieOptions}/>
-                                </div> 
-                            </div>
-                        </div>
-                        <div className='w-1/2 flex flex-col'>
-                            <div className='h-[15%] bg-gray-600 flex justify-between align-middle'>
-                                <div className='flex justify-center items-center'>
-                                    <h5 className='font-bold text-white ml-2'>Device Info</h5>
-                                </div>
-                                <div className='bg-[#e9903d] flex items-center justify-center w-[10%] rounded-sm m-1 '>
-                                    <MdInfo   className='text-white'/>
-                                </div>
-                            </div>
-                            <div className='h-1/2 bg-gray-500 flex  flex-col gap-2 p-1 shadow-xl'>
-                                <div className='flex gap-4 justify-around'>
-                                    <div className='flex font-bold'>
-                                        {
-                                            activeStatus === 'ACTIVE' ? 
-                                            <div className='mr-1 text-green-500'><IoMdCheckmarkCircleOutline size={25}/></div> :
-                                            <div className='mr-1'><AiOutlineWarning size={25}/></div> 
-                                        }
-                                        <div className='text-green-500'>{activeStatus}</div>
-                                    </div>
-                                    <div className='flex gap-1'>
-                                        <div className='flex items-center justify-center'>
-                                            <div className='flex items-center font-bold text-[#fc5050]'>NOS:</div>
-                                        </div>
-                                        <div className='flex justify-center text-[#ffffff] items-center font-bold'>
-                                            {leftoverKeys}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div>
-                                <div className='flex justify-center text-xs'>
-                                        <div className='mr-1 text-[#fff347]'><MdOutlineManageHistory size={25}/></div>
-                                        <div className='flex items-center font-bold text-[#fff347] border-b pb-0  border-white'>RECENT UPDATE</div>
-                                    </div>
-                                    <div className='flex justify-center items-center font-bold text-xs'>{lastUpdated}</div>
-                                </div>
-                                
-                            </div>
-                            {/* peak value */}
-                            <div className='h-1/2 mt-1 bg-gray-500 overflow-auto p-1 shadow-xl' style={customScrollbarStyle}>
-                                <div className='flex items-start justify-start text-[#ffa24c]'>
-                                    <div className='mr-1'><FaThinkPeaks size={20}/></div>
-                                    <div className='text-xs font-bold border-b pb-0  border-white'>PEAK VALUE</div>
-                                </div>
-                                {
-                                    peakValues.map((peak, index) =>(
-                                        <div key={index} className='rounded-md cursor-pointer hover:scale-[1.02] duration-200 h-1/3 mt-2 text-gray-700 flex justify-around items-center font-medium'>
-                                            <div className='text-white font-bold'>
-                                                {`${peak.key}`}
-                                            </div>
-                                            <div className='mt-4 data' >
-                                                <ReactSpeedometer height={100} width={140}  style={chartStyle}  maxValue={(peak.value)+200}
-                                                    value={peak.value}
-                                                    needleColor="white"
-                                                    startColor="green"
-                                                    arcsLength={[0.3, 0.5, 0.2]}
-                                                    // forceRender={true}
-                                                    maxSegmentLabels={5}
-                                                    needleHeightRatio={0.7}
-                                                    endColor="red"
-                                                    valueTextFillColor="white"
-                                                  
-                                                    
-                                                />
-                                            </div>
-                                        </div>
-                                    ))
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className='sm:flex sm:h-[41vh] 2xl:h-[44vh] xxs:h-screen gap-4 mb-4'>
-                    <div className='sm:w-1/2 xxs:h-1/2 sm:h-full mb-2  bg-gray-500 w-full scrollbar-hide  shadow-xl overflow-auto px-2'>
-                    <table className='w-full'>
-                                <thead className='sticky top-0 bg-gray-600'>
-                                    <tr>
-                                        <th className='border text-white border-black'>S.No</th>
-                                        {
-                                        Object.keys(cardData)
-                                        .filter(key => key !== '_id' && key !== '__v' && key !== 'Time')
-                                        .map((key) => (
-                                            <th key={key} className='text-white border border-black'> {key} </th>
-                                        ))
-                                    }
-                                       
-                                        <th className='border text-white border-black'>Updated At</th>
-                                    </tr>
-                                </thead>
-                                <tbody className='text-xs'>
-                                    {
-                                        alldata
-                                        .map((item,index) => (
-                                            <tr key={index}>
-                                                <td className='border border-black text-center'>{index + 1}</td>
-                                                {Object.keys(item)
-                                                .filter(key => !['_id', 'Time', '__v'].includes(key))
-                                                .map((key, i) => (
-                                                    <td key={i} className='border border-black text-center'>{item[key]}</td>
-                                                ))}
-                                                <td className='border border-black text-center'>{item.Time}</td>
-                                            </tr>
-                                        ))
-                                    }
-                                </tbody>
-                            </table>
-                        
-                    </div>
-                    {/* line graph */}
-                    <div className='sm:w-1/2 xxs:h-1/2 sm:h-full mb-4 shadow-lg'>
-                        <div className='h-[15%] bg-gray-600 flex justify-between align-middle'>
-                            <div className='flex justify-center items-center'>
-                                <h5 className='font-bold text-white ml-2'>Peak Analysis</h5>
-                            </div>
-                            <div>
-                                <div>
-                                
-                                </div>
-                            </div>
-    
-                            <div className='bg-[#e9903d] flex items-center justify-center w-[5%] rounded-sm m-1 '>
-                
-                                <FaChartArea  className='text-white'/>
-                            </div>
-                        </div>
-                        <div className='h-[85%] bg-gray-500'>
-                            <div className='flex justify-around pt-1'>
-                                <div className='flex gap-2 w-[88%] overflow-auto' style={{scrollbarWidth : 'none'}}>
-                                    {
-                                        Object.keys(cardData)
-                                        .filter(key => key !== '_id' && key !== '__v' && key !== 'Time')
-                                        .map((key,index) => (
-                                            <div key={key}  className=' text-white-700 flex text-xs font-medium rounded-md'>
-                                                {/* <div className='rounded-full border border-black h-2 w-2 mt-[5px] mr-1'></div> */}
-                                                <input id={key} type='checkbox' className='cursor-pointer'
-                                                onChange={() =>handleKeyClick(key)}
-                                                checked={index === 0 && selectedKey.length === 0 ? true : selectedKey.includes(key)}></input>
-                                                <div className='flex items-center'>{`${key}`}</div>
-                                            </div>
-                                        ))
-                                    }
-                                </div>
-                                <select id='limit' value={limit} onChange={handleLimitChange} className='text-xs  rounded-xl font-medium cursor-pointer'>
-                                    <option value='25'>25</option>
-                                    <option value='50'>50</option>
-                                    <option value='75'>75</option>
-                                    <option value='100'>100</option>
-                                </select>
-                            </div>
-                            <div className='flex'>
-                                {/* <div className="vertical-text w-[4%]" > */}
-                                <div>
-                                <ReactSlider
-                                    className="w-10 h-[95%] flex justify-center items-center"
-                                    thumbClassName="w-5 h-50 bg-[#2d2d2d] rounded-full flex items-center justify-center cursor-pointer text-white font-medium text-xs hover:scale-110"
-                                    trackClassName="w-1 rounded-full bg-gray-300"
-                                    min={0}
-                                    max={1000}
-                                    defaultValue={[0, 1000]}
-                                    renderThumb={(props, state) => (
-                                        <div {...props}>{state.valueNow}</div>
-                                    )}
-                                    pearling
-                                    minDistance={5}
-                                    orientation="vertical"
-                                    invert
-                                    onChange={(value) => handleLineSliderChange(value)}
-                                    />
-                                </div>
-                            
-                               
-                                <div className='w-full'>
-                                    <Line data={data} height={100} options={options}>
-                                    </Line> 
-                                </div>                         
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+      <div className="xl:h-screen flex flex-col">
+        <div className="h-[7%]">
+          <Navbar />
         </div>
-    </div>
-</>
-  )
+        {/* main content */}
+        <div className="flex flex-col h-[93%] gap-2 p-2 pb-4">
+          {/* top section */}
+          <div className="flex gap-2 h-1/2">
+            {/* section 1 - cards */}
+            <div className="w-1/2 flex flex-col shadow-lg shadow-gray-600">
+              <div className="flex text-white">
+                <div className="bg-gray-700 flex-1 p-1 font-medium">
+                  Sensor Data
+                </div>
+                <div className="p-1 bg-[#e9903d] text-2xl flex justify-center items-center">
+                  <MdOutlineSensors />
+                </div>
+              </div>
+              <div
+                className="grid grid-cols-3 gap-2 p-2 flex-1 overflow-auto"
+                style={{
+                  background:
+                    "linear-gradient(180deg, #737780 0%, #6c7587 100%)",
+                  scrollbarWidth: "thin",
+                  scrollbarColor: "#4B5563 transparent",
+                }}
+              >
+                {Object.keys(cardData)
+                  .filter(
+                    (key) => key !== "_id" && key !== "__v" && key !== "Time"
+                  )
+                  .map((key) => (
+                    <div
+                      key={key}
+                      className="font-medium border-2 bg-[#fcb599] text-gray-700 rounded-md h-28 flex flex-col items-center justify-center"
+                    >
+                      <div className="flex justify-center items-center text-2xl font-bold">
+                        <div className="text-3xl">
+                          <FaTemperatureArrowDown />
+                        </div>
+                        <div>{`${cardData[key]}`}</div>
+                      </div>
+                      <div className="flex items-center justify-center">
+                        {`${key} `}
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+
+            {/* section 2 */}
+            <div className="flex gap-2 w-1/2">
+              {/* pie chart */}
+              <div className="h-full w-1/2 flex flex-col shadow-lg shadow-gray-600">
+                <div className="flex text-white">
+                  <div className="bg-gray-700 flex-1 p-1 font-medium">
+                    Pie Visualization
+                  </div>
+                  <div className="p-1 bg-[#e9903d] text-xl flex items-center justify-center">
+                    <FaChartPie />
+                  </div>
+                </div>
+                <div
+                  className="flex-1"
+                  style={{
+                    background:
+                      "linear-gradient(180deg, #737780 0%, #6c7587 100%)",
+                  }}
+                >
+                  <Chart
+                    chartType="PieChart"
+                    width={"100%"}
+                    height={"100%"}
+                    data={pieData}
+                    options={pieOptions}
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col gap-2 w-1/2">
+                {/* last update */}
+                <div className="h-1/2 flex flex-col shadow-lg shadow-gray-600">
+                  <div className="flex text-white">
+                    <div className="bg-gray-700 flex-1 p-1 font-medium">
+                      Device Info
+                    </div>
+                    <div className="p-1 bg-[#e9903d] text-xl flex items-center justify-center">
+                      <MdInfo />
+                    </div>
+                  </div>
+                  <div
+                    className="flex-1 p-1 flex flex-col gap-2"
+                    style={{
+                      background:
+                        "linear-gradient(180deg, #737780 0%, #6c7587 100%)",
+                    }}
+                  >
+                    <div className="h-[40%] flex gap-1 font-medium">
+                      <div
+                        className="flex justify-center items-center gap-2 w-1/2 rounded-md"
+                        style={{
+                          background:
+                            "linear-gradient(180deg, #e3ebfc 0%, #ccd3e3 100%)",
+                        }}
+                      >
+                        {activeStatus === "ACTIVE" ? (
+                          <div className="text-green-500">
+                            <IoMdCheckmarkCircleOutline className="text-xl" />
+                          </div>
+                        ) : (
+                          <div>
+                            <AiOutlineWarning className="text-xl" />
+                          </div>
+                        )}
+                        <div className="text-green-500">{activeStatus}</div>
+                      </div>
+                      <div
+                        className="w-1/2 rounded-md font-bold flex gap-1 justify-center items-center text-[#fc5050]"
+                        style={{
+                          background:
+                            "linear-gradient(180deg, #e3ebfc 0%, #ccd3e3 100%)",
+                        }}
+                      >
+                        <div>NOS:</div>
+                        <div>{leftoverKeys}</div>
+                      </div>
+                    </div>
+                    <div
+                      className="h-[60%] rounded-md text-gray-700"
+                      style={{
+                        background:
+                          "linear-gradient(180deg, #e3ebfc 0%, #ccd3e3 100%)",
+                      }}
+                    >
+                      <div className="flex gap-1 justify-center items-center">
+                        <div className="mr-1 ">
+                          <MdOutlineManageHistory className="text-2xl" />
+                        </div>
+                        <div className="flex items-center font-bold  border-b pb-0  border-gray-600">
+                          RECENT UPDATE
+                        </div>
+                      </div>
+                      <div className="flex justify-center items-center font-bold text-xs">
+                        {lastUpdated}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {/* speedometer */}
+                <div className="h-1/2 flex flex-col shadow-lg shadow-gray-600">
+                  <div className="flex text-white">
+                    <div className="bg-gray-700 flex-1 p-1 font-medium">
+                      Peak Value
+                    </div>
+                    <div className="p-1 bg-[#e9903d] text-xl flex items-center justify-center">
+                      <FaThinkPeaks />
+                    </div>
+                  </div>
+                  <div
+                    className="flex-1 overflow-auto"
+                    style={{
+                      background:
+                        "linear-gradient(180deg, #737780 0%, #6c7587 100%)",
+                    }}
+                  >
+                    {peakValues.map((peak, index) => (
+                      <div
+                        key={index}
+                        className="flex justify-around items-center font-medium"
+                      >
+                        <div className="text-white font-bold">
+                          {`${peak.key}`}
+                        </div>
+                        <div>
+                          <ReactSpeedometer
+                            height={100}
+                            width={140}
+                            // style={chartStyle}
+                            maxValue={peak.value + 200}
+                            value={peak.value}
+                            needleColor="white"
+                            startColor="green"
+                            arcsLength={[0.3, 0.5, 0.2]}
+                            // forceRender={true}
+                            maxSegmentLabels={5}
+                            needleHeightRatio={0.7}
+                            endColor="red"
+                            valueTextFillColor="white"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* bottom section */}
+          <div className="flex gap-2 h-1/2">
+            {/* section 3 - table */}
+            <div
+              className="w-1/2 overflow-auto text-gray-200"
+              style={{
+                background: "linear-gradient(180deg, #737780 0%, #6c7587 100%)",
+                scrollbarWidth: "thin",
+                scrollbarColor: "#4B5563 transparent",
+              }}
+            >
+              <table className="w-full">
+                <thead className="sticky top-0 bg-gray-700">
+                  <tr>
+                    <th className="border text-white border-black">S.No</th>
+                    {Object.keys(cardData)
+                      .filter(
+                        (key) =>
+                          key !== "_id" && key !== "__v" && key !== "Time"
+                      )
+                      .map((key) => (
+                        <th
+                          key={key}
+                          className="text-white border border-black"
+                        >
+                          {key}
+                        </th>
+                      ))}
+
+                    <th className="border text-white border-black">
+                      Updated At
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="text-xs">
+                  {alldata.map((item, index) => (
+                    <tr key={index}>
+                      <td className="border border-black text-center">
+                        {index + 1}
+                      </td>
+                      {Object.keys(item)
+                        .filter((key) => !["_id", "Time", "__v"].includes(key))
+                        .map((key, i) => (
+                          <td
+                            key={i}
+                            className="border border-black text-center"
+                          >
+                            {item[key]}
+                          </td>
+                        ))}
+                      <td className="border border-black text-center">
+                        {item.Time}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* section 4 - line graph */}
+            <div className="w-1/2 flex flex-col">
+              <div className="flex text-white">
+                <div className="bg-gray-700 flex-1 p-1 font-medium">
+                  Line Plot
+                </div>
+                <div className="p-1 bg-[#e9903d] text-xl flex items-center justify-center">
+                  <FaChartArea />
+                </div>
+              </div>
+              <div
+                className="p-2 flex flex-col flex-1"
+                style={{
+                  background:
+                    "linear-gradient(180deg, #737780 0%, #6c7587 100%)",
+                }}
+              >
+                <div className="flex h-[10%]">
+                  <div
+                    className="flex gap-2 w-[92%] overflow-auto"
+                    style={{ scrollbarWidth: "none" }}
+                  >
+                    {Object.keys(cardData)
+                      .filter(
+                        (key) =>
+                          key !== "_id" && key !== "__v" && key !== "Time"
+                      )
+                      .map((key, index) => (
+                        <div
+                          key={key}
+                          className=" text-white-700 flex text-xs font-medium rounded-md"
+                        >
+                          <input
+                            id={key}
+                            type="checkbox"
+                            className="cursor-pointer"
+                            onChange={() => handleKeyClick(key)}
+                            checked={
+                              index === 0 && selectedKey.length === 0
+                                ? true
+                                : selectedKey.includes(key)
+                            }
+                          ></input>
+                          <div className="flex items-center">{`${key}`}</div>
+                        </div>
+                      ))}
+                  </div>
+                  <select
+                    id="limit"
+                    value={limit}
+                    onChange={handleLimitChange}
+                    className="text-xs w-[8%] rounded-xl font-medium cursor-pointer"
+                  >
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="75">75</option>
+                    <option value="100">100</option>
+                  </select>
+                </div>
+                <div className="flex w-full h-[90%]">
+                  <div className='w-[8%] flex justify-center'>
+                    <ReactSlider
+                      className="w-10 h-[95%] flex justify-center items-center"
+                      thumbClassName="w-5 h-50 bg-[#2d2d2d] rounded-full flex items-center justify-center cursor-pointer text-white font-medium text-xs hover:scale-110"
+                      trackClassName="w-1 rounded-full bg-gray-300"
+                      min={0}
+                      max={1000}
+                      defaultValue={[0, 1000]}
+                      renderThumb={(props, state) => (
+                        <div {...props}>{state.valueNow}</div>
+                      )}
+                      pearling
+                      minDistance={5}
+                      orientation="vertical"
+                      invert
+                      onChange={(value) => handleLineSliderChange(value)}
+                    />
+                  </div>
+
+                  <div className='w-[92%]'>
+                    <Line data={data}  options={options} height={'100%'}></Line>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
 }
 
 export default MainPage

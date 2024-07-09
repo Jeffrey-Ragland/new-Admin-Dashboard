@@ -26,17 +26,29 @@ const IoclMainPage = (dataFromApp) => {
     labels:[],
     datasets: []
   });
-  // const [selectedLineLimit, setSelectedLineLimit] = useState(100);
-  
+
+  const getInitialLimit = () => {
+    const storedLimit = localStorage.getItem("IOCLLimit");
+    return storedLimit ? parseInt(storedLimit) : 100;
+  };
+
+  const [ioclLineLimit, setIoclLineLimit] = useState(getInitialLimit);
+  // const [ioclLineLimit, setIoclLineLimit] = useState(parseInt(localStorage.getItem('IOCLLimit')));
+
+  // useEffect(() => {
+  //   const storedLimit = localStorage.getItem('IOCLLimit');
+  //   if(storedLimit) {
+  //     setIoclLineLimit(parseInt(storedLimit));
+  //   }
+  // },[]);
 
   const handleLineLimit = (e) => {
     const limit = parseInt(e.target.value);
-    // setSelectedLineLimit(limit);
+    setIoclLineLimit(limit);
     localStorage.setItem("IOCLLimit", limit.toString());
   };
 
   
-
   useEffect(() => {
     console.log("data from app file", dataFromApp.dataFromApp);
     if (
@@ -57,19 +69,19 @@ const IoclMainPage = (dataFromApp) => {
         labels: lineLabels,
         datasets: [
           {
-            label: "Sensor 1",
+            label: "S1",
             data: sensor1Data,
             borderColor: "rgb(255, 99, 132)",
             backgroundColor: "rgba(255, 99, 132, 0.2)",
           },
           {
-            label: "Sensor 2",
+            label: "S2",
             data: sensor2Data,
             borderColor: "rgb(54, 162, 235)",
             backgroundColor: "rgba(54, 162, 235, 0.2)",
           },
           {
-            label: "Sensor 3",
+            label: "S3",
             data: sensor3Data,
             borderColor: "rgb(75, 192, 192)",
             backgroundColor: "rgba(75, 192, 192, 0.2)",
@@ -106,7 +118,7 @@ const IoclMainPage = (dataFromApp) => {
 
   // bar chart data
   const barData = {
-    labels: ["Sensor 1", "Sensor 2", "Sensor 3"],
+    labels: ["S1", "S2", "S3"],
     datasets: [
       {
         label: "Temperature Data",
@@ -272,7 +284,13 @@ const IoclMainPage = (dataFromApp) => {
           {/* graphs and table */}
           <div className="w-full xl:w-[80%] md:h-[80%] xl:h-auto  p-2 flex flex-col gap-2">
             {/* line graph */}
-            <div className="md:h-[50%] lg:h-[60%] bg-white flex flex-col rounded-md overflow-x-auto">
+            <div
+              className="md:h-[50%] lg:h-[60%] bg-white flex flex-col rounded-md overflow-x-auto overflow-y-hidden"
+              style={{
+                scrollbarWidth: "thin",
+                scrollbarColor: "#08174e transparent",
+              }}
+            >
               <div className="flex justify-between">
                 <div
                   className="py-1 px-2 2xl:py-2 2xl:px-4 flex flex-1 text-white rounded-tl-md font-medium"
@@ -301,8 +319,8 @@ const IoclMainPage = (dataFromApp) => {
                   id="option1"
                   name="options"
                   value={100}
+                  checked={ioclLineLimit === 100}
                   className="cursor-pointer mt-0.5"
-                  defaultChecked
                   onChange={handleLineLimit}
                 />
                 <label htmlFor="option1" className="mr-2 cursor-pointer">
@@ -313,6 +331,7 @@ const IoclMainPage = (dataFromApp) => {
                   id="option2"
                   name="options"
                   value={500}
+                  checked={ioclLineLimit === 500}
                   className="cursor-pointer mt-0.5"
                   onChange={handleLineLimit}
                 />
@@ -324,6 +343,7 @@ const IoclMainPage = (dataFromApp) => {
                   id="option3"
                   name="options"
                   value={1000}
+                  checked={ioclLineLimit === 1000}
                   className="cursor-pointer mt-0.5"
                   onChange={handleLineLimit}
                 />
@@ -335,6 +355,7 @@ const IoclMainPage = (dataFromApp) => {
                   id="option4"
                   name="options"
                   value={1500}
+                  checked={ioclLineLimit === 1500}
                   className="cursor-pointer mt-0.5"
                   onChange={handleLineLimit}
                 />
@@ -346,6 +367,7 @@ const IoclMainPage = (dataFromApp) => {
                   id="option5"
                   name="options"
                   value={2000}
+                  checked={ioclLineLimit === 2000}
                   className="cursor-pointer mt-0.5"
                   onChange={handleLineLimit}
                 />
@@ -354,7 +376,7 @@ const IoclMainPage = (dataFromApp) => {
                 </label>
               </div>
 
-              <div className="flex flex-1 rounded-b-md px-2 w-[30000px]">
+              <div className="flex flex-1 rounded-b-md px-2 w-[20000px]">
                 <Line data={lineData} options={lineOptions} width={"100%"} />
               </div>
             </div>
@@ -363,7 +385,10 @@ const IoclMainPage = (dataFromApp) => {
               {/* table */}
               <div
                 className="w-full md:w-1/2 h-60 md:h-auto bg-white overflow-auto rounded-md mb-[6vh] md:mb-[8vh] lg:mb-0"
-                // style={{ scrollbarWidth: "none" }}
+                style={{
+                  scrollbarWidth: "thin",
+                  scrollbarColor: "#08174e transparent",
+                }}
               >
                 <table className=" w-full text-center">
                   <thead
@@ -382,18 +407,22 @@ const IoclMainPage = (dataFromApp) => {
                     </tr>
                   </thead>
 
-                  <tbody className="text-xs md:text-sm">
+                  <tbody className="text-xs md:text-sm text-gray-600">
                     {dataFromApp.dataFromApp.length > 0 &&
                       dataFromApp.dataFromApp.map((data, index) => (
                         <tr>
-                          <td className='border border-black '>{index + 1}</td>
-                          <td className='border border-black '>{data.Sensor1}</td>
-                          <td className='border border-black '>{data.Sensor2}</td>
-                          <td className='border border-black '>{data.Sensor3}</td>
-                          <td className='text-[10px] border border-black '>
-                            {new Date(
-                              data.createdAt
-                            ).toLocaleString("en-GB")}
+                          <td className="border border-black ">{index + 1}</td>
+                          <td className="border border-black ">
+                            {data.Sensor1}
+                          </td>
+                          <td className="border border-black ">
+                            {data.Sensor2}
+                          </td>
+                          <td className="border border-black ">
+                            {data.Sensor3}
+                          </td>
+                          <td className="text-[10px] border border-black ">
+                            {new Date(data.createdAt).toLocaleString("en-GB")}
                           </td>
                         </tr>
                       ))}
@@ -410,7 +439,7 @@ const IoclMainPage = (dataFromApp) => {
                 >
                   Peak Analysis
                 </div>
-                <div className="flex flex-1">
+                <div className="flex flex-1 border border-black px-2">
                   <Bar data={barData} options={barOptions} height={"100%"} />
                 </div>
               </div>

@@ -407,7 +407,7 @@ const handleFromDate = (date) => {
   const b ="border-gray-600";
 
   return (
-    <div className='grid grid-rows-2 md:flex md:flex-col w-[100%] h-[100%]'>
+    <div className='grid grid-rows-2 md:flex md:flex-col w-[100%] h-[100%] overflow-hidden'>
       <div className='md:flex h-[20%] gap-2 justify-center items-center'>
         <div className=' gap-2 hover:scale-125 cursor-pointer duration-200 mt-2 w-full h-full flex justify-center items-center' onClick={handlechartAnalysis1}>
           <img src={reportimg} className=''/>
