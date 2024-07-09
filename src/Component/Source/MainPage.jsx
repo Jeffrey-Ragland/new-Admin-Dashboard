@@ -226,9 +226,9 @@ const MainPage = (all_sensor_data) => {
         {/* main content */}
         <div className="flex flex-col h-[93%] gap-2 p-2 pb-4">
           {/* top section */}
-          <div className="flex gap-2 h-1/2">
+          <div className="flex flex-col-reverse md:flex-col xl:flex-row gap-2 xl:h-1/2">
             {/* section 1 - cards */}
-            <div className="w-1/2 flex flex-col shadow-lg shadow-gray-600">
+            <div className="w-full xl:w-1/2 flex flex-col shadow-lg shadow-gray-600">
               <div className="flex text-white">
                 <div className="bg-gray-700 flex-1 p-1 font-medium">
                   Sensor Data
@@ -238,7 +238,7 @@ const MainPage = (all_sensor_data) => {
                 </div>
               </div>
               <div
-                className="grid grid-cols-3 gap-2 p-2 flex-1 overflow-auto"
+                className="grid grid-cols-3 gap-2 p-2 xl:flex-1 h-[300px] overflow-auto"
                 style={{
                   background:
                     "linear-gradient(180deg, #737780 0%, #6c7587 100%)",
@@ -270,9 +270,9 @@ const MainPage = (all_sensor_data) => {
             </div>
 
             {/* section 2 */}
-            <div className="flex gap-2 w-1/2">
+            <div className="flex flex-col-reverse md:flex-row gap-2 w-full xl:w-1/2">
               {/* pie chart */}
-              <div className="h-full w-1/2 flex flex-col shadow-lg shadow-gray-600">
+              <div className="h-full w-full md:w-1/2 flex flex-col shadow-lg shadow-gray-600">
                 <div className="flex text-white">
                   <div className="bg-gray-700 flex-1 p-1 font-medium">
                     Pie Visualization
@@ -282,7 +282,7 @@ const MainPage = (all_sensor_data) => {
                   </div>
                 </div>
                 <div
-                  className="flex-1"
+                  className="xl:flex-1"
                   style={{
                     background:
                       "linear-gradient(180deg, #737780 0%, #6c7587 100%)",
@@ -297,7 +297,7 @@ const MainPage = (all_sensor_data) => {
                   />
                 </div>
               </div>
-              <div className="flex flex-col gap-2 w-1/2">
+              <div className="flex flex-col gap-2 w-full md:w-1/2">
                 {/* last update */}
                 <div className="h-1/2 flex flex-col shadow-lg shadow-gray-600">
                   <div className="flex text-white">
@@ -417,7 +417,7 @@ const MainPage = (all_sensor_data) => {
           </div>
 
           {/* bottom section */}
-          <div className="flex gap-2 h-1/2">
+          <div className="flex gap-2 xl:h-1/2">
             {/* section 3 - table */}
             <div
               className="w-1/2 overflow-auto text-gray-200"
@@ -535,7 +535,7 @@ const MainPage = (all_sensor_data) => {
                   </select>
                 </div>
                 <div className="flex w-full h-[90%]">
-                  <div className='w-[8%] flex justify-center'>
+                  <div className="w-[8%] flex justify-center">
                     <ReactSlider
                       className="w-10 h-[95%] flex justify-center items-center"
                       thumbClassName="w-5 h-50 bg-[#2d2d2d] rounded-full flex items-center justify-center cursor-pointer text-white font-medium text-xs hover:scale-110"
@@ -554,8 +554,8 @@ const MainPage = (all_sensor_data) => {
                     />
                   </div>
 
-                  <div className='w-[92%]'>
-                    <Line data={data}  options={options} height={'100%'}></Line>
+                  <div className="w-[92%]">
+                    <Line data={data} options={options} height={"100%"}></Line>
                   </div>
                 </div>
               </div>

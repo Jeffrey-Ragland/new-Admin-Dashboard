@@ -8,8 +8,7 @@ const Source_Outlet = () => {
             <Sidebar/>
         </div>
          <div className='w-full'>
-             <Outlet>
-             </Outlet>
+             <Outlet/>
         </div>
     </div>
     )
