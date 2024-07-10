@@ -238,7 +238,7 @@ const MainPage = (all_sensor_data) => {
                 </div>
               </div>
               <div
-                className="grid grid-cols-3 gap-2 p-2 xl:flex-1 h-[300px] overflow-auto"
+                className="grid grid-cols-3 gap-2 p-2 xl:flex-1 h-[250px] overflow-auto"
                 style={{
                   background:
                     "linear-gradient(180deg, #737780 0%, #6c7587 100%)",
@@ -272,7 +272,7 @@ const MainPage = (all_sensor_data) => {
             {/* section 2 */}
             <div className="flex flex-col-reverse md:flex-row gap-2 w-full xl:w-1/2">
               {/* pie chart */}
-              <div className="h-full w-full md:w-1/2 flex flex-col shadow-lg shadow-gray-600">
+              <div className="w-full md:w-1/2 flex flex-col shadow-lg shadow-gray-600">
                 <div className="flex text-white">
                   <div className="bg-gray-700 flex-1 p-1 font-medium">
                     Pie Visualization
@@ -282,7 +282,7 @@ const MainPage = (all_sensor_data) => {
                   </div>
                 </div>
                 <div
-                  className="xl:flex-1"
+                  className="md:flex-1"
                   style={{
                     background:
                       "linear-gradient(180deg, #737780 0%, #6c7587 100%)",
@@ -332,7 +332,9 @@ const MainPage = (all_sensor_data) => {
                             <AiOutlineWarning className="text-xl" />
                           </div>
                         )}
-                        <div className="text-green-500">{activeStatus}</div>
+                        <div className="text-green-500 py-4 md:py-0">
+                          {activeStatus}
+                        </div>
                       </div>
                       <div
                         className="w-1/2 rounded-md font-bold flex gap-1 justify-center items-center text-[#fc5050]"
@@ -346,7 +348,7 @@ const MainPage = (all_sensor_data) => {
                       </div>
                     </div>
                     <div
-                      className="h-[60%] rounded-md text-gray-700"
+                      className="h-[60%] rounded-md text-gray-700 py-4 md:py-0"
                       style={{
                         background:
                           "linear-gradient(180deg, #e3ebfc 0%, #ccd3e3 100%)",
@@ -377,7 +379,7 @@ const MainPage = (all_sensor_data) => {
                     </div>
                   </div>
                   <div
-                    className="flex-1 overflow-auto"
+                    className="flex-1 overflow-auto py-4 xl:py-0"
                     style={{
                       background:
                         "linear-gradient(180deg, #737780 0%, #6c7587 100%)",
@@ -417,10 +419,10 @@ const MainPage = (all_sensor_data) => {
           </div>
 
           {/* bottom section */}
-          <div className="flex gap-2 xl:h-1/2">
+          <div className="flex flex-col-reverse xl:flex-row gap-2 xl:h-1/2 mb-[8vh] xl:mb-0">
             {/* section 3 - table */}
             <div
-              className="w-1/2 overflow-auto text-gray-200"
+              className="w-full xl:w-1/2 overflow-auto text-gray-200 h-[250px] xl:h-auto"
               style={{
                 background: "linear-gradient(180deg, #737780 0%, #6c7587 100%)",
                 scrollbarWidth: "thin",
@@ -476,7 +478,7 @@ const MainPage = (all_sensor_data) => {
             </div>
 
             {/* section 4 - line graph */}
-            <div className="w-1/2 flex flex-col">
+            <div className="w-full xl:w-1/2 flex flex-col">
               <div className="flex text-white">
                 <div className="bg-gray-700 flex-1 p-1 font-medium">
                   Line Plot
@@ -486,7 +488,7 @@ const MainPage = (all_sensor_data) => {
                 </div>
               </div>
               <div
-                className="p-2 flex flex-col flex-1"
+                className="p-2 flex flex-col flex-1 py-8 xl:py-0"
                 style={{
                   background:
                     "linear-gradient(180deg, #737780 0%, #6c7587 100%)",

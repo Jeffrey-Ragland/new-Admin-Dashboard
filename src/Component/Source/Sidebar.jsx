@@ -107,11 +107,12 @@ const Sidebar = () => {
           </Link>
         </div>
       ) : (
-        <div className="bg-gray-600 w-full fixed bottom-0 text-gray-100 p-2 flex justify-evenly items-center z-10 h-[8vh]">
+        // mobile view bottom navbar
+        <div className="bg-gray-900 w-full fixed bottom-0 text-gray-100 p-2 flex justify-evenly items-center z-10 h-[8vh]">
           <Link
             to="/"
-            className={`p-2 hover:bg-gray-800 duration-200 flex items-center ${
-              location.pathname === "/" && "bg-gray-800"
+            className={`p-2 duration-200 flex items-center rounded-xl ${
+              location.pathname === "/" && "bg-gray-200 text-gray-800"
             }`}
             onMouseEnter={() => setDashHover(true)}
             onMouseLeave={() => setDashHover(false)}
@@ -123,8 +124,8 @@ const Sidebar = () => {
 
           <Link
             to="/Graph"
-            className={`p-2 hover:bg-gray-800 duration-200 flex items-center ${
-              location.pathname === "/Graph" && "bg-gray-800"
+            className={`p-2 duration-200 flex items-center rounded-xl ${
+              location.pathname === "/Graph" && "bg-gray-200 text-gray-800"
             }`}
             onMouseEnter={() => setGraphHover(true)}
             onMouseLeave={() => setGraphHover(false)}
@@ -136,8 +137,8 @@ const Sidebar = () => {
 
           <Link
             to="/Report"
-            className={`p-2 hover:bg-gray-800 duration-200 flex items-center ${
-              location.pathname === "/Report" && "bg-gray-800"
+            className={`p-2 duration-200 flex items-center rounded-xl ${
+              location.pathname === "/Report" && "bg-gray-200 text-gray-800"
             }`}
             onMouseEnter={() => setReportHover(true)}
             onMouseLeave={() => setReportHover(false)}
@@ -149,8 +150,8 @@ const Sidebar = () => {
 
           <Link
             to="/Settings"
-            className={`p-2 hover:bg-gray-800 duration-200 flex items-center ${
-              location.pathname === "/Settings" && "bg-gray-800"
+            className={`p-2 duration-200 flex items-center rounded-xl ${
+              location.pathname === "/Settings" && "bg-gray-200 text-gray-800"
             }`}
             onMouseEnter={() => setSettingsHover(true)}
             onMouseLeave={() => setSettingsHover(false)}
