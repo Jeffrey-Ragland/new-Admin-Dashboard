@@ -29,7 +29,8 @@ const Login = () => {
           localStorage.setItem('Project',Project);
           localStorage.setItem('token',tokenRole);
           console.log("result.data.redirectUrl",data.redirectUrl);
-          localStorage.setItem('Controles',data.redirectUrl)
+          localStorage.setItem('Controles',data.redirectUrl);
+          localStorage.setItem("projectNumber", data.projectNumber);
           window.location.href='/'
         }
         else{

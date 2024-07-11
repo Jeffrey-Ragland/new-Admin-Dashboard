@@ -22,11 +22,15 @@ import 'react-toastify/dist/ReactToastify.css';
 import Bpcl_report from './Component/Bpcl/Bpcl_report';
 import Bpcl_Setting from './Component/Bpcl/Bpcl_Setting'
 import Bpcl_Graph from './Component/Bpcl/Bpcl_Graph';
-import IoclOutlet from './Component/Route/IoclOutlet';
+import OnlyOutlet from './Component/Route/OnlyOutlet';
 import IoclMainPage from './Component/Iocl/IoclMainPage';
 import IoclGraphs from './Component/Iocl/IoclGraphs';
 import IoclReports from './Component/Iocl/IoclReports';
 import IoclSettings from './Component/Iocl/IoclSettings';
+import DemokitMainpage from "./Component/Demokit/DemokitMainpage";
+import DemokitUtmaps from "./Component/Demokit/DemokitUtmaps";
+import DemokitPorts from "./Component/Demokit/DemokitPorts";
+import DemokitZtar from "./Component/Demokit/DemokitZtar";
 
 // let iocl = 0;
 
@@ -37,21 +41,21 @@ const[chartdata,setChartData]=useState([]);
 const[ReportData,setReportData]=useState([]);
 const [ioclData, setIoclData] = useState([]);
 
-const getInitialCondition = () => {
-  const storedLimit = localStorage.getItem("IOCLLimit");
-  return storedLimit ? 1 : 0;
-}
+// const getInitialCondition = () => {
+//   const storedLimit = localStorage.getItem("IOCLLimit");
+//   return storedLimit ? 1 : 0;
+// }
 
-const [ioclCondition, setIoclCondition] = useState(getInitialCondition);
+// const [ioclCondition, setIoclCondition] = useState(getInitialCondition);
 
   let controls =localStorage.getItem("Controles");
 
-  useEffect(() => {
-    if(ioclCondition === 0) {
-      localStorage.setItem('IOCLLimit', "100");
-      setIoclCondition(1);
-    }
-  }, []);
+  // useEffect(() => {
+  //   if(ioclCondition === 0) {
+  //     localStorage.setItem('IOCLLimit', "100");
+  //     setIoclCondition(1);
+  //   }
+  // }, []);
 
 
   // localStorage.setItem('IOCLLimit', '100');
@@ -64,24 +68,24 @@ const [ioclCondition, setIoclCondition] = useState(getInitialCondition);
   // }
 
 
-  useEffect(()=>{
-    fetch_tof_fata();
-    fetchProductData();
-    chartdatafetch();
-    getIOCLData();
-  const data = setInterval(fetch_tof_fata,2000);
-  const sensors =setInterval(fetchProductData,5000);
-  const chartdata =setInterval(chartdatafetch,2000);
-  const ioclData = setInterval(getIOCLData,2000);
-  return()=>{
-    clearInterval(data);
-    clearInterval(sensors);
-    clearInterval(chartdata);
-    clearInterval(ioclData);
-  }
-  },[])
+  // useEffect(()=>{
+  //   fetch_tof_fata();
+  //   fetchProductData();
+  //   chartdatafetch();
+  //   getIOCLData();
+  // const data = setInterval(fetch_tof_fata,2000);
+  // const sensors =setInterval(fetchProductData,5000);
+  // const chartdata =setInterval(chartdatafetch,2000);
+  // const ioclData = setInterval(getIOCLData,2000);
+  // return()=>{
+  //   clearInterval(data);
+  //   clearInterval(sensors);
+  //   clearInterval(chartdata);
+  //   clearInterval(ioclData);
+  // }
+  // },[])
 
-  console.log('iocl data',ioclData);
+  // console.log('iocl data',ioclData);
 
 
 const fetch_tof_fata =async()=>{
@@ -212,17 +216,26 @@ const getIOCLData = async () => {
             </Route>
           ) : null}
           {controls === "IOCL" ? (
-            <Route path="/" element={<IoclOutlet />}>
-              <Route index element={<IoclMainPage dataFromApp={ioclData}/>} />
+            <Route path="/" element={<OnlyOutlet />}>
+              <Route index element={<IoclMainPage dataFromApp={ioclData} />} />
               <Route path="ioclGraphs" element={<IoclGraphs />} />
               <Route path="ioclReports" element={<IoclReports />} />
               <Route path="ioclSettings" element={<IoclSettings />} />
             </Route>
           ) : null}
+          {controls === "DEMOKIT" ? (
+            <Route path="/" element={<OnlyOutlet />}>
+              <Route index element={<DemokitMainpage />} />
+              <Route path="utmaps" element={<DemokitUtmaps />} />
+              <Route path="ports" element={<DemokitPorts />} />
+              <Route path="ztar" element={<DemokitZtar />} />
+            </Route>
+          ) : null}
           {controls !== "SKF" &&
             controls !== "ADMIN" &&
             controls !== "IOCL" &&
-            controls !== "BPCL" && (
+            controls !== "BPCL" &&
+            controls !== "DEMOKIT" && (
               <Route path="/" element={<Source_Outlet />}>
                 <Route
                   index
