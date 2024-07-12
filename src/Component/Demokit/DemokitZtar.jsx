@@ -1,7 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import xymaLogo from "../Assets/xyma - Copy.png";
-import { BsThermometerSun } from "react-icons/bs";
+import { MdManageHistory } from "react-icons/md";
+import { PiCloudWarningBold } from "react-icons/pi";
+import { BiWater } from "react-icons/bi";
 import { Line } from "react-chartjs-2";
 import { Bar } from "react-chartjs-2";
 import {
@@ -88,18 +90,16 @@ const DemokitZtar = () => {
 
   // bar chart data
   const barData = {
-    labels: ["S1", "S2", "S3"],
+    labels: ["S1"],
     datasets: [
       {
         label: "Temperature Data",
-        data: [73, 87, 56],
+        data: [73],
         backgroundColor: [
           "rgba(255, 99, 132, 0.9)",
-          "rgba(54, 162, 235, 0.9)",
-          "rgba(255, 206, 86, 0.9)",
         ],
         borderWidth: 1,
-        barPercentage: 1,
+        barPercentage: 0.25,
         categoryPercentage: 1,
       },
     ],
@@ -191,70 +191,36 @@ const DemokitZtar = () => {
           {/* right top */}
           <div className=" xl:h-[40%] flex flex-col xl:flex-row gap-4 xl:gap-2">
             {/* cards */}
-            <div className="w-full xl:w-[50%] flex flex-col md:flex-row xl:flex-col gap-2">
-              <div className="flex gap-2 h-1/2 md:w-1/2 md:h-auto xl:h-1/2 xl:w-auto">
-                <div
-                  className="rounded-md w-1/2 flex flex-col items-center justify-center gap-2 font-medium py-4 xl:py-0"
-                  style={{
-                    background:
-                      "linear-gradient(180deg, #75736f 0%, #3d3c3a 100%)",
-                  }}
-                >
-                  <div className="flex items-center gap-2">
-                    <BsThermometerSun className="text-5xl 2xl:text-7xl" />
-                    <div className="flex flex-col text-base 2xl:text-2xl">
-                      <div>Sensor 1</div>
-                      <div>45 °C</div>
-                    </div>
-                  </div>
-                </div>
-                <div
-                  className="rounded-md w-1/2 flex flex-col items-center justify-center gap-2 font-medium py-4 xl:py-0"
-                  style={{
-                    background:
-                      "linear-gradient(180deg, #75736f 0%, #3d3c3a 100%)",
-                  }}
-                >
-                  <div className="flex items-center gap-2">
-                    <BsThermometerSun className="text-5xl 2xl:text-7xl" />
-                    <div className="flex flex-col text-base 2xl:text-2xl">
-                      <div>Sensor 2</div>
-                      <div>83 °C</div>
-                    </div>
-                  </div>
+            <div className="w-full xl:w-[50%] flex flex-row gap-2">
+              <div
+                className="rounded-md w-1/2 md:w-1/3 xl:w-1/2 flex items-center justify-center gap-2 font-medium py-4 xl:py-0"
+                style={{
+                  background:
+                    "linear-gradient(180deg, #75736f 0%, #3d3c3a 100%)",
+                }}
+              >
+                <BiWater className="text-6xl xl:text-7xl 2xl:text-8xl" />
+                <div className="flex flex-col text-base 2xl:text-2xl">
+                  <div>Liquid Level</div>
+                  <div>255 mm</div>
                 </div>
               </div>
 
-              <div className="flex gap-2 h-1/2 md:w-1/2 md:h-auto xl:h-1/2 xl:w-auto">
-                <div
-                  className="rounded-md w-1/2 flex flex-col items-center justify-center gap-2 font-medium py-4 xl:py-0"
-                  style={{
-                    background:
-                      "linear-gradient(180deg, #75736f 0%, #3d3c3a 100%)",
-                  }}
-                >
+              {/* recent update and activity status */}
+              <div className="flex flex-col md:flex-row xl:flex-col gap-2 w-1/2 md:w-2/3 xl:w-1/2  2xl:text-xl">
+                <div className="rounded-md h-1/2 md:h-auto xl:h-1/2 md:w-1/2 xl:w-auto flex flex-col items-center justify-center gap-2 font-medium py-4 xl:py-0 border border-white bg-white/5">
                   <div className="flex items-center gap-2">
-                    <BsThermometerSun className="text-5xl 2xl:text-7xl" />
-                    <div className="flex flex-col text-base 2xl:text-2xl">
-                      <div>Sensor 3</div>
-                      <div>76 °C</div>
-                    </div>
+                    <MdManageHistory className="text-3xl 2xl:text-5xl" />
+                    <div>Last Update:</div>
+                  </div>
+                  <div className="text-sm 2xl:text-base font-normal">
+                    02/04/2024 02:55 pm
                   </div>
                 </div>
-                <div
-                  className="rounded-md w-1/2 flex flex-col items-center justify-center gap-2 font-medium py-4 xl:py-0"
-                  style={{
-                    background:
-                      "linear-gradient(180deg, #75736f 0%, #3d3c3a 100%)",
-                  }}
-                >
-                  <div className="flex items-center gap-2">
-                    <BsThermometerSun className="text-5xl 2xl:text-7xl" />
-                    <div className="flex flex-col text-base 2xl:text-2xl">
-                      <div>Sensor 4</div>
-                      <div>21 °C</div>
-                    </div>
-                  </div>
+
+                <div className="rounded-md h-1/2 md:h-auto xl:h-1/2 md:w-1/2 xl:w-auto flex  items-center justify-center gap-2 font-medium py-4 xl:py-0 border border-white bg-white/5 text-red-400 shadow-md shadow-red-800">
+                  <PiCloudWarningBold className="text-3xl 2xl:text-5xl" />
+                  Inactive
                 </div>
               </div>
             </div>
@@ -277,10 +243,7 @@ const DemokitZtar = () => {
                 >
                   <tr>
                     <th className="px-2">S.No</th>
-                    <th className="px-2">S1</th>
-                    <th className="px-2">S2</th>
-                    <th className="px-2">S3</th>
-                    <th className="px-2">S4</th>
+                    <th className="px-2">Level</th>
                     <th className="px-2">Updated&nbsp;At</th>
                   </tr>
                 </thead>
@@ -289,135 +252,90 @@ const DemokitZtar = () => {
                   <tr>
                     <td>1</td>
                     <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
                     <td>2:55 pm</td>
                   </tr>
 
                   <tr>
                     <td>2</td>
                     <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
                     <td>2:55 pm</td>
                   </tr>
 
                   <tr>
                     <td>3</td>
                     <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
                     <td>2:55 pm</td>
                   </tr>
 
                   <tr>
                     <td>4</td>
                     <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
                     <td>2:55 pm</td>
                   </tr>
 
                   <tr>
                     <td>5</td>
                     <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
                     <td>2:55 pm</td>
                   </tr>
 
                   <tr>
                     <td>6</td>
                     <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
                     <td>2:55 pm</td>
                   </tr>
 
                   <tr>
                     <td>7</td>
                     <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
                     <td>2:55 pm</td>
                   </tr>
 
                   <tr>
                     <td>8</td>
                     <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
                     <td>2:55 pm</td>
                   </tr>
 
                   <tr>
                     <td>9</td>
                     <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
                     <td>2:55 pm</td>
                   </tr>
 
                   <tr>
                     <td>10</td>
                     <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
                     <td>2:55 pm</td>
                   </tr>
 
                   <tr>
                     <td>11</td>
                     <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
                     <td>2:55 pm</td>
                   </tr>
 
                   <tr>
                     <td>12</td>
                     <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
                     <td>2:55 pm</td>
                   </tr>
 
                   <tr>
                     <td>13</td>
                     <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
                     <td>2:55 pm</td>
                   </tr>
 
                   <tr>
                     <td>14</td>
                     <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
                     <td>2:55 pm</td>
                   </tr>
 
                   <tr>
                     <td>15</td>
                     <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
                     <td>2:55 pm</td>
                   </tr>
                 </tbody>

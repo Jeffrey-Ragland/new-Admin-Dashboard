@@ -11,8 +11,8 @@ const DemokitMainpage = () => {
       }}
     >
       {/* top bar */}
-      <div className="flex justify-between">
-        <img src={xymaLogo} alt="logo" className="max-h-10" />
+      <div className="flex justify-between items-center">
+        <img src={xymaLogo} alt="logo" className="max-h-10 2xl:max-h-16" />
         <Link to="/login">
           <button
             className=" py-1 pb-2 px-2 text-white font-medium text-sm 2xl:text-lg rounded-md hover:scale-110 duration-200"
@@ -29,14 +29,14 @@ const DemokitMainpage = () => {
       </div>
 
       {/* title */}
-      <center className="text-base md:text-xl font-medium">
+      <center className="text-base md:text-xl 2xl:text-3xl font-medium">
         Sensor for Critical Parameter Measurements
       </center>
 
-      <div className="flex-1 flex flex-col md:flex-row justify-evenly md:justify-around items-center font-medium">
+      <div className="flex-1 flex flex-col md:flex-row justify-evenly md:justify-around items-center font-medium text-lg 2xl:text-2xl">
         <Link to="/utmaps">
           <button
-            className="py-2 px-6 w-40 rounded-md hover:scale-110 duration-200 text-lg border border-orange-400 hover:border-4"
+            className="py-2 px-6 2xl:py-4 w-40 2xl:w-80 rounded-md hover:scale-110 duration-200  border border-orange-400 hover:border-4"
             style={{
               background: "linear-gradient(180deg, #75736f 0%, #3d3c3a 100%)",
             }}
@@ -47,7 +47,7 @@ const DemokitMainpage = () => {
 
         <Link to="/ports">
           <button
-            className="py-2 px-6 w-40 rounded-md hover:scale-110 duration-200 text-lg border border-orange-400 hover:border-4"
+            className="py-2 px-6 2xl:py-4 w-40 2xl:w-80 rounded-md hover:scale-110 duration-200  border border-orange-400 hover:border-4"
             style={{
               background: "linear-gradient(180deg, #75736f 0%, #3d3c3a 100%)",
             }}
@@ -58,7 +58,7 @@ const DemokitMainpage = () => {
 
         <Link to="/ztar">
           <button
-            className="py-2 px-6 w-40 rounded-md hover:scale-110 duration-200 text-lg border border-orange-400 hover:border-4"
+            className="py-2 px-6 2xl:py-4 w-40 2xl:w-80 rounded-md hover:scale-110 duration-200  border border-orange-400 hover:border-4"
             style={{
               background: "linear-gradient(180deg, #75736f 0%, #3d3c3a 100%)",
             }}

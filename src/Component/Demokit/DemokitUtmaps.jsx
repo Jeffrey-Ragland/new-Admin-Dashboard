@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from "react-router-dom";
 import xymaLogo from "../Assets/xyma - Copy.png";
 import { BsThermometerSun } from "react-icons/bs";
+import { MdManageHistory } from "react-icons/md";
+import { PiCloudWarningBold } from "react-icons/pi";
 import { Line } from "react-chartjs-2";
 import { Bar } from "react-chartjs-2";
 import {
@@ -157,7 +159,7 @@ const DemokitUtmaps = () => {
       }}
     >
       <div className="flex justify-between items-center gap-2 xl:h-[8%]">
-        <img src={xymaLogo} alt="logo" className="max-h-10 2xl:max-h-12" />
+        <img src={xymaLogo} alt="logo" className="max-h-10 2xl:max-h-16" />
         <div className="hidden md:block text-xl 2xl:text-2xl font-normal md:font-medium text-center">
           μTMapS - Multi-Point Temperature Mapping Sensor
         </div>
@@ -260,169 +262,187 @@ const DemokitUtmaps = () => {
               </div>
             </div>
 
-            {/* table */}
-            <div
-              className=" w-full xl:w-[50%] rounded-md h-[250px] md:h-[300px] xl:h-auto overflow-auto text-center bg-white"
-              style={{
-                scrollbarWidth: "thin",
-                scrollbarColor: "gray transparent",
-              }}
-            >
-              <table className="w-full">
-                <thead
-                  className="sticky top-0 text-white 2xl:text-xl"
-                  style={{
-                    background:
-                      "linear-gradient(180deg, #75736f 0%, #3d3c3a 100%)",
-                  }}
-                >
-                  <tr>
-                    <th className="px-2">S.No</th>
-                    <th className="px-2">S1</th>
-                    <th className="px-2">S2</th>
-                    <th className="px-2">S3</th>
-                    <th className="px-2">S4</th>
-                    <th className="px-2">Updated&nbsp;At</th>
-                  </tr>
-                </thead>
+            <div className=" w-full xl:w-[50%] flex flex-col gap-2">
+              {/* recent update and activity status */}
+              <div className="h-[15%] flex gap-2 font-medium 2xl:text-xl">
+                <div className="w-1/2 xl:w-[75%] border border-white rounded-md bg-white/5 flex flex-col xl:flex-row items-center gap-2 px-2 py-2 xl:py-0 ">
+                  <div className="flex gap-2">
+                    <MdManageHistory className="text-xl 2xl:text-3xl" />
+                    <div>Last Update:</div>
+                  </div>
+                  <div className="text-sm 2xl:text-base font-normal">
+                    02/04/2024 02:55 pm
+                  </div>
+                </div>
+                <div className="w-1/2 xl:w-[25%] border border-white rounded-md bg-white/5 text-red-400 shadow-lg shadow-red-800 flex justify-center items-center px-2 gap-2">
+                  <PiCloudWarningBold className="text-xl 2xl:text-3xl" />
+                  Inactive
+                </div>
+              </div>
+              {/* table */}
+              <div
+                className="bg-white rounded-md h-[250px] md:h-[300px] xl:h-[85%] overflow-auto text-center"
+                style={{
+                  scrollbarWidth: "thin",
+                  scrollbarColor: "gray transparent",
+                }}
+              >
+                <table className="w-full">
+                  <thead
+                    className="sticky top-0 text-white 2xl:text-xl"
+                    style={{
+                      background:
+                        "linear-gradient(180deg, #75736f 0%, #3d3c3a 100%)",
+                    }}
+                  >
+                    <tr>
+                      <th className="px-2">S.No</th>
+                      <th className="px-2">S1</th>
+                      <th className="px-2">S2</th>
+                      <th className="px-2">S3</th>
+                      <th className="px-2">S4</th>
+                      <th className="px-2">Updated&nbsp;At</th>
+                    </tr>
+                  </thead>
 
-                <tbody className="text-sm 2xl:text-base text-gray-600">
-                  <tr>
-                    <td>1</td>
-                    <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
-                    <td>2:55 pm</td>
-                  </tr>
+                  <tbody className="text-sm 2xl:text-base text-gray-600">
+                    <tr>
+                      <td>1</td>
+                      <td>20</td>
+                      <td>30</td>
+                      <td>40</td>
+                      <td>50</td>
+                      <td>2:55 pm</td>
+                    </tr>
 
-                  <tr>
-                    <td>2</td>
-                    <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
-                    <td>2:55 pm</td>
-                  </tr>
+                    <tr>
+                      <td>2</td>
+                      <td>20</td>
+                      <td>30</td>
+                      <td>40</td>
+                      <td>50</td>
+                      <td>2:55 pm</td>
+                    </tr>
 
-                  <tr>
-                    <td>3</td>
-                    <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
-                    <td>2:55 pm</td>
-                  </tr>
+                    <tr>
+                      <td>3</td>
+                      <td>20</td>
+                      <td>30</td>
+                      <td>40</td>
+                      <td>50</td>
+                      <td>2:55 pm</td>
+                    </tr>
 
-                  <tr>
-                    <td>4</td>
-                    <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
-                    <td>2:55 pm</td>
-                  </tr>
+                    <tr>
+                      <td>4</td>
+                      <td>20</td>
+                      <td>30</td>
+                      <td>40</td>
+                      <td>50</td>
+                      <td>2:55 pm</td>
+                    </tr>
 
-                  <tr>
-                    <td>5</td>
-                    <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
-                    <td>2:55 pm</td>
-                  </tr>
+                    <tr>
+                      <td>5</td>
+                      <td>20</td>
+                      <td>30</td>
+                      <td>40</td>
+                      <td>50</td>
+                      <td>2:55 pm</td>
+                    </tr>
 
-                  <tr>
-                    <td>6</td>
-                    <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
-                    <td>2:55 pm</td>
-                  </tr>
+                    <tr>
+                      <td>6</td>
+                      <td>20</td>
+                      <td>30</td>
+                      <td>40</td>
+                      <td>50</td>
+                      <td>2:55 pm</td>
+                    </tr>
 
-                  <tr>
-                    <td>7</td>
-                    <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
-                    <td>2:55 pm</td>
-                  </tr>
+                    <tr>
+                      <td>7</td>
+                      <td>20</td>
+                      <td>30</td>
+                      <td>40</td>
+                      <td>50</td>
+                      <td>2:55 pm</td>
+                    </tr>
 
-                  <tr>
-                    <td>8</td>
-                    <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
-                    <td>2:55 pm</td>
-                  </tr>
+                    <tr>
+                      <td>8</td>
+                      <td>20</td>
+                      <td>30</td>
+                      <td>40</td>
+                      <td>50</td>
+                      <td>2:55 pm</td>
+                    </tr>
 
-                  <tr>
-                    <td>9</td>
-                    <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
-                    <td>2:55 pm</td>
-                  </tr>
+                    <tr>
+                      <td>9</td>
+                      <td>20</td>
+                      <td>30</td>
+                      <td>40</td>
+                      <td>50</td>
+                      <td>2:55 pm</td>
+                    </tr>
 
-                  <tr>
-                    <td>10</td>
-                    <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
-                    <td>2:55 pm</td>
-                  </tr>
+                    <tr>
+                      <td>10</td>
+                      <td>20</td>
+                      <td>30</td>
+                      <td>40</td>
+                      <td>50</td>
+                      <td>2:55 pm</td>
+                    </tr>
 
-                  <tr>
-                    <td>11</td>
-                    <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
-                    <td>2:55 pm</td>
-                  </tr>
+                    <tr>
+                      <td>11</td>
+                      <td>20</td>
+                      <td>30</td>
+                      <td>40</td>
+                      <td>50</td>
+                      <td>2:55 pm</td>
+                    </tr>
 
-                  <tr>
-                    <td>12</td>
-                    <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
-                    <td>2:55 pm</td>
-                  </tr>
+                    <tr>
+                      <td>12</td>
+                      <td>20</td>
+                      <td>30</td>
+                      <td>40</td>
+                      <td>50</td>
+                      <td>2:55 pm</td>
+                    </tr>
 
-                  <tr>
-                    <td>13</td>
-                    <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
-                    <td>2:55 pm</td>
-                  </tr>
+                    <tr>
+                      <td>13</td>
+                      <td>20</td>
+                      <td>30</td>
+                      <td>40</td>
+                      <td>50</td>
+                      <td>2:55 pm</td>
+                    </tr>
 
-                  <tr>
-                    <td>14</td>
-                    <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
-                    <td>2:55 pm</td>
-                  </tr>
+                    <tr>
+                      <td>14</td>
+                      <td>20</td>
+                      <td>30</td>
+                      <td>40</td>
+                      <td>50</td>
+                      <td>2:55 pm</td>
+                    </tr>
 
-                  <tr>
-                    <td>15</td>
-                    <td>20</td>
-                    <td>30</td>
-                    <td>40</td>
-                    <td>50</td>
-                    <td>2:55 pm</td>
-                  </tr>
-                </tbody>
-              </table>
+                    <tr>
+                      <td>15</td>
+                      <td>20</td>
+                      <td>30</td>
+                      <td>40</td>
+                      <td>50</td>
+                      <td>2:55 pm</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
           {/* right bottom */}
