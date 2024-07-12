@@ -2,6 +2,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 import xymaLogo from "../Assets/xyma - Copy.png";
 import { BsThermometerSun } from "react-icons/bs";
+import { BsDropletHalf } from "react-icons/bs";
+import { HiMiniBeaker } from "react-icons/hi2";
 import { Line } from "react-chartjs-2";
 import { Bar } from "react-chartjs-2";
 import {
@@ -158,9 +160,9 @@ const DemokitPorts = () => {
       <div className="flex justify-between items-center gap-2 xl:h-[8%]">
         <img src={xymaLogo} alt="logo" className="max-h-10 2xl:max-h-12" />
         <div className="hidden md:block text-xl 2xl:text-2xl font-normal md:font-medium text-center">
-          μTMapS - Multi-Point Temperature Measurement Sensor
+          PoRTS - Multi-Parameter Measurement Sensor
         </div>
-        <div className="md:hidden font-medium text-xl">μTMapS</div>
+        <div className="md:hidden font-medium text-xl">PoRTS</div>
         <Link to="/">
           <button
             className=" py-1 pb-2 px-4 font-medium text-sm 2xl:text-lg rounded-md hover:scale-110 duration-200"
@@ -177,7 +179,7 @@ const DemokitPorts = () => {
       </div>
 
       <center className="md:hidden font-medium text-sm">
-        Multi-Point Temperature Measurement Sensor
+        Multi-Parameter Measurement Sensor
       </center>
 
       <div className="xl:h-[92%] flex flex-col-reverse xl:flex-row gap-4 xl:gap-2">
@@ -191,68 +193,49 @@ const DemokitPorts = () => {
           {/* right top */}
           <div className=" xl:h-[40%] flex flex-col xl:flex-row gap-4 xl:gap-2">
             {/* cards */}
-            <div className="w-full xl:w-[50%] flex flex-col md:flex-row xl:flex-col gap-2">
-              <div className="flex gap-2 h-1/2 md:w-1/2 md:h-auto xl:h-1/2 xl:w-auto">
-                <div
-                  className="rounded-md w-1/2 flex flex-col items-center justify-center gap-2 font-medium py-4 xl:py-0"
-                  style={{
-                    background:
-                      "linear-gradient(180deg, #75736f 0%, #3d3c3a 100%)",
-                  }}
-                >
-                  <div className="flex items-center gap-2">
-                    <BsThermometerSun className="text-5xl 2xl:text-7xl" />
-                    <div className="flex flex-col text-base 2xl:text-2xl">
-                      <div>Sensor 1</div>
-                      <div>45 °C</div>
-                    </div>
-                  </div>
-                </div>
-                <div
-                  className="rounded-md w-1/2 flex flex-col items-center justify-center gap-2 font-medium py-4 xl:py-0"
-                  style={{
-                    background:
-                      "linear-gradient(180deg, #75736f 0%, #3d3c3a 100%)",
-                  }}
-                >
-                  <div className="flex items-center gap-2">
-                    <BsThermometerSun className="text-5xl 2xl:text-7xl" />
-                    <div className="flex flex-col text-base 2xl:text-2xl">
-                      <div>Sensor 2</div>
-                      <div>83 °C</div>
-                    </div>
-                  </div>
+            <div className="w-full xl:w-[50%] flex flex-row gap-2">
+              <div
+                className="rounded-md w-1/2 md:w-1/3 xl:w-1/2 flex items-center justify-center gap-2 font-medium py-4 xl:py-0"
+                style={{
+                  background:
+                    "linear-gradient(180deg, #75736f 0%, #3d3c3a 100%)",
+                }}
+              >
+                <BsThermometerSun className="text-6xl xl:text-7xl 2xl:text-8xl" />
+                <div className="flex flex-col text-base 2xl:text-2xl">
+                  <div>Temperature</div>
+                  <div>45 °C</div>
                 </div>
               </div>
 
-              <div className="flex gap-2 h-1/2 md:w-1/2 md:h-auto xl:h-1/2 xl:w-auto">
+              <div className="flex flex-col md:flex-row xl:flex-col gap-2 w-1/2 md:w-2/3 xl:w-1/2">
                 <div
-                  className="rounded-md w-1/2 flex flex-col items-center justify-center gap-2 font-medium py-4 xl:py-0"
+                  className="rounded-md h-1/2 md:h-auto xl:h-1/2 md:w-1/2 xl:w-auto flex flex-col items-center justify-center gap-2 font-medium py-4 xl:py-0"
                   style={{
                     background:
                       "linear-gradient(180deg, #75736f 0%, #3d3c3a 100%)",
                   }}
                 >
                   <div className="flex items-center gap-2">
-                    <BsThermometerSun className="text-5xl 2xl:text-7xl" />
+                    <HiMiniBeaker className="text-5xl 2xl:text-7xl" />
                     <div className="flex flex-col text-base 2xl:text-2xl">
-                      <div>Sensor 3</div>
-                      <div>76 °C</div>
+                      <div>Density</div>
+                      <div>76 cSt</div>
                     </div>
                   </div>
                 </div>
                 <div
-                  className="rounded-md w-1/2 flex flex-col items-center justify-center gap-2 font-medium py-4 xl:py-0"
+                  className="rounded-md h-1/2 md:h-auto xl:h-1/2 md:w-1/2 xl:w-auto flex flex-col items-center justify-center gap-2 font-medium py-4 xl:py-0"
                   style={{
                     background:
                       "linear-gradient(180deg, #75736f 0%, #3d3c3a 100%)",
                   }}
                 >
                   <div className="flex items-center gap-2">
-                    <BsThermometerSun className="text-5xl 2xl:text-7xl" />
+                    <BsDropletHalf className="text-5xl 2xl:text-7xl" />
                     <div className="flex flex-col text-base 2xl:text-2xl">
-                      <div>Sensor 4</div>
-                      <div>21 °C</div>
+                      <div>Viscosity</div>
+                      <div>21 cp</div>
                     </div>
                   </div>
                 </div>

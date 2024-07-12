@@ -158,9 +158,9 @@ const DemokitZtar = () => {
       <div className="flex justify-between items-center gap-2 xl:h-[8%]">
         <img src={xymaLogo} alt="logo" className="max-h-10 2xl:max-h-12" />
         <div className="hidden md:block text-xl 2xl:text-2xl font-normal md:font-medium text-center">
-          μTMapS - Multi-Point Temperature Measurement Sensor
+          Ztar - Ultrasonic level measurement sensor
         </div>
-        <div className="md:hidden font-medium text-xl">μTMapS</div>
+        <div className="md:hidden font-medium text-xl">Ztar</div>
         <Link to="/">
           <button
             className=" py-1 pb-2 px-4 font-medium text-sm 2xl:text-lg rounded-md hover:scale-110 duration-200"
@@ -177,7 +177,7 @@ const DemokitZtar = () => {
       </div>
 
       <center className="md:hidden font-medium text-sm">
-        Multi-Point Temperature Measurement Sensor
+        Ultrasonic level measurement sensor
       </center>
 
       <div className="xl:h-[92%] flex flex-col-reverse xl:flex-row gap-4 xl:gap-2">

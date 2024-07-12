@@ -159,7 +159,7 @@ const DemokitUtmaps = () => {
       <div className="flex justify-between items-center gap-2 xl:h-[8%]">
         <img src={xymaLogo} alt="logo" className="max-h-10 2xl:max-h-12" />
         <div className="hidden md:block text-xl 2xl:text-2xl font-normal md:font-medium text-center">
-          μTMapS - Multi-Point Temperature Measurement Sensor
+          μTMapS - Multi-Point Temperature Mapping Sensor
         </div>
         <div className="md:hidden font-medium text-xl">μTMapS</div>
         <Link to="/">
@@ -178,7 +178,7 @@ const DemokitUtmaps = () => {
       </div>
 
       <center className="md:hidden font-medium text-sm">
-        Multi-Point Temperature Measurement Sensor
+        Multi-Point Temperature Mapping Sensor
       </center>
 
       <div className="xl:h-[92%] flex flex-col-reverse xl:flex-row gap-4 xl:gap-2">
@@ -430,7 +430,9 @@ const DemokitUtmaps = () => {
             {/* line graph */}
             <div className="border border-white bg-white/5 rounded-md w-full xl:w-[70%] px-2 pb-2 h-[250px] md:h-[300px] lg:h-[400px] xl:h-full flex flex-col">
               <div>
-                <center className='font-medium'>Sensor Temperature Measurement</center>
+                <center className="font-medium">
+                  Sensor Temperature Measurement
+                </center>
                 <div className="flex items-center px-2 py-1 text-sm font-medium">
                   <div className="mr-2">Set Limit:</div>
                   <input
