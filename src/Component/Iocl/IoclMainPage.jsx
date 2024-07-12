@@ -152,7 +152,12 @@ const IoclMainPage = (dataFromApp) => {
 
 
   return (
-    <div className="flex md:h-screen text-sm md:text-base 2xl:text-2xl">
+    <div
+      className="flex md:h-screen text-sm md:text-base 2xl:text-2xl"
+      style={{
+        background: "linear-gradient(180deg, #cdd3de 0%, #8b92b1 100%)",
+      }}
+    >
       {/* sidebar */}
       <div className="lg:w-[20%] xl:w-[15%] h-full">
         <IoclSidebar />
