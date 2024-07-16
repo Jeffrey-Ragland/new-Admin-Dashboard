@@ -167,9 +167,6 @@ const DemokitZtar = () => {
             style={{
               background: "linear-gradient(90deg, #f22213 0%, #f03f32 100%)",
             }}
-            onClick={() => {
-              localStorage.clear();
-            }}
           >
             Back
           </button>

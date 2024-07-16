@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import xymaLogo from "../Assets/xyma - Copy.png";
 import { BsThermometerSun } from "react-icons/bs";
-import { MdManageHistory } from "react-icons/md";
+import { MdManageHistory, MdOutlineCloudDone } from "react-icons/md";
 import { PiCloudWarningBold } from "react-icons/pi";
 import { Line } from "react-chartjs-2";
 import { Bar } from "react-chartjs-2";
@@ -28,32 +28,82 @@ ChartJS.register(
   Legend
 );
 
-const DemokitUtmaps = () => {
-  
-  // line chart data
-  const lineData = {
-    labels: ["S1", "S2", "S3"],
-    datasets: [
-      {
-        label: "S1",
-        data: [60, 40, 80, 20],
-        borderColor: "rgb(255, 99, 132)",
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
-      },
-      {
-        label: "S2",
-        data: [20, 70, 30, 40],
-        borderColor: "rgb(54, 162, 235)",
-        backgroundColor: "rgba(54, 162, 235, 0.2)",
-      },
-      {
-        label: "S3",
-        data: [10, 50, 90, 100],
-        borderColor: "rgb(75, 192, 192)",
-        backgroundColor: "rgba(75, 192, 192, 0.2)",
-      },
-    ],
+const DemokitUtmaps = (dataFromApp) => {
+
+  const [activeStatus, setActiveStatus] = useState('');
+  const [lineData, setLineData] = useState({
+    labels: [],
+    datasets: []
+  });
+
+  // const [barData, setBarData] = useState({
+  //   labels: [],
+  //   datasets: []
+  // })
+
+  console.log('utmaps data from app', dataFromApp);
+
+  const getInitialLimit = () => {
+    const storedLimit = localStorage.getItem("UtmapsLimit");
+    return storedLimit ? parseInt(storedLimit) : 100;
   };
+
+  const [utmapsLineLimit, setUtmapsLineLimit] = useState(getInitialLimit);
+
+  const handleLineLimit = (e) => {
+    const limit = parseInt(e.target.value);
+    setUtmapsLineLimit(limit);
+    localStorage.setItem("UtmapsLimit", limit.toString());
+  };
+
+  // line chart data
+    useEffect(() => {
+      if (
+        Array.isArray(dataFromApp.dataFromApp) &&
+        dataFromApp.dataFromApp.length > 0
+      ) {
+        const reversedData = [...dataFromApp.dataFromApp].reverse();
+
+        const lineLabels = reversedData.map((item) => {
+          const createdAt = new Date(item.createdAt).toLocaleString("en-GB");
+          return createdAt;
+        });
+        const sensor1Data = reversedData.map((item) => item.Sensor1);
+        const sensor2Data = reversedData.map((item) => item.Sensor2);
+        const sensor3Data = reversedData.map((item) => item.Sensor3);
+        const sensor4Data = reversedData.map((item) => item.Sensor4);
+
+        setLineData({
+          labels: lineLabels,
+          datasets: [
+            {
+              label: "S1",
+              data: sensor1Data,
+              borderColor: "rgb(255, 99, 132)",
+              backgroundColor: "rgba(255, 99, 132, 0.2)",
+            },
+            {
+              label: "S2",
+              data: sensor2Data,
+              borderColor: "rgb(54, 162, 235)",
+              backgroundColor: "rgba(54, 162, 235, 0.2)",
+            },
+            {
+              label: "S3",
+              data: sensor3Data,
+              borderColor: "rgb(75, 192, 192)",
+              backgroundColor: "rgba(75, 192, 192, 0.2)",
+            },
+            {
+              label: "S4",
+              data: sensor4Data,
+              borderColor: "rgb(255, 255, 0)",
+              backgroundColor: "rgba(255, 255, 0, 0.2)",
+            },
+          ],
+        });
+      }
+    }, [dataFromApp]);
 
   const lineOptions = {
     responsive: true,
@@ -64,7 +114,7 @@ const DemokitUtmaps = () => {
         labels: {
           color: "white",
           font: {
-            size: 10,
+            size: 8,
           },
         },
       },
@@ -74,7 +124,7 @@ const DemokitUtmaps = () => {
         ticks: {
           color: "white",
           font: {
-            size: 10,
+            size: 6,
           },
         },
       },
@@ -82,7 +132,7 @@ const DemokitUtmaps = () => {
         ticks: {
           color: "white",
           font: {
-            size: 10,
+            size: 6,
           },
         },
       },
@@ -91,15 +141,30 @@ const DemokitUtmaps = () => {
 
   // bar chart data
   const barData = {
-    labels: ["S1", "S2", "S3"],
+    labels: ["S1", "S2", "S3", "S4"],
     datasets: [
       {
-        label: "Temperature Data",
-        data: [73, 87, 56],
+        data: [
+          dataFromApp.dataFromApp.length > 0 &&
+            dataFromApp.dataFromApp[0].Sensor1,
+          dataFromApp.dataFromApp.length > 0 &&
+            dataFromApp.dataFromApp[0].Sensor2,
+          dataFromApp.dataFromApp.length > 0 &&
+            dataFromApp.dataFromApp[0].Sensor3,
+          dataFromApp.dataFromApp.length > 0 &&
+            dataFromApp.dataFromApp[0].Sensor4,
+        ],
+        borderColor: [
+          "rgb(255, 99, 132)",
+          "rgb(54, 162, 235)",
+          "rgb(75, 192, 192)",
+          "rgb(255, 255, 0)",
+        ],
         backgroundColor: [
-          "rgba(255, 99, 132, 0.9)",
-          "rgba(54, 162, 235, 0.9)",
-          "rgba(255, 206, 86, 0.9)",
+          "rgba(255, 99, 132, 0.5)",
+          "rgba(54, 162, 235, 0.5)",
+          "rgba(75, 192, 192, 0.5)",
+          "rgba(255, 255, 0, 0.5)",
         ],
         borderWidth: 1,
         barPercentage: 1,
@@ -114,13 +179,7 @@ const DemokitUtmaps = () => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: "top",
-        labels: {
-          color: "white",
-          font: {
-            size: 10,
-          },
-        },
+        display: false,
       },
       title: {
         display: true,
@@ -151,6 +210,30 @@ const DemokitUtmaps = () => {
     },
   };
 
+  // for activity status 
+  useEffect (() => {
+    if (dataFromApp.dataFromApp.length > 0) {
+      const currentDate = new Date();
+      const lastDataEntry = dataFromApp.dataFromApp[0];
+
+      if (lastDataEntry && lastDataEntry.createdAt) {
+        const lastDataTime = new Date(lastDataEntry.createdAt);
+
+        const timeDifference = currentDate.getTime() - lastDataTime.getTime();
+        const differenceInMinutes = timeDifference / (1000 * 60);
+
+        if (differenceInMinutes < 5) {
+          setActiveStatus("Active");
+        } else {
+          setActiveStatus("Inactive");
+        }
+      } else {
+        console.error("createdAt field is missing in the data");
+        setActiveStatus("Inactive");
+      }
+    }
+  }, [dataFromApp])
+  
   return (
     <div
       className="xl:h-screen text-white p-2 flex flex-col gap-2 md:gap-0.5"
@@ -169,9 +252,6 @@ const DemokitUtmaps = () => {
             className=" py-1 pb-2 px-4 font-medium text-sm 2xl:text-lg rounded-md hover:scale-110 duration-200"
             style={{
               background: "linear-gradient(90deg, #f22213 0%, #f03f32 100%)",
-            }}
-            onClick={() => {
-              localStorage.clear();
             }}
           >
             Back
@@ -207,7 +287,10 @@ const DemokitUtmaps = () => {
                     <BsThermometerSun className="text-5xl 2xl:text-7xl" />
                     <div className="flex flex-col text-base 2xl:text-2xl">
                       <div>Sensor 1</div>
-                      <div>45 °C</div>
+                      <div className="text-2xl md:text-3xl 2xl:text-6xl text-green-400">
+                        {dataFromApp.dataFromApp.length > 0 &&
+                          dataFromApp.dataFromApp[0].Sensor1}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -222,7 +305,10 @@ const DemokitUtmaps = () => {
                     <BsThermometerSun className="text-5xl 2xl:text-7xl" />
                     <div className="flex flex-col text-base 2xl:text-2xl">
                       <div>Sensor 2</div>
-                      <div>83 °C</div>
+                      <div className="text-2xl md:text-3xl 2xl:text-6xl text-green-400">
+                        {dataFromApp.dataFromApp.length > 0 &&
+                          dataFromApp.dataFromApp[0].Sensor2}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -240,7 +326,10 @@ const DemokitUtmaps = () => {
                     <BsThermometerSun className="text-5xl 2xl:text-7xl" />
                     <div className="flex flex-col text-base 2xl:text-2xl">
                       <div>Sensor 3</div>
-                      <div>76 °C</div>
+                      <div className="text-2xl md:text-3xl 2xl:text-6xl text-green-400">
+                        {dataFromApp.dataFromApp.length > 0 &&
+                          dataFromApp.dataFromApp[0].Sensor3}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -255,7 +344,10 @@ const DemokitUtmaps = () => {
                     <BsThermometerSun className="text-5xl 2xl:text-7xl" />
                     <div className="flex flex-col text-base 2xl:text-2xl">
                       <div>Sensor 4</div>
-                      <div>21 °C</div>
+                      <div className="text-2xl md:text-3xl 2xl:text-6xl text-green-400">
+                        {dataFromApp.dataFromApp.length > 0 &&
+                          dataFromApp.dataFromApp[0].Sensor4}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -268,15 +360,28 @@ const DemokitUtmaps = () => {
                 <div className="w-1/2 xl:w-[75%] border border-white rounded-md bg-white/5 flex flex-col xl:flex-row items-center gap-2 px-2 py-2 xl:py-0 ">
                   <div className="flex gap-2">
                     <MdManageHistory className="text-xl 2xl:text-3xl" />
-                    <div>Last Update:</div>
+                    <div>Last&nbsp;Update:</div>
                   </div>
                   <div className="text-sm 2xl:text-base font-normal">
-                    02/04/2024 02:55 pm
+                    {dataFromApp.dataFromApp.length > 0 &&
+                      new Date(
+                        dataFromApp.dataFromApp[0].createdAt
+                      ).toLocaleString("en-GB")}
                   </div>
                 </div>
-                <div className="w-1/2 xl:w-[25%] border border-white rounded-md bg-white/5 text-red-400 shadow-lg shadow-red-800 flex justify-center items-center px-2 gap-2">
-                  <PiCloudWarningBold className="text-xl 2xl:text-3xl" />
-                  Inactive
+                <div
+                  className={`w-1/2 xl:w-[25%] border border-white rounded-md bg-white/5 ${
+                    activeStatus === "Active"
+                      ? "text-green-400 shadow-green-800"
+                      : "text-red-400 shadow-red-800"
+                  }  shadow-lg  flex justify-center items-center px-2 gap-2`}
+                >
+                  {activeStatus === 'Active' ? (
+                    <MdOutlineCloudDone className="text-xl 2xl:text-3xl" />) : (
+                      <PiCloudWarningBold className="text-xl 2xl:text-3xl" />
+                    )
+                  }
+                  {activeStatus}
                 </div>
               </div>
               {/* table */}
@@ -306,140 +411,32 @@ const DemokitUtmaps = () => {
                   </thead>
 
                   <tbody className="text-sm 2xl:text-base text-gray-600">
-                    <tr>
-                      <td>1</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>2</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>3</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>4</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>5</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>6</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>7</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>8</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>9</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>10</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>11</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>12</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>13</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>14</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>15</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
+                    {dataFromApp.dataFromApp.length > 0 &&
+                      dataFromApp.dataFromApp.map((data, index) => (
+                        <tr
+                          key={index}
+                          className={`${index % 2 === 0 ? "" : "bg-stone-200"}`}
+                        >
+                          <td className="border border-gray-400 ">
+                            {index + 1}
+                          </td>
+                          <td className="border border-gray-400">
+                            {data.Sensor1}
+                          </td>
+                          <td className="border border-gray-400 ">
+                            {data.Sensor2}
+                          </td>
+                          <td className="border border-gray-400">
+                            {data.Sensor3}
+                          </td>
+                          <td className="border border-gray-400 ">
+                            {data.Sensor4}
+                          </td>
+                          <td className="text-[10px] border border-gray-400">
+                            {new Date(data.createdAt).toLocaleString("en-GB")}
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               </div>
@@ -460,10 +457,9 @@ const DemokitUtmaps = () => {
                     id="option1"
                     name="options"
                     value={100}
-                    // checked={ioclLineLimit === 100}
-                    defaultChecked
+                    checked={utmapsLineLimit === 100}
                     className="cursor-pointer mt-0.5"
-                    // onChange={handleLineLimit}
+                    onChange={handleLineLimit}
                   />
                   <label htmlFor="option1" className="mr-2 cursor-pointer">
                     100
@@ -473,9 +469,9 @@ const DemokitUtmaps = () => {
                     id="option2"
                     name="options"
                     value={500}
-                    // checked={ioclLineLimit === 500}
+                    checked={utmapsLineLimit === 500}
                     className="cursor-pointer mt-0.5"
-                    // onChange={handleLineLimit}
+                    onChange={handleLineLimit}
                   />
                   <label htmlFor="option2" className="mr-2 cursor-pointer">
                     500
@@ -485,12 +481,24 @@ const DemokitUtmaps = () => {
                     id="option3"
                     name="options"
                     value={1000}
-                    // checked={ioclLineLimit === 1000}
+                    checked={utmapsLineLimit === 1000}
                     className="cursor-pointer mt-0.5"
-                    // onChange={handleLineLimit}
+                    onChange={handleLineLimit}
                   />
                   <label htmlFor="option3" className="mr-2 cursor-pointer">
                     1000
+                  </label>
+                  <input
+                    type="radio"
+                    id="option4"
+                    name="options"
+                    value={1500}
+                    checked={utmapsLineLimit === 1500}
+                    className="cursor-pointer mt-0.5"
+                    onChange={handleLineLimit}
+                  />
+                  <label htmlFor="option4" className="mr-2 cursor-pointer">
+                    1500
                   </label>
                 </div>
               </div>
@@ -543,6 +551,6 @@ const DemokitUtmaps = () => {
       </div>
     </div>
   );
-}
+};
 
 export default DemokitUtmaps

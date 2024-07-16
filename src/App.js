@@ -40,6 +40,7 @@ const [projectData, setProjectData] = useState([]);
 const[chartdata,setChartData]=useState([]);
 const[ReportData,setReportData]=useState([]);
 const [ioclData, setIoclData] = useState([]);
+const [utmapsData, setUtmapsData] = useState([]);
 
 // const getInitialCondition = () => {
 //   const storedLimit = localStorage.getItem("IOCLLimit");
@@ -47,6 +48,20 @@ const [ioclData, setIoclData] = useState([]);
 // }
 
 // const [ioclCondition, setIoclCondition] = useState(getInitialCondition);
+
+const getInitialUtmapsCondition = () => {
+  const storedLimit = localStorage.getItem('UtmapsLimit');
+  return storedLimit ? 1 : 0
+};
+
+const [utmapsCondition, setUtmapsCondition] = useState(getInitialUtmapsCondition);
+
+useEffect(() => {
+  if(utmapsCondition === 0) {
+    localStorage.setItem('UtmapsLimit', '100');
+    setUtmapsCondition(1);
+  }
+}, []);
 
   let controls =localStorage.getItem("Controles");
 
@@ -58,32 +73,25 @@ const [ioclData, setIoclData] = useState([]);
   // }, []);
 
 
-  // localStorage.setItem('IOCLLimit', '100');
-
-  
-  // if(iocl === 0) {
-
-  //   localStorage.setItem("IOCLLimit", "100");
-  //   iocl +=1;
-  // }
-
-
-  // useEffect(()=>{
-  //   fetch_tof_fata();
-  //   fetchProductData();
-  //   chartdatafetch();
-  //   getIOCLData();
+  useEffect(()=>{
+    // fetch_tof_fata();
+    // fetchProductData();
+    // chartdatafetch();
+    // getIOCLData();
+    getDemokitUtmapsData();
   // const data = setInterval(fetch_tof_fata,2000);
   // const sensors =setInterval(fetchProductData,5000);
   // const chartdata =setInterval(chartdatafetch,2000);
   // const ioclData = setInterval(getIOCLData,2000);
-  // return()=>{
-  //   clearInterval(data);
-  //   clearInterval(sensors);
-  //   clearInterval(chartdata);
-  //   clearInterval(ioclData);
-  // }
-  // },[])
+  const utmapsData = setInterval(getDemokitUtmapsData, 2000);
+  return()=>{
+    // clearInterval(data);
+    // clearInterval(sensors);
+    // clearInterval(chartdata);
+    // clearInterval(ioclData);
+    clearInterval(utmapsData);
+  }
+  },[])
 
   // console.log('iocl data',ioclData);
 
@@ -186,6 +194,23 @@ const getIOCLData = async () => {
   }
 };
 
+const getDemokitUtmapsData = async() => {
+  try {
+    const projectNumber = localStorage.getItem("projectNumber");
+    const utmapsLimit = localStorage.getItem("UtmapsLimit");
+    const response = await axios.get(
+      `http://localhost:4000/sensor/getDemokitUtmapsData?projectNumber=${projectNumber}&limit=${utmapsLimit}`
+    );
+    if (response.data.success) {
+      setUtmapsData(response.data.data);
+    } else {
+      toast.error("No Data Found!");
+    }
+  } catch (error) {
+    console.error("Error fetching Demokit Utmaps data", error);
+  };
+};
+ 
   return (
     <>
       <Routes>
@@ -226,7 +251,7 @@ const getIOCLData = async () => {
           {controls === "DEMOKIT" ? (
             <Route path="/" element={<OnlyOutlet />}>
               <Route index element={<DemokitMainpage />} />
-              <Route path="utmaps" element={<DemokitUtmaps />} />
+              <Route path="utmaps" element={<DemokitUtmaps dataFromApp={utmapsData}/>} />
               <Route path="ports" element={<DemokitPorts />} />
               <Route path="ztar" element={<DemokitZtar />} />
             </Route>

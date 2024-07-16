@@ -33,15 +33,7 @@ const IoclMainPage = (dataFromApp) => {
   };
 
   const [ioclLineLimit, setIoclLineLimit] = useState(getInitialLimit);
-  // const [ioclLineLimit, setIoclLineLimit] = useState(parseInt(localStorage.getItem('IOCLLimit')));
-
-  // useEffect(() => {
-  //   const storedLimit = localStorage.getItem('IOCLLimit');
-  //   if(storedLimit) {
-  //     setIoclLineLimit(parseInt(storedLimit));
-  //   }
-  // },[]);
-
+  
   const handleLineLimit = (e) => {
     const limit = parseInt(e.target.value);
     setIoclLineLimit(limit);
