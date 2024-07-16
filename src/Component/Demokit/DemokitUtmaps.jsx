@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
+import axios from 'axios';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 import xymaLogo from "../Assets/xyma - Copy.png";
+import xymaImg from "../Assets/xyma.png";
+import coverImg from "../Assets/pdfcover.jpg";
+import sensorPage from "../Assets/utmapsPage.jpg";
+import disclaimerPage from "../Assets/disclaimerPage.jpg";
 import { BsThermometerSun } from "react-icons/bs";
 import { MdManageHistory, MdOutlineCloudDone } from "react-icons/md";
 import { PiCloudWarningBold } from "react-icons/pi";
@@ -31,15 +40,14 @@ ChartJS.register(
 const DemokitUtmaps = (dataFromApp) => {
 
   const [activeStatus, setActiveStatus] = useState('');
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+  const [filteredReportData, setFilteredReportData] = useState([]);
+
   const [lineData, setLineData] = useState({
     labels: [],
     datasets: []
   });
-
-  // const [barData, setBarData] = useState({
-  //   labels: [],
-  //   datasets: []
-  // })
 
   console.log('utmaps data from app', dataFromApp);
 
@@ -233,6 +241,101 @@ const DemokitUtmaps = (dataFromApp) => {
       }
     }
   }, [dataFromApp])
+
+  // report data
+  useEffect(() => {
+    handleReportData();
+  },[fromDate, toDate]);
+
+  const handleReportData = async () => {
+    try {
+      const projectName = localStorage.getItem('projectNumber');
+      const response = await axios.get(
+        `http://localhost:4000/sensor/getDemokitUtmapsReport?fromDate=${fromDate}&toDate=${toDate}&projectName=${projectName}`
+      );
+      setFilteredReportData(response.data.data);
+      console.log('report data',response.data.data);
+    } catch (error) {
+      console.error('Error fetching data: ', error);
+    };
+  };
+
+  // to generate report pdf
+  const generatePdf = () => {
+    const doc = new jsPDF();
+    const logo = xymaImg;
+    const cover = coverImg;
+    const desc = sensorPage;
+    const disclaimer = disclaimerPage;
+
+    // cover img
+    doc.addImage(cover, "JPG", 0, 0, 210, 297);
+    doc.addPage();
+
+    //logo
+    doc.addImage(logo, "PNG", 10, 10, 40, 20);
+
+    //sensor description
+    doc.addImage(desc, "PNG", 0, 40, 220, 250);
+    doc.addPage();
+
+    //logo
+    doc.addImage(logo, "PNG", 10, 10, 40, 20);
+
+    if (filteredReportData && filteredReportData.length > 0) {
+      // table
+      doc.autoTable({
+        head: [["S.No", "S1", "S2", "S3", "S4", "Updated At"]],
+        body: filteredReportData.map(
+          ({ Sensor1, Sensor2, Sensor3, Sensor4, createdAt }, index) => [
+            index + 1,
+            Sensor1,
+            Sensor2,
+            Sensor3,
+            Sensor4,
+            new Date(createdAt).toLocaleString("en-GB"),
+          ]
+        ),
+        startY: 40,
+        headerStyles: {
+          fillColor: [222, 121, 13],
+        },
+      });
+    }
+
+     doc.addPage();
+
+     //logo
+     doc.addImage(logo, "PNG", 10, 10, 40, 20);
+
+     //disclaimer
+     doc.addImage(disclaimer, "PNG", 0, 50, 210, 250);
+
+    //  doc.save("sensor_adminData.pdf");
+    const blob = doc.output('blob');
+
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+  }
+
+  // to generate report excel
+  const generateExcel = () => {
+    const ws = XLSX.utils.json_to_sheet(
+      filteredReportData.map(
+        ({ _id, ProjectName, createdAt, updatedAt, __v, ...rest }) => ({
+          ...rest,
+          createdAt: new Date(createdAt).toLocaleString("en-GB"),
+        })
+      )
+    );
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const info = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    saveAs(info, "Utmaps_Report.xlsx");
+  };
   
   return (
     <div
@@ -376,11 +479,11 @@ const DemokitUtmaps = (dataFromApp) => {
                       : "text-red-400 shadow-red-800"
                   }  shadow-lg  flex justify-center items-center px-2 gap-2`}
                 >
-                  {activeStatus === 'Active' ? (
-                    <MdOutlineCloudDone className="text-xl 2xl:text-3xl" />) : (
-                      <PiCloudWarningBold className="text-xl 2xl:text-3xl" />
-                    )
-                  }
+                  {activeStatus === "Active" ? (
+                    <MdOutlineCloudDone className="text-xl 2xl:text-3xl" />
+                  ) : (
+                    <PiCloudWarningBold className="text-xl 2xl:text-3xl" />
+                  )}
                   {activeStatus}
                 </div>
               </div>
@@ -522,25 +625,35 @@ const DemokitUtmaps = (dataFromApp) => {
                     <label>From</label>
                     <input
                       type="date"
-                      placeholder="From"
                       className="text-black rounded-md px-0.5 2xl:p-2"
+                      required
+                      value={fromDate}
+                      onChange={(e) => setFromDate(e.target.value)}
                     />
                   </div>
                   <div className="flex flex-col gap-1">
                     <label>To</label>
                     <input
                       type="date"
-                      placeholder="To"
                       className="text-black rounded-md px-0.5 2xl:p-2"
+                      required
+                      value={toDate}
+                      onChange={(e) => setToDate(e.target.value)}
                     />
                   </div>
                 </div>
 
                 <div className="flex md:flex-col xl:flex-row gap-2 justify-center items-center h-1/2">
-                  <button className="rounded-md bg-red-500 hover:scale-105 duration-200 py-1 px-2 md:w-28 xl:w-auto 2xl:py-2 2xl:px-4">
+                  <button
+                    className="rounded-md bg-red-500 hover:scale-105 duration-200 py-1 px-2 md:w-28 xl:w-auto 2xl:py-2 2xl:px-4"
+                    onClick={generatePdf}
+                  >
                     PDF
                   </button>
-                  <button className="rounded-md bg-green-500 hover:scale-105 duration-200 py-1 px-2 2xl:py-2 2xl:px-4 md:w-28 xl:w-auto">
+                  <button
+                    className="rounded-md bg-green-500 hover:scale-105 duration-200 py-1 px-2 2xl:py-2 2xl:px-4 md:w-28 xl:w-auto"
+                    onClick={generateExcel}
+                  >
                     Excel
                   </button>
                 </div>
