@@ -1,7 +1,17 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 import xymaLogo from "../Assets/xyma - Copy.png";
-import { MdManageHistory } from "react-icons/md";
+import xymaImg from "../Assets/xyma.png";
+import coverImg from "../Assets/pdfcover.jpg";
+import sensorPage from "../Assets/utmapsPage.jpg";
+import disclaimerPage from "../Assets/disclaimerPage.jpg";
+import { MdManageHistory, MdOutlineCloudDone } from "react-icons/md";
 import { PiCloudWarningBold } from "react-icons/pi";
 import { BiWater } from "react-icons/bi";
 import { Line } from "react-chartjs-2";
@@ -28,31 +38,59 @@ ChartJS.register(
   Legend
 );
 
-const DemokitZtar = () => {
-  // line chart data
-  const lineData = {
-    labels: ["S1", "S2", "S3"],
-    datasets: [
-      {
-        label: "S1",
-        data: [60, 40, 80, 20],
-        borderColor: "rgb(255, 99, 132)",
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
-      },
-      {
-        label: "S2",
-        data: [20, 70, 30, 40],
-        borderColor: "rgb(54, 162, 235)",
-        backgroundColor: "rgba(54, 162, 235, 0.2)",
-      },
-      {
-        label: "S3",
-        data: [10, 50, 90, 100],
-        borderColor: "rgb(75, 192, 192)",
-        backgroundColor: "rgba(75, 192, 192, 0.2)",
-      },
-    ],
+const DemokitZtar = (dataFromApp) => {
+  const [activeStatus, setActiveStatus] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [filteredReportData, setFilteredReportData] = useState([]);
+
+  const [lineData, setLineData] = useState({
+    labels: [],
+    datasets: [],
+  });
+
+  console.log("ztar data from app", dataFromApp);
+
+  const getInitialLimit = () => {
+    const storedLimit = localStorage.getItem("ZtarLimit");
+    return storedLimit ? parseInt(storedLimit) : 100;
   };
+
+  const [ztarLineLimit, setZtarLineLimit] = useState(getInitialLimit);
+
+  const handleLineLimit = (e) => {
+    const limit = parseInt(e.target.value);
+    setZtarLineLimit(limit);
+    localStorage.setItem("ZtarLimit", limit.toString());
+  };
+
+  // line chart data
+  useEffect(() => {
+    if (
+      Array.isArray(dataFromApp.dataFromApp) &&
+      dataFromApp.dataFromApp.length > 0
+    ) {
+      const reversedData = [...dataFromApp.dataFromApp].reverse();
+
+      const lineLabels = reversedData.map((item) => {
+        const createdAt = new Date(item.createdAt).toLocaleString("en-GB");
+        return createdAt;
+      });
+      const levelData = reversedData.map((item) => item.Level);
+
+      setLineData({
+        labels: lineLabels,
+        datasets: [
+          {
+            label: "Level",
+            data: levelData,
+            borderColor: "rgb(255, 255, 0)",
+            backgroundColor: "rgba(255, 255, 0, 0.2)",
+          },
+        ],
+      });
+    }
+  }, [dataFromApp]);
 
   const lineOptions = {
     responsive: true,
@@ -63,7 +101,7 @@ const DemokitZtar = () => {
         labels: {
           color: "white",
           font: {
-            size: 10,
+            size: 8,
           },
         },
       },
@@ -73,7 +111,7 @@ const DemokitZtar = () => {
         ticks: {
           color: "white",
           font: {
-            size: 10,
+            size: 6,
           },
         },
       },
@@ -81,7 +119,7 @@ const DemokitZtar = () => {
         ticks: {
           color: "white",
           font: {
-            size: 10,
+            size: 6,
           },
         },
       },
@@ -90,16 +128,17 @@ const DemokitZtar = () => {
 
   // bar chart data
   const barData = {
-    labels: ["S1"],
+    labels: ["Level"],
     datasets: [
       {
-        label: "Temperature Data",
-        data: [73],
-        backgroundColor: [
-          "rgba(255, 99, 132, 0.9)",
+        data: [
+          dataFromApp.dataFromApp.length > 0 &&
+            dataFromApp.dataFromApp[0].Level,
         ],
+        borderColor: ["rgb(255, 255, 0)"],
+        backgroundColor: ["rgba(255, 255, 0, 0.5)"],
         borderWidth: 1,
-        barPercentage: 0.25,
+        barPercentage: 1,
         categoryPercentage: 1,
       },
     ],
@@ -111,13 +150,7 @@ const DemokitZtar = () => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: "top",
-        labels: {
-          color: "white",
-          font: {
-            size: 10,
-          },
-        },
+        display: false,
       },
       title: {
         display: true,
@@ -146,6 +179,122 @@ const DemokitZtar = () => {
         },
       },
     },
+  };
+
+  // for activity status
+  useEffect(() => {
+    if (dataFromApp.dataFromApp.length > 0) {
+      const currentDate = new Date();
+      const lastDataEntry = dataFromApp.dataFromApp[0];
+
+      if (lastDataEntry && lastDataEntry.createdAt) {
+        const lastDataTime = new Date(lastDataEntry.createdAt);
+
+        const timeDifference = currentDate.getTime() - lastDataTime.getTime();
+        const differenceInMinutes = timeDifference / (1000 * 60);
+
+        if (differenceInMinutes < 5) {
+          setActiveStatus("Active");
+        } else {
+          setActiveStatus("Inactive");
+        }
+      } else {
+        console.error("createdAt field is missing in the data");
+        setActiveStatus("Inactive");
+      }
+    }
+  }, [dataFromApp]);
+
+  // report data
+  useEffect(() => {
+    handleReportData();
+  }, [fromDate, toDate]);
+
+  const handleReportData = async () => {
+    try {
+      const projectName = localStorage.getItem("projectNumber");
+      const response = await axios.get(
+        `http://localhost:4000/sensor/getDemokitZtarReport?fromDate=${fromDate}&toDate=${toDate}&projectName=${projectName}`
+      );
+      setFilteredReportData(response.data.data);
+      console.log("report data", response.data.data);
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+    }
+  };
+
+  // to generate report pdf
+  const generatePdf = () => {
+    const doc = new jsPDF();
+    const logo = xymaImg;
+    const cover = coverImg;
+    const desc = sensorPage;
+    const disclaimer = disclaimerPage;
+
+    // cover img
+    doc.addImage(cover, "JPG", 0, 0, 210, 297);
+    doc.addPage();
+
+    //logo
+    doc.addImage(logo, "PNG", 10, 10, 40, 20);
+
+    //sensor description
+    doc.addImage(desc, "PNG", 0, 40, 220, 250);
+    doc.addPage();
+
+    //logo
+    doc.addImage(logo, "PNG", 10, 10, 40, 20);
+
+    if (filteredReportData && filteredReportData.length > 0) {
+      // table
+      doc.autoTable({
+        head: [["S.No", "Level"]],
+        body: filteredReportData.map(
+          ({ Level, createdAt }, index) => [
+            index + 1,
+            Level,
+            new Date(createdAt).toLocaleString("en-GB"),
+          ]
+        ),
+        startY: 40,
+        headerStyles: {
+          fillColor: [222, 121, 13],
+        },
+      });
+    }
+
+    doc.addPage();
+
+    //logo
+    doc.addImage(logo, "PNG", 10, 10, 40, 20);
+
+    //disclaimer
+    doc.addImage(disclaimer, "PNG", 0, 50, 210, 250);
+
+    //  doc.save("sensor_adminData.pdf");
+    const blob = doc.output("blob");
+
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+  };
+
+  // to generate report excel
+  const generateExcel = () => {
+    const ws = XLSX.utils.json_to_sheet(
+      filteredReportData.map(
+        ({ _id, ProjectName, createdAt, updatedAt, __v, ...rest }) => ({
+          ...rest,
+          createdAt: new Date(createdAt).toLocaleString("en-GB"),
+        })
+      )
+    );
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const info = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    saveAs(info, "Ztar_Report.xlsx");
   };
 
   return (
@@ -199,7 +348,10 @@ const DemokitZtar = () => {
                 <BiWater className="text-6xl xl:text-7xl 2xl:text-8xl" />
                 <div className="flex flex-col text-base 2xl:text-2xl">
                   <div>Liquid Level</div>
-                  <div>255 mm</div>
+                  <div className="text-2xl md:text-3xl 2xl:text-6xl text-green-400">
+                    {dataFromApp.dataFromApp.length > 0 &&
+                      dataFromApp.dataFromApp[0].Level}
+                  </div>
                 </div>
               </div>
 
@@ -208,16 +360,29 @@ const DemokitZtar = () => {
                 <div className="rounded-md h-1/2 md:h-auto xl:h-1/2 md:w-1/2 xl:w-auto flex flex-col items-center justify-center gap-2 font-medium py-4 xl:py-0 border border-white bg-white/5">
                   <div className="flex items-center gap-2">
                     <MdManageHistory className="text-3xl 2xl:text-5xl" />
-                    <div>Last Update:</div>
+                    <div>Last&nbsp;Update:</div>
                   </div>
                   <div className="text-sm 2xl:text-base font-normal">
-                    02/04/2024 02:55 pm
+                    {dataFromApp.dataFromApp.length > 0 &&
+                      new Date(
+                        dataFromApp.dataFromApp[0].createdAt
+                      ).toLocaleString("en-GB")}
                   </div>
                 </div>
 
-                <div className="rounded-md h-1/2 md:h-auto xl:h-1/2 md:w-1/2 xl:w-auto flex  items-center justify-center gap-2 font-medium py-4 xl:py-0 border border-white bg-white/5 text-red-400 shadow-md shadow-red-800">
-                  <PiCloudWarningBold className="text-3xl 2xl:text-5xl" />
-                  Inactive
+                <div
+                  className={`text-xl md:text-2xl 2xl:text-3xl rounded-md h-1/2 md:h-auto xl:h-1/2 md:w-1/2 xl:w-auto flex  items-center justify-center gap-2 font-medium py-4 xl:py-0 border border-white bg-white/5 shadow-lg ${
+                    activeStatus === "Active"
+                      ? "text-green-400 shadow-green-800"
+                      : "text-red-400 shadow-red-800"
+                  }`}
+                >
+                  {activeStatus === "Active" ? (
+                    <MdOutlineCloudDone className="text-xl md:text-4xl 2xl:text-5xl" />
+                  ) : (
+                    <PiCloudWarningBold className="text-xl md:text-4xl 2xl:text-5xl" />
+                  )}
+                  {activeStatus}
                 </div>
               </div>
             </div>
@@ -246,95 +411,19 @@ const DemokitZtar = () => {
                 </thead>
 
                 <tbody className="text-sm 2xl:text-base text-gray-600">
-                  <tr>
-                    <td>1</td>
-                    <td>20</td>
-                    <td>2:55 pm</td>
-                  </tr>
-
-                  <tr>
-                    <td>2</td>
-                    <td>20</td>
-                    <td>2:55 pm</td>
-                  </tr>
-
-                  <tr>
-                    <td>3</td>
-                    <td>20</td>
-                    <td>2:55 pm</td>
-                  </tr>
-
-                  <tr>
-                    <td>4</td>
-                    <td>20</td>
-                    <td>2:55 pm</td>
-                  </tr>
-
-                  <tr>
-                    <td>5</td>
-                    <td>20</td>
-                    <td>2:55 pm</td>
-                  </tr>
-
-                  <tr>
-                    <td>6</td>
-                    <td>20</td>
-                    <td>2:55 pm</td>
-                  </tr>
-
-                  <tr>
-                    <td>7</td>
-                    <td>20</td>
-                    <td>2:55 pm</td>
-                  </tr>
-
-                  <tr>
-                    <td>8</td>
-                    <td>20</td>
-                    <td>2:55 pm</td>
-                  </tr>
-
-                  <tr>
-                    <td>9</td>
-                    <td>20</td>
-                    <td>2:55 pm</td>
-                  </tr>
-
-                  <tr>
-                    <td>10</td>
-                    <td>20</td>
-                    <td>2:55 pm</td>
-                  </tr>
-
-                  <tr>
-                    <td>11</td>
-                    <td>20</td>
-                    <td>2:55 pm</td>
-                  </tr>
-
-                  <tr>
-                    <td>12</td>
-                    <td>20</td>
-                    <td>2:55 pm</td>
-                  </tr>
-
-                  <tr>
-                    <td>13</td>
-                    <td>20</td>
-                    <td>2:55 pm</td>
-                  </tr>
-
-                  <tr>
-                    <td>14</td>
-                    <td>20</td>
-                    <td>2:55 pm</td>
-                  </tr>
-
-                  <tr>
-                    <td>15</td>
-                    <td>20</td>
-                    <td>2:55 pm</td>
-                  </tr>
+                  {dataFromApp.dataFromApp.length > 0 &&
+                    dataFromApp.dataFromApp.map((data, index) => (
+                      <tr
+                        key={index}
+                        className={`${index % 2 === 0 ? "" : "bg-stone-200"}`}
+                      >
+                        <td className="border border-gray-400 ">{index + 1}</td>
+                        <td className="border border-gray-400">{data.Level}</td>
+                        <td className="text-[10px] border border-gray-400">
+                          {new Date(data.createdAt).toLocaleString("en-GB")}
+                        </td>
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>
@@ -345,7 +434,7 @@ const DemokitZtar = () => {
             <div className="border border-white bg-white/5 rounded-md w-full xl:w-[70%] px-2 pb-2 h-[250px] md:h-[300px] lg:h-[400px] xl:h-full flex flex-col">
               <div>
                 <center className="font-medium">
-                  Sensor Temperature Measurement
+                  Liquid Level Measurement
                 </center>
                 <div className="flex items-center px-2 py-1 text-sm font-medium">
                   <div className="mr-2">Set Limit:</div>
@@ -354,10 +443,9 @@ const DemokitZtar = () => {
                     id="option1"
                     name="options"
                     value={100}
-                    // checked={ioclLineLimit === 100}
-                    defaultChecked
+                    checked={ztarLineLimit === 100}
                     className="cursor-pointer mt-0.5"
-                    // onChange={handleLineLimit}
+                    onChange={handleLineLimit}
                   />
                   <label htmlFor="option1" className="mr-2 cursor-pointer">
                     100
@@ -367,9 +455,9 @@ const DemokitZtar = () => {
                     id="option2"
                     name="options"
                     value={500}
-                    // checked={ioclLineLimit === 500}
+                    checked={ztarLineLimit === 500}
                     className="cursor-pointer mt-0.5"
-                    // onChange={handleLineLimit}
+                    onChange={handleLineLimit}
                   />
                   <label htmlFor="option2" className="mr-2 cursor-pointer">
                     500
@@ -379,12 +467,24 @@ const DemokitZtar = () => {
                     id="option3"
                     name="options"
                     value={1000}
-                    // checked={ioclLineLimit === 1000}
+                    checked={ztarLineLimit === 1000}
                     className="cursor-pointer mt-0.5"
-                    // onChange={handleLineLimit}
+                    onChange={handleLineLimit}
                   />
                   <label htmlFor="option3" className="mr-2 cursor-pointer">
                     1000
+                  </label>
+                  <input
+                    type="radio"
+                    id="option4"
+                    name="options"
+                    value={1500}
+                    checked={ztarLineLimit === 1500}
+                    className="cursor-pointer mt-0.5"
+                    onChange={handleLineLimit}
+                  />
+                  <label htmlFor="option4" className="mr-2 cursor-pointer">
+                    1500
                   </label>
                 </div>
               </div>
@@ -408,25 +508,35 @@ const DemokitZtar = () => {
                     <label>From</label>
                     <input
                       type="date"
-                      placeholder="From"
                       className="text-black rounded-md px-0.5 2xl:p-2"
+                      required
+                      value={fromDate}
+                      onChange={(e) => setFromDate(e.target.value)}
                     />
                   </div>
                   <div className="flex flex-col gap-1">
                     <label>To</label>
                     <input
                       type="date"
-                      placeholder="To"
                       className="text-black rounded-md px-0.5 2xl:p-2"
+                      required
+                      value={toDate}
+                      onChange={(e) => setToDate(e.target.value)}
                     />
                   </div>
                 </div>
 
                 <div className="flex md:flex-col xl:flex-row gap-2 justify-center items-center h-1/2">
-                  <button className="rounded-md bg-red-500 hover:scale-105 duration-200 py-1 px-2 md:w-28 xl:w-auto 2xl:py-2 2xl:px-4">
+                  <button
+                    className="rounded-md bg-red-500 hover:scale-105 duration-200 py-1 px-2 md:w-28 xl:w-auto 2xl:py-2 2xl:px-4"
+                    onClick={generatePdf}
+                  >
                     PDF
                   </button>
-                  <button className="rounded-md bg-green-500 hover:scale-105 duration-200 py-1 px-2 2xl:py-2 2xl:px-4 md:w-28 xl:w-auto">
+                  <button
+                    className="rounded-md bg-green-500 hover:scale-105 duration-200 py-1 px-2 2xl:py-2 2xl:px-4 md:w-28 xl:w-auto"
+                    onClick={generateExcel}
+                  >
                     Excel
                   </button>
                 </div>

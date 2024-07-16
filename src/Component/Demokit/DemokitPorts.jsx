@@ -1,10 +1,19 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 import xymaLogo from "../Assets/xyma - Copy.png";
-import { BsThermometerSun } from "react-icons/bs";
-import { BsDropletHalf } from "react-icons/bs";
+import xymaImg from "../Assets/xyma.png";
+import coverImg from "../Assets/pdfcover.jpg";
+import sensorPage from "../Assets/utmapsPage.jpg";
+import disclaimerPage from "../Assets/disclaimerPage.jpg";
+import { BsThermometerSun, BsDropletHalf } from "react-icons/bs";
 import { HiMiniBeaker } from "react-icons/hi2";
-import { MdManageHistory } from "react-icons/md";
+import { MdManageHistory, MdOutlineCloudDone } from "react-icons/md";
 import { PiCloudWarningBold } from "react-icons/pi";
 import { Line } from "react-chartjs-2";
 import { Bar } from "react-chartjs-2";
@@ -30,31 +39,73 @@ ChartJS.register(
   Legend
 );
 
-const DemokitPorts = () => {
-  // line chart data
-  const lineData = {
-    labels: ["S1", "S2", "S3"],
-    datasets: [
-      {
-        label: "S1",
-        data: [60, 40, 80, 20],
-        borderColor: "rgb(255, 99, 132)",
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
-      },
-      {
-        label: "S2",
-        data: [20, 70, 30, 40],
-        borderColor: "rgb(54, 162, 235)",
-        backgroundColor: "rgba(54, 162, 235, 0.2)",
-      },
-      {
-        label: "S3",
-        data: [10, 50, 90, 100],
-        borderColor: "rgb(75, 192, 192)",
-        backgroundColor: "rgba(75, 192, 192, 0.2)",
-      },
-    ],
+const DemokitPorts = (dataFromApp) => {
+  const [activeStatus, setActiveStatus] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [filteredReportData, setFilteredReportData] = useState([]);
+
+  const [lineData, setLineData] = useState({
+    labels: [],
+    datasets: [],
+  });
+
+  console.log("ports data from app", dataFromApp);
+
+  const getInitialLimit = () => {
+    const storedLimit = localStorage.getItem("PortsLimit");
+    return storedLimit ? parseInt(storedLimit) : 100;
   };
+
+  const [portsLineLimit, setPortsLineLimit] = useState(getInitialLimit);
+
+  const handleLineLimit = (e) => {
+    const limit = parseInt(e.target.value);
+    setPortsLineLimit(limit);
+    localStorage.setItem("PortsLimit", limit.toString());
+  };
+
+  // line chart data
+  useEffect(() => {
+    if (
+      Array.isArray(dataFromApp.dataFromApp) &&
+      dataFromApp.dataFromApp.length > 0
+    ) {
+      const reversedData = [...dataFromApp.dataFromApp].reverse();
+
+      const lineLabels = reversedData.map((item) => {
+        const createdAt = new Date(item.createdAt).toLocaleString("en-GB");
+        return createdAt;
+      });
+      const temperatureData = reversedData.map((item) => item.Temperature);
+      const densityData = reversedData.map((item) => item.Density);
+      const viscosityData = reversedData.map((item) => item.Viscosity);
+
+      setLineData({
+        labels: lineLabels,
+        datasets: [
+          {
+            label: "Temperature",
+            data: temperatureData,
+            borderColor: "rgb(255, 99, 132)",
+            backgroundColor: "rgba(255, 99, 132, 0.2)",
+          },
+          {
+            label: "Density",
+            data: densityData,
+            borderColor: "rgb(54, 162, 235)",
+            backgroundColor: "rgba(54, 162, 235, 0.2)",
+          },
+          {
+            label: "Viscosity",
+            data: viscosityData,
+            borderColor: "rgb(255, 255, 0)",
+            backgroundColor: "rgba(255, 255, 0, 0.2)",
+          },
+        ],
+      });
+    }
+  }, [dataFromApp]);
 
   const lineOptions = {
     responsive: true,
@@ -65,7 +116,7 @@ const DemokitPorts = () => {
         labels: {
           color: "white",
           font: {
-            size: 10,
+            size: 8,
           },
         },
       },
@@ -75,7 +126,7 @@ const DemokitPorts = () => {
         ticks: {
           color: "white",
           font: {
-            size: 10,
+            size: 6,
           },
         },
       },
@@ -83,7 +134,7 @@ const DemokitPorts = () => {
         ticks: {
           color: "white",
           font: {
-            size: 10,
+            size: 6,
           },
         },
       },
@@ -92,15 +143,26 @@ const DemokitPorts = () => {
 
   // bar chart data
   const barData = {
-    labels: ["S1", "S2", "S3"],
+    labels: ["Temperature", "Density", "Viscosity"],
     datasets: [
       {
-        label: "Temperature Data",
-        data: [73, 87, 56],
+        data: [
+          dataFromApp.dataFromApp.length > 0 &&
+            dataFromApp.dataFromApp[0].Temperature,
+          dataFromApp.dataFromApp.length > 0 &&
+            dataFromApp.dataFromApp[0].Density,
+          dataFromApp.dataFromApp.length > 0 &&
+            dataFromApp.dataFromApp[0].Viscosity,
+        ],
+        borderColor: [
+          "rgb(255, 99, 132)",
+          "rgb(54, 162, 235)",
+          "rgb(255, 255, 0)",
+        ],
         backgroundColor: [
-          "rgba(255, 99, 132, 0.9)",
-          "rgba(54, 162, 235, 0.9)",
-          "rgba(255, 206, 86, 0.9)",
+          "rgba(255, 99, 132, 0.5)",
+          "rgba(54, 162, 235, 0.5)",
+          "rgba(255, 255, 0, 0.5)",
         ],
         borderWidth: 1,
         barPercentage: 1,
@@ -115,13 +177,7 @@ const DemokitPorts = () => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: "top",
-        labels: {
-          color: "white",
-          font: {
-            size: 10,
-          },
-        },
+        display: false,
       },
       title: {
         display: true,
@@ -150,6 +206,124 @@ const DemokitPorts = () => {
         },
       },
     },
+  };
+
+  // for activity status
+  useEffect(() => {
+    if (dataFromApp.dataFromApp.length > 0) {
+      const currentDate = new Date();
+      const lastDataEntry = dataFromApp.dataFromApp[0];
+
+      if (lastDataEntry && lastDataEntry.createdAt) {
+        const lastDataTime = new Date(lastDataEntry.createdAt);
+
+        const timeDifference = currentDate.getTime() - lastDataTime.getTime();
+        const differenceInMinutes = timeDifference / (1000 * 60);
+
+        if (differenceInMinutes < 5) {
+          setActiveStatus("Active");
+        } else {
+          setActiveStatus("Inactive");
+        }
+      } else {
+        console.error("createdAt field is missing in the data");
+        setActiveStatus("Inactive");
+      }
+    }
+  }, [dataFromApp]);
+
+  // report data
+  useEffect(() => {
+    handleReportData();
+  }, [fromDate, toDate]);
+
+  const handleReportData = async () => {
+    try {
+      const projectName = localStorage.getItem("projectNumber");
+      const response = await axios.get(
+        `http://localhost:4000/sensor/getDemokitPortsReport?fromDate=${fromDate}&toDate=${toDate}&projectName=${projectName}`
+      );
+      setFilteredReportData(response.data.data);
+      console.log("report data", response.data.data);
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+    }
+  };
+
+  // to generate report pdf
+  const generatePdf = () => {
+    const doc = new jsPDF();
+    const logo = xymaImg;
+    const cover = coverImg;
+    const desc = sensorPage;
+    const disclaimer = disclaimerPage;
+
+    // cover img
+    doc.addImage(cover, "JPG", 0, 0, 210, 297);
+    doc.addPage();
+
+    //logo
+    doc.addImage(logo, "PNG", 10, 10, 40, 20);
+
+    //sensor description
+    doc.addImage(desc, "PNG", 0, 40, 220, 250);
+    doc.addPage();
+
+    //logo
+    doc.addImage(logo, "PNG", 10, 10, 40, 20);
+
+    if (filteredReportData && filteredReportData.length > 0) {
+      // table
+      doc.autoTable({
+        head: [["S.No", "Temperature", "Density", "Viscosity", "Updated At"]],
+        body: filteredReportData.map(
+          ({ Temperature, Density, Viscosity, createdAt }, index) => [
+            index + 1,
+            Temperature,
+            Density,
+            Viscosity,
+            new Date(createdAt).toLocaleString("en-GB"),
+          ]
+        ),
+        startY: 40,
+        headerStyles: {
+          fillColor: [222, 121, 13],
+        },
+      });
+    }
+
+    doc.addPage();
+
+    //logo
+    doc.addImage(logo, "PNG", 10, 10, 40, 20);
+
+    //disclaimer
+    doc.addImage(disclaimer, "PNG", 0, 50, 210, 250);
+
+    //  doc.save("sensor_adminData.pdf");
+    const blob = doc.output("blob");
+
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+  };
+
+  // to generate report excel
+  const generateExcel = () => {
+    const ws = XLSX.utils.json_to_sheet(
+      filteredReportData.map(
+        ({ _id, ProjectName, createdAt, updatedAt, __v, ...rest }) => ({
+          ...rest,
+          createdAt: new Date(createdAt).toLocaleString("en-GB"),
+        })
+      )
+    );
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const info = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    saveAs(info, "Ports_Report.xlsx");
   };
 
   return (
@@ -203,7 +377,10 @@ const DemokitPorts = () => {
                 <BsThermometerSun className="text-6xl xl:text-7xl 2xl:text-8xl" />
                 <div className="flex flex-col text-base 2xl:text-2xl">
                   <div>Temperature</div>
-                  <div>45 °C</div>
+                  <div className="text-2xl md:text-3xl 2xl:text-6xl text-green-400">
+                    {dataFromApp.dataFromApp.length > 0 &&
+                      dataFromApp.dataFromApp[0].Temperature}
+                  </div>
                 </div>
               </div>
 
@@ -219,7 +396,10 @@ const DemokitPorts = () => {
                     <HiMiniBeaker className="text-5xl 2xl:text-7xl" />
                     <div className="flex flex-col text-base 2xl:text-2xl">
                       <div>Density</div>
-                      <div>76 cSt</div>
+                      <div className="text-2xl md:text-3xl 2xl:text-6xl text-green-400">
+                        {dataFromApp.dataFromApp.length > 0 &&
+                          dataFromApp.dataFromApp[0].Density}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -234,7 +414,10 @@ const DemokitPorts = () => {
                     <BsDropletHalf className="text-5xl 2xl:text-7xl" />
                     <div className="flex flex-col text-base 2xl:text-2xl">
                       <div>Viscosity</div>
-                      <div>21 cp</div>
+                      <div className="text-2xl md:text-3xl 2xl:text-6xl text-green-400">
+                        {dataFromApp.dataFromApp.length > 0 &&
+                          dataFromApp.dataFromApp[0].Viscosity}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -247,15 +430,28 @@ const DemokitPorts = () => {
                 <div className="w-1/2 xl:w-[75%] border border-white rounded-md bg-white/5 flex flex-col xl:flex-row items-center gap-2 px-2 py-2 xl:py-0">
                   <div className="flex gap-2">
                     <MdManageHistory className="text-xl 2xl:text-3xl" />
-                    <div>Last Update:</div>
+                    <div>Last&nbsp;Update:</div>
                   </div>
                   <div className="text-sm 2xl:text-base font-normal">
-                    02/04/2024 02:55 pm
+                    {dataFromApp.dataFromApp.length > 0 &&
+                      new Date(
+                        dataFromApp.dataFromApp[0].createdAt
+                      ).toLocaleString("en-GB")}
                   </div>
                 </div>
-                <div className="w-1/2 xl:w-[25%] border border-white rounded-md bg-white/5 text-red-400 shadow-lg shadow-red-800 flex justify-center items-center px-2 gap-2">
-                  <PiCloudWarningBold className="text-xl 2xl:text-3xl" />
-                  Inactive
+                <div
+                  className={`w-1/2 xl:w-[25%] border border-white rounded-md bg-white/5 ${
+                    activeStatus === "Active"
+                      ? "text-green-400 shadow-green-800"
+                      : "text-red-400 shadow-red-800"
+                  }  shadow-lg  flex justify-center items-center px-2 gap-2`}
+                >
+                  {activeStatus === "Active" ? (
+                    <MdOutlineCloudDone className="text-xl 2xl:text-3xl" />
+                  ) : (
+                    <PiCloudWarningBold className="text-xl 2xl:text-3xl" />
+                  )}
+                  {activeStatus}
                 </div>
               </div>
               {/* table */}
@@ -276,149 +472,37 @@ const DemokitPorts = () => {
                   >
                     <tr>
                       <th className="px-2">S.No</th>
-                      <th className="px-2">S1</th>
-                      <th className="px-2">S2</th>
-                      <th className="px-2">S3</th>
-                      <th className="px-2">S4</th>
+                      <th className="px-2">Temp.</th>
+                      <th className="px-2">Density</th>
+                      <th className="px-2">Viscosity</th>
                       <th className="px-2">Updated&nbsp;At</th>
                     </tr>
                   </thead>
 
                   <tbody className="text-sm 2xl:text-base text-gray-600">
-                    <tr>
-                      <td>1</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>2</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>3</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>4</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>5</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>6</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>7</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>8</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>9</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>10</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>11</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>12</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>13</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>14</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
-
-                    <tr>
-                      <td>15</td>
-                      <td>20</td>
-                      <td>30</td>
-                      <td>40</td>
-                      <td>50</td>
-                      <td>2:55 pm</td>
-                    </tr>
+                    {dataFromApp.dataFromApp.length > 0 &&
+                      dataFromApp.dataFromApp.map((data, index) => (
+                        <tr
+                          key={index}
+                          className={`${index % 2 === 0 ? "" : "bg-stone-200"}`}
+                        >
+                          <td className="border border-gray-400 ">
+                            {index + 1}
+                          </td>
+                          <td className="border border-gray-400">
+                            {data.Temperature}
+                          </td>
+                          <td className="border border-gray-400 ">
+                            {data.Density}
+                          </td>
+                          <td className="border border-gray-400">
+                            {data.Viscosity}
+                          </td>
+                          <td className="text-[10px] border border-gray-400">
+                            {new Date(data.createdAt).toLocaleString("en-GB")}
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               </div>
@@ -430,7 +514,7 @@ const DemokitPorts = () => {
             <div className="border border-white bg-white/5 rounded-md w-full xl:w-[70%] px-2 pb-2 h-[250px] md:h-[300px] lg:h-[400px] xl:h-full flex flex-col">
               <div>
                 <center className="font-medium">
-                  Sensor Temperature Measurement
+                  Multi-Parameter Measurement
                 </center>
                 <div className="flex items-center px-2 py-1 text-sm font-medium">
                   <div className="mr-2">Set Limit:</div>
@@ -439,10 +523,9 @@ const DemokitPorts = () => {
                     id="option1"
                     name="options"
                     value={100}
-                    // checked={ioclLineLimit === 100}
-                    defaultChecked
+                    checked={portsLineLimit === 100}
                     className="cursor-pointer mt-0.5"
-                    // onChange={handleLineLimit}
+                    onChange={handleLineLimit}
                   />
                   <label htmlFor="option1" className="mr-2 cursor-pointer">
                     100
@@ -452,9 +535,9 @@ const DemokitPorts = () => {
                     id="option2"
                     name="options"
                     value={500}
-                    // checked={ioclLineLimit === 500}
+                    checked={portsLineLimit === 500}
                     className="cursor-pointer mt-0.5"
-                    // onChange={handleLineLimit}
+                    onChange={handleLineLimit}
                   />
                   <label htmlFor="option2" className="mr-2 cursor-pointer">
                     500
@@ -464,12 +547,24 @@ const DemokitPorts = () => {
                     id="option3"
                     name="options"
                     value={1000}
-                    // checked={ioclLineLimit === 1000}
+                    checked={portsLineLimit === 1000}
                     className="cursor-pointer mt-0.5"
-                    // onChange={handleLineLimit}
+                    onChange={handleLineLimit}
                   />
                   <label htmlFor="option3" className="mr-2 cursor-pointer">
                     1000
+                  </label>
+                  <input
+                    type="radio"
+                    id="option4"
+                    name="options"
+                    value={1500}
+                    checked={portsLineLimit === 1500}
+                    className="cursor-pointer mt-0.5"
+                    onChange={handleLineLimit}
+                  />
+                  <label htmlFor="option4" className="mr-2 cursor-pointer">
+                    1500
                   </label>
                 </div>
               </div>
@@ -493,25 +588,35 @@ const DemokitPorts = () => {
                     <label>From</label>
                     <input
                       type="date"
-                      placeholder="From"
                       className="text-black rounded-md px-0.5 2xl:p-2"
+                      required
+                      value={fromDate}
+                      onChange={(e) => setFromDate(e.target.value)}
                     />
                   </div>
                   <div className="flex flex-col gap-1">
                     <label>To</label>
                     <input
                       type="date"
-                      placeholder="To"
                       className="text-black rounded-md px-0.5 2xl:p-2"
+                      required
+                      value={toDate}
+                      onChange={(e) => setToDate(e.target.value)}
                     />
                   </div>
                 </div>
 
                 <div className="flex md:flex-col xl:flex-row gap-2 justify-center items-center h-1/2">
-                  <button className="rounded-md bg-red-500 hover:scale-105 duration-200 py-1 px-2 md:w-28 xl:w-auto 2xl:py-2 2xl:px-4">
+                  <button
+                    className="rounded-md bg-red-500 hover:scale-105 duration-200 py-1 px-2 md:w-28 xl:w-auto 2xl:py-2 2xl:px-4"
+                    onClick={generatePdf}
+                  >
                     PDF
                   </button>
-                  <button className="rounded-md bg-green-500 hover:scale-105 duration-200 py-1 px-2 2xl:py-2 2xl:px-4 md:w-28 xl:w-auto">
+                  <button
+                    className="rounded-md bg-green-500 hover:scale-105 duration-200 py-1 px-2 2xl:py-2 2xl:px-4 md:w-28 xl:w-auto"
+                    onClick={generateExcel}
+                  >
                     Excel
                   </button>
                 </div>

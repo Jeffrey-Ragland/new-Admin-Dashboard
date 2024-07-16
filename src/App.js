@@ -32,7 +32,6 @@ import DemokitUtmaps from "./Component/Demokit/DemokitUtmaps";
 import DemokitPorts from "./Component/Demokit/DemokitPorts";
 import DemokitZtar from "./Component/Demokit/DemokitZtar";
 
-// let iocl = 0;
 
 const App = () => {
 const [Tof_data,setTofdata]=useState('')
@@ -41,6 +40,8 @@ const[chartdata,setChartData]=useState([]);
 const[ReportData,setReportData]=useState([]);
 const [ioclData, setIoclData] = useState([]);
 const [utmapsData, setUtmapsData] = useState([]);
+const [portsData, setPortsData] = useState([]);
+const [ztarData, setZtarData] = useState([]);
 
 // const getInitialCondition = () => {
 //   const storedLimit = localStorage.getItem("IOCLLimit");
@@ -49,6 +50,7 @@ const [utmapsData, setUtmapsData] = useState([]);
 
 // const [ioclCondition, setIoclCondition] = useState(getInitialCondition);
 
+// utmaps
 const getInitialUtmapsCondition = () => {
   const storedLimit = localStorage.getItem('UtmapsLimit');
   return storedLimit ? 1 : 0
@@ -60,6 +62,38 @@ useEffect(() => {
   if(utmapsCondition === 0) {
     localStorage.setItem('UtmapsLimit', '100');
     setUtmapsCondition(1);
+  }
+}, []);
+
+// ports
+const getInitialPortsCondition = () => {
+  const storedLimit = localStorage.getItem("PortsLimit");
+  return storedLimit ? 1 : 0;
+};
+
+const [portsCondition, setPortsCondition] = useState(
+  getInitialPortsCondition
+);
+
+useEffect(() => {
+  if (portsCondition === 0) {
+    localStorage.setItem("PortsLimit", "100");
+    setPortsCondition(1);
+  }
+}, []);
+
+// ztar
+const getInitialZtarCondition = () => {
+  const storedLimit = localStorage.getItem("ZtarLimit");
+  return storedLimit ? 1 : 0;
+};
+
+const [ztarCondition, setZtarCondition] = useState(getInitialZtarCondition);
+
+useEffect(() => {
+  if (ztarCondition === 0) {
+    localStorage.setItem("ZtarLimit", "100");
+    setZtarCondition(1);
   }
 }, []);
 
@@ -79,17 +113,23 @@ useEffect(() => {
     // chartdatafetch();
     // getIOCLData();
     getDemokitUtmapsData();
+    getDemokitPortsData();
+    getDemokitZtarData();
   // const data = setInterval(fetch_tof_fata,2000);
   // const sensors =setInterval(fetchProductData,5000);
   // const chartdata =setInterval(chartdatafetch,2000);
   // const ioclData = setInterval(getIOCLData,2000);
   const utmapsData = setInterval(getDemokitUtmapsData, 2000);
+  const portsData = setInterval(getDemokitPortsData, 2000);
+  const ztarData = setInterval(getDemokitZtarData, 2000);
   return()=>{
     // clearInterval(data);
     // clearInterval(sensors);
     // clearInterval(chartdata);
     // clearInterval(ioclData);
     clearInterval(utmapsData);
+    clearInterval(portsData);
+    clearInterval(ztarData);
   }
   },[])
 
@@ -194,6 +234,7 @@ const getIOCLData = async () => {
   }
 };
 
+// utmaps
 const getDemokitUtmapsData = async() => {
   try {
     const projectNumber = localStorage.getItem("projectNumber");
@@ -209,6 +250,42 @@ const getDemokitUtmapsData = async() => {
   } catch (error) {
     console.error("Error fetching Demokit Utmaps data", error);
   };
+};
+
+// ports
+const getDemokitPortsData = async () => {
+  try {
+    const projectNumber = localStorage.getItem("projectNumber");
+    const portsLimit = localStorage.getItem("PortsLimit");
+    const response = await axios.get(
+      `http://localhost:4000/sensor/getDemokitPortsData?projectNumber=${projectNumber}&limit=${portsLimit}`
+    );
+    if (response.data.success) {
+      setPortsData(response.data.data);
+    } else {
+      toast.error("No Data Found!");
+    }
+  } catch (error) {
+    console.error("Error fetching Demokit Ports data", error);
+  };
+};
+
+// ztar
+const getDemokitZtarData = async () => {
+  try {
+    const projectNumber = localStorage.getItem("projectNumber");
+    const ztarLimit = localStorage.getItem("ZtarLimit");
+    const response = await axios.get(
+      `http://localhost:4000/sensor/getDemokitZtarData?projectNumber=${projectNumber}&limit=${ztarLimit}`
+    );
+    if (response.data.success) {
+      setZtarData(response.data.data);
+    } else {
+      toast.error("No Data Found!");
+    }
+  } catch (error) {
+    console.error("Error fetching Demokit Ztar data", error);
+  }
 };
  
   return (
@@ -252,8 +329,8 @@ const getDemokitUtmapsData = async() => {
             <Route path="/" element={<OnlyOutlet />}>
               <Route index element={<DemokitMainpage />} />
               <Route path="utmaps" element={<DemokitUtmaps dataFromApp={utmapsData}/>} />
-              <Route path="ports" element={<DemokitPorts />} />
-              <Route path="ztar" element={<DemokitZtar />} />
+              <Route path="ports" element={<DemokitPorts dataFromApp={portsData}/>} />
+              <Route path="ztar" element={<DemokitZtar dataFromApp={ztarData}/>} />
             </Route>
           ) : null}
           {controls !== "SKF" &&
