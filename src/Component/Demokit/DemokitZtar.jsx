@@ -138,7 +138,7 @@ const DemokitZtar = (dataFromApp) => {
         borderColor: ["rgb(255, 255, 0)"],
         backgroundColor: ["rgba(255, 255, 0, 0.5)"],
         borderWidth: 1,
-        barPercentage: 1,
+        barPercentage: 0.1,
         categoryPercentage: 1,
       },
     ],
