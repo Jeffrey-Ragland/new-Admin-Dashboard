@@ -32,7 +32,6 @@ import DemokitUtmaps from "./Component/Demokit/DemokitUtmaps";
 import DemokitPorts from "./Component/Demokit/DemokitPorts";
 import DemokitZtar from "./Component/Demokit/DemokitZtar";
 
-
 const App = () => {
 const [Tof_data,setTofdata]=useState('')
 const [projectData, setProjectData] = useState([]);
@@ -42,13 +41,26 @@ const [ioclData, setIoclData] = useState([]);
 const [utmapsData, setUtmapsData] = useState([]);
 const [portsData, setPortsData] = useState([]);
 const [ztarData, setZtarData] = useState([]);
+const [autoDashData, setAutoDashData] = useState([]);
 
-// const getInitialCondition = () => {
-//   const storedLimit = localStorage.getItem("IOCLLimit");
-//   return storedLimit ? 1 : 0;
-// }
+let controls = localStorage.getItem("Controles");
 
-// const [ioclCondition, setIoclCondition] = useState(getInitialCondition);
+// iocl 
+const getInitialCondition = () => {
+  const storedLimit = localStorage.getItem("IOCLLimit");
+  return storedLimit ? 1 : 0;
+};
+
+const [ioclCondition, setIoclCondition] = useState(getInitialCondition);
+
+useEffect(() => {
+  if (controls === 'IOCL' && ioclCondition === 0) {
+    localStorage.setItem("IOCLLimit", "100");
+    setIoclCondition(1);
+  }
+}, [controls, ioclCondition]);
+
+
 
 // utmaps
 const getInitialUtmapsCondition = () => {
@@ -59,11 +71,11 @@ const getInitialUtmapsCondition = () => {
 const [utmapsCondition, setUtmapsCondition] = useState(getInitialUtmapsCondition);
 
 useEffect(() => {
-  if(utmapsCondition === 0) {
-    localStorage.setItem('UtmapsLimit', '100');
+  if (controls === "DEMOKIT" && utmapsCondition === 0) {
+    localStorage.setItem("UtmapsLimit", "100");
     setUtmapsCondition(1);
   }
-}, []);
+}, [controls, utmapsCondition]);
 
 // ports
 const getInitialPortsCondition = () => {
@@ -76,11 +88,11 @@ const [portsCondition, setPortsCondition] = useState(
 );
 
 useEffect(() => {
-  if (portsCondition === 0) {
+  if (controls === "DEMOKIT" && portsCondition === 0) {
     localStorage.setItem("PortsLimit", "100");
     setPortsCondition(1);
   }
-}, []);
+}, [controls, portsCondition]);
 
 // ztar
 const getInitialZtarCondition = () => {
@@ -91,51 +103,90 @@ const getInitialZtarCondition = () => {
 const [ztarCondition, setZtarCondition] = useState(getInitialZtarCondition);
 
 useEffect(() => {
-  if (ztarCondition === 0) {
+  if (controls === "DEMOKIT" && ztarCondition === 0) {
     localStorage.setItem("ZtarLimit", "100");
     setZtarCondition(1);
   }
-}, []);
+}, [controls, ztarCondition]);
 
-  let controls =localStorage.getItem("Controles");
+// automated dashboard
+const getInitialAutoDashCondition = () => {
+  const storedLimit = localStorage.getItem('AutoDashLimit');
+  return storedLimit ? 1 : 0;
+};
 
-  // useEffect(() => {
-  //   if(ioclCondition === 0) {
-  //     localStorage.setItem('IOCLLimit', "100");
-  //     setIoclCondition(1);
-  //   }
-  // }, []);
+const [autoDashCondition, setAutoDashCondition] = useState(getInitialAutoDashCondition);
+
+useEffect(() => {
+  if(controls === 'AutomatedDashboard' && autoDashCondition === 0); {
+    localStorage.setItem("AutoDashLimit", 100);
+    setAutoDashCondition(1);
+  };
+}, [controls, autoDashCondition]);
 
 
-  useEffect(()=>{
-    // fetch_tof_fata();
-    // fetchProductData();
-    // chartdatafetch();
-    // getIOCLData();
+// fetching data
+useEffect(() => {
+
+  // to prevent api errors in login page console
+  if(!controls) {
+    return;
+  }
+
+  // admin
+  else if (controls === "ADMIN") {
+    fetch_tof_fata();
+    const data = setInterval(fetch_tof_fata, 2000);
+
+    return () => {
+      clearInterval(data);
+    };
+  }
+
+  // iocl
+  else if (controls === "IOCL") {
+    getIOCLData();
+    const ioclData = setInterval(getIOCLData, 2000);
+
+    return () => {
+      clearInterval(ioclData);
+    };
+  }
+
+  // demokit
+  else if (controls === "DEMOKIT") {
     getDemokitUtmapsData();
     getDemokitPortsData();
     getDemokitZtarData();
-  // const data = setInterval(fetch_tof_fata,2000);
-  // const sensors =setInterval(fetchProductData,5000);
-  // const chartdata =setInterval(chartdatafetch,2000);
-  // const ioclData = setInterval(getIOCLData,2000);
-  const utmapsData = setInterval(getDemokitUtmapsData, 2000);
-  const portsData = setInterval(getDemokitPortsData, 2000);
-  const ztarData = setInterval(getDemokitZtarData, 2000);
-  return()=>{
-    // clearInterval(data);
-    // clearInterval(sensors);
-    // clearInterval(chartdata);
-    // clearInterval(ioclData);
-    clearInterval(utmapsData);
-    clearInterval(portsData);
-    clearInterval(ztarData);
+    const utmapsData = setInterval(getDemokitUtmapsData, 2000);
+    const portsData = setInterval(getDemokitPortsData, 2000);
+    const ztarData = setInterval(getDemokitZtarData, 2000);
+
+    return () => {
+      clearInterval(utmapsData);
+      clearInterval(portsData);
+      clearInterval(ztarData);
+    };
   }
-  },[])
+  
+  // automated dashboard
+  else if (controls === "AutomatedDashboard") {
+    getAutoDashData();
+    const autoDashData = setInterval(getAutoDashData, 2000);
+    // chartdatafetch();
+    // const sensors = setInterval(fetchProductData, 5000);
+    // const chartdata = setInterval(chartdatafetch, 2000);
 
-  // console.log('iocl data',ioclData);
+    return () => {
+      // clearInterval(sensors);
+      // clearInterval(chartdata);
+      clearInterval(autoDashData);
+    };
+  }
+}, [controls]);
 
-
+  
+// admin
 const fetch_tof_fata =async()=>{
   try{
     const response = await fetch("http://localhost:4000/sensor/BPCL_READ");
@@ -147,78 +198,96 @@ const fetch_tof_fata =async()=>{
   }
 }
 
-
-const fetchProductData = async () => {
+// automated dashboard
+const getAutoDashData = async () => {
   try {
-      const projectName = localStorage.getItem('Project');
-      const Count =localStorage.getItem('CountReportData')
-
-      let Count_final =0;
-      if(Count == null){
-        Count_final =500;
-      }else{
-        Count_final =localStorage.getItem('CountReportData')
-      }
-
-      const response = await axios (`http://localhost:4000/sensor/displayProjectData?project=${projectName}`);
-      const report = await axios(`http://localhost:4000/sensor/DisplayProjectReport?project=${projectName}&Count=${Count_final}`);
-
-      if(response.data.success)
-      {
-          setProjectData(response.data.data);
-          setReportData(report.data.data);
-          const modifiedData = response.data.data.map(item =>
-            {
-              if(item.Time && typeof item.Time === 'string')
-              {
-              const dateParts = item.Time.split(/[,\s:/]+/);
-              const day = parseInt(dateParts[0]); 
-              const month = parseInt(dateParts[1]); 
-              const year = parseInt(dateParts[2]);  
-              let hours = parseInt(dateParts[3]);
-              const minutes = parseInt(dateParts[4]);
-              const seconds = parseInt(dateParts[5]);
-              const meridian = dateParts[6];
-              if (meridian === 'pm' && hours !== 12) {
-                  hours += 12;
-              }
-              const date = new Date(year, month - 1, day, hours, minutes, seconds);
-              const unixTimestamp = date.getTime();
-              return { ...item, Time: unixTimestamp };
-            }
-            else
-            {
-              return item;
-            }
-          }
-        );    
-      }
-      else
-      {
-        console.log('cant fetch project data');
-      }
-      
-  } catch (error) {
-    console.error('Error fetching product data:', error);
-  }
-}
-
-
-const chartdatafetch =async()=>{
-  try{
-    const  chartlength =sessionStorage.getItem("chartLength");
-    const  sensorname = sessionStorage.getItem("Chart_status");
     const projectName = localStorage.getItem('Project');
-    const response = await axios(`http://localhost:4000/sensor/project_all_data?project=${projectName}&sensorname=${sensorname}&chartlength=${chartlength}`);
-    if(response.data.success){
-        setChartData(response.data.data);
-    }else{
-      toast.error('No Data found!!');
+    const autoDashLimit = localStorage.getItem('AutoDashLimit');
+    const response = await axios.get(`http://localhost:4000/sensor/getAutoDashData?project=${projectName}&limit=${autoDashLimit}`);
+    if (response.data.success) {
+      setAutoDashData(response.data.data);
+    } else {
+      toast.error('Data not found');
     }
-  }catch(error){
-    console.error("Error Fetching Data: ",error)
-  }
-}
+  } catch (error) {
+    console.error("Error fetching automated dashboard data", error);
+  };
+};
+
+
+
+
+// const fetchProductData = async () => {
+//   try {
+//       const projectName = localStorage.getItem('Project');
+//       const Count =localStorage.getItem('CountReportData')
+
+//       let Count_final =0;
+//       if(Count == null){
+//         Count_final =500;
+//       }else{
+//         Count_final =localStorage.getItem('CountReportData')
+//       }
+
+//       const response = await axios (`http://localhost:4000/sensor/displayProjectData?project=${projectName}`);
+//       const report = await axios(`http://localhost:4000/sensor/DisplayProjectReport?project=${projectName}&Count=${Count_final}`);
+
+//       if(response.data.success)
+//       {
+//           setProjectData(response.data.data);
+//           setReportData(report.data.data);
+//           const modifiedData = response.data.data.map(item =>
+//             {
+//               if(item.Time && typeof item.Time === 'string')
+//               {
+//               const dateParts = item.Time.split(/[,\s:/]+/);
+//               const day = parseInt(dateParts[0]); 
+//               const month = parseInt(dateParts[1]); 
+//               const year = parseInt(dateParts[2]);  
+//               let hours = parseInt(dateParts[3]);
+//               const minutes = parseInt(dateParts[4]);
+//               const seconds = parseInt(dateParts[5]);
+//               const meridian = dateParts[6];
+//               if (meridian === 'pm' && hours !== 12) {
+//                   hours += 12;
+//               }
+//               const date = new Date(year, month - 1, day, hours, minutes, seconds);
+//               const unixTimestamp = date.getTime();
+//               return { ...item, Time: unixTimestamp };
+//             }
+//             else
+//             {
+//               return item;
+//             }
+//           }
+//         );    
+//       }
+//       else
+//       {
+//         console.log('cant fetch project data');
+//       }
+      
+//   } catch (error) {
+//     console.error('Error fetching product data:', error);
+//   }
+// }
+
+
+// const chartdatafetch =async()=>{
+//   try{
+//     const  chartlength =sessionStorage.getItem("chartLength");
+//     const  sensorname = sessionStorage.getItem("Chart_status");
+//     const projectName = localStorage.getItem('Project');
+//     const response = await axios(`http://localhost:4000/sensor/project_all_data?project=${projectName}&sensorname=${sensorname}&chartlength=${chartlength}`);
+//     if(response.data.success){
+//         setChartData(response.data.data);
+//     }else{
+//       toast.error('No Data found!!');
+//     }
+//   }catch(error){
+//     console.error("Error Fetching Data: ",error)
+//   }
+// }
 
 const getIOCLData = async () => {
   try {
@@ -328,37 +397,42 @@ const getDemokitZtarData = async () => {
           {controls === "DEMOKIT" ? (
             <Route path="/" element={<OnlyOutlet />}>
               <Route index element={<DemokitMainpage />} />
-              <Route path="utmaps" element={<DemokitUtmaps dataFromApp={utmapsData}/>} />
-              <Route path="ports" element={<DemokitPorts dataFromApp={portsData}/>} />
-              <Route path="ztar" element={<DemokitZtar dataFromApp={ztarData}/>} />
+              <Route
+                path="utmaps"
+                element={<DemokitUtmaps dataFromApp={utmapsData} />}
+              />
+              <Route
+                path="ports"
+                element={<DemokitPorts dataFromApp={portsData} />}
+              />
+              <Route
+                path="ztar"
+                element={<DemokitZtar dataFromApp={ztarData} />}
+              />
             </Route>
           ) : null}
-          {controls !== "SKF" &&
-            controls !== "ADMIN" &&
-            controls !== "IOCL" &&
-            controls !== "BPCL" &&
-            controls !== "DEMOKIT" && (
-              <Route path="/" element={<Source_Outlet />}>
-                <Route
-                  index
-                  element={<Source_MainPage all_sensor_data={projectData} />}
-                />
-                <Route
-                  path="Graph"
-                  element={
-                    <GraphPage
-                      all_sensor_data={projectData}
-                      Chartdata={chartdata}
-                    />
-                  }
-                />
-                <Route
-                  path="Report"
-                  element={<Reports_Page report_data={ReportData} />}
-                />
-                <Route path="Settings" element={<Settings_Page />} />
-              </Route>
-            )}
+          {controls === "AutomatedDashboard" && (
+            <Route path="/" element={<Source_Outlet />}>
+              <Route
+                index
+                element={<Source_MainPage dataFromApp={autoDashData} />}
+              />
+              <Route
+                path="Graph"
+                element={
+                  <GraphPage
+                    all_sensor_data={projectData}
+                    Chartdata={chartdata}
+                  />
+                }
+              />
+              <Route
+                path="Report"
+                element={<Reports_Page report_data={ReportData} />}
+              />
+              <Route path="Settings" element={<Settings_Page />} />
+            </Route>
+          )}
         </Route>
         <Route path="*" element={<div>Page Not Found</div>} />
       </Routes>

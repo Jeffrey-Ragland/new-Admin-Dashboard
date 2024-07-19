@@ -26,11 +26,11 @@ const Login = () => {
             token:data.token,
             role:data.role
           });
-          localStorage.setItem('Project',Project);
+          localStorage.setItem('Project',Project); // for admin dashboard
           localStorage.setItem('token',tokenRole);
           console.log("result.data.redirectUrl",data.redirectUrl);
-          localStorage.setItem('Controles',data.redirectUrl);
-          localStorage.setItem("projectNumber", data.projectNumber);
+          localStorage.setItem('Controles',data.redirectUrl); // for routing
+          localStorage.setItem("projectNumber", data.projectNumber); // for demokit
           window.location.href='/'
         }
         else{

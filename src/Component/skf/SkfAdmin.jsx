@@ -318,7 +318,7 @@ const SkfAdmin = () => {
 
           {/* top right */}
           <div className='flex gap-2'>
-            <Link to='/dashadmin'>
+            <Link to='/'>
             <div className='h-10 mt-[2px] p-2 text-center rounded-lg bg-green-400 text-white hover:scale-110 duration-200 font-medium'>
               Back
             </div>

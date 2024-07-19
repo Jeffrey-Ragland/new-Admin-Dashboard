@@ -22,9 +22,9 @@ import { Chart as ChartJS,LineElement,CategoryScale,LinearScale,PointElement, sc
 import ReactSlider from 'react-slider';
 ChartJS.register(LineElement,CategoryScale,LinearScale,PointElement)
 
-const MainPage = (all_sensor_data) => {
+const MainPage = (dataFromApp) => {
 
-
+    console.log(dataFromApp.dataFromApp);
 
     const [pieData, setPieData] = useState([]);
     const [activeStatus, setActiveStatus] = useState('ACTIVE'); 
@@ -32,11 +32,11 @@ const MainPage = (all_sensor_data) => {
     const [peakValues, setPeakValues] = useState([]); //peak value
     const [leftoverKeys, setLeftoverKeys] = useState(0); //total parameters
     const [limit, setLimit] = useState(25); //for line graph limit
-    const alldata = all_sensor_data.all_sensor_data
+    // const alldata = all_sensor_data.all_sensor_data
     const [selectedKey, SetSelectedKey] = useState([]); // line graph parameter selection
     const [lineSliderValues, setLineSliderValues] = useState([0, 1000]); 
     let ChartSensor = sessionStorage.getItem("Chart_status");
-    const chart_data = all_sensor_data.all_sensor_data.map(item=>item[ChartSensor]);
+    // const chart_data = all_sensor_data.all_sensor_data.map(item=>item[ChartSensor]);
 
 
     const handleLimitChange = (e) =>
@@ -58,29 +58,29 @@ const MainPage = (all_sensor_data) => {
 
     // card data code
     let cardData = 'N/A';
-    if(alldata && alldata.length > 0)
-    {
-        cardData = alldata[0];
-    }
+    // if(alldata && alldata.length > 0)
+    // {
+    //     cardData = alldata[0];
+    // }
 
 
     //pie chart code
-    useEffect(() => {
-        if (alldata.length > 0) {
-            const lastProjectData = alldata[0];
-            const keysBeforeFilter = Object.keys(lastProjectData);
-            const filteredkeys = keysBeforeFilter.filter(key => key !== '_id' && key !== '__v' && key !== 'Time')
-            const pieChartData =filteredkeys.map(key => [key, parseFloat(lastProjectData[key])]); 
-            setPieData([['Category', 'Value'], ...pieChartData]);
-            setLastUpdated(lastProjectData.Time); // for last updated
+    // useEffect(() => {
+    //     if (alldata.length > 0) {
+    //         const lastProjectData = alldata[0];
+    //         const keysBeforeFilter = Object.keys(lastProjectData);
+    //         const filteredkeys = keysBeforeFilter.filter(key => key !== '_id' && key !== '__v' && key !== 'Time')
+    //         const pieChartData =filteredkeys.map(key => [key, parseFloat(lastProjectData[key])]); 
+    //         setPieData([['Category', 'Value'], ...pieChartData]);
+    //         setLastUpdated(lastProjectData.Time); // for last updated
 
-            const peakValues = findPeakValue(lastProjectData); // for peak value
-            setPeakValues(peakValues);
+    //         const peakValues = findPeakValue(lastProjectData); // for peak value
+    //         setPeakValues(peakValues);
 
-            const leftoverKeys = keysBeforeFilter.length - 3; //total parameters
-            setLeftoverKeys(leftoverKeys);
-        }
-    }, [alldata]);
+    //         const leftoverKeys = keysBeforeFilter.length - 3; //total parameters
+    //         setLeftoverKeys(leftoverKeys);
+    //     }
+    // }, [alldata]);
 
 
     const pieOptions = {
@@ -136,10 +136,10 @@ const MainPage = (all_sensor_data) => {
       //Linechart
 
       const data={
-        labels:chart_data,
+        // labels:chart_data,
         datasets:[{
             // label: 'Headers',
-            data:chart_data,
+            // data:chart_data,
             backgroundColor:'block',
             borderColor:'red',
             pointBordColor:'aqua',
@@ -453,7 +453,7 @@ const MainPage = (all_sensor_data) => {
                   </tr>
                 </thead>
                 <tbody className="text-xs">
-                  {alldata.map((item, index) => (
+                  {/* {alldata.map((item, index) => (
                     <tr key={index}>
                       <td className="border border-black text-center">
                         {index + 1}
@@ -472,7 +472,7 @@ const MainPage = (all_sensor_data) => {
                         {item.Time}
                       </td>
                     </tr>
-                  ))}
+                  ))} */}
                 </tbody>
               </table>
             </div>

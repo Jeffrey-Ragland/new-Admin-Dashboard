@@ -172,10 +172,7 @@ const IoclMainPage = (dataFromApp) => {
                 background: "linear-gradient(90deg, #f22213 0%, #f03f32 100%)",
               }}
               onClick={() => {
-                localStorage.removeItem("Project");
-                localStorage.removeItem("token");
-                localStorage.removeItem("Controles");
-                localStorage.removeItem("IOCLLimit");
+                localStorage.clear();
               }}
             >
               Logout
@@ -436,7 +433,7 @@ const IoclMainPage = (dataFromApp) => {
                 >
                   Peak Analysis
                 </div>
-                <div className="flex flex-1 border border-black px-2">
+                <div className="flex flex-1 px-2">
                   <Bar data={barData} options={barOptions} height={"100%"} />
                 </div>
               </div>

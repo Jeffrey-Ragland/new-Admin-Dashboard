@@ -35,9 +35,9 @@ function Model(props) {
           child.material.color.set(hovered ? "red" : "white");
         }
       
-        if(child.isMesh) {
-            console.log(child.name)
-        }
+        // if(child.isMesh) {
+        //     console.log(child.name)
+        // }
       });
     }
   });
