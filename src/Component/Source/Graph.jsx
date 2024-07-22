@@ -46,6 +46,7 @@
             data: reversedData.map((item) => item[key]),
             borderColor: `hsl(${(index * 60) % 360}, 70%, 50%)`,
             backgroundColor: `hsla(${(index * 60) % 360}, 70%, 50%, 0.2)`,
+            tension: 0.5
           }));
           setLineData({
             labels: lineLabels,

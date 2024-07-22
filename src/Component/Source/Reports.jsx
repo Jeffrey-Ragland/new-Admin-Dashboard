@@ -282,247 +282,282 @@
 // }
 // export default Reports
 
-import React,{useState} from 'react'
-import reportimg from '../Assets/chartreport.png'
-import datepicker from '..//Assets/datepicker.png'
-import db from '..//Assets/db.png'
-import count from '..//Assets/count.png'
-import {Line} from 'react-chartjs-2';
-import '../Source/style.css'
-import DatePicker from "react-datepicker";
-import Search from "../Assets/search_15372880.png"
-
- 
+// import React,{useState} from 'react'
+// import reportimg from '../Assets/chartreport.png'
+// import datepicker from '..//Assets/datepicker.png'
+// import db from '..//Assets/db.png'
+// import count from '..//Assets/count.png'
+// import {Line} from 'react-chartjs-2';
+// import '../Source/style.css'
+// import DatePicker from "react-datepicker";
+// import Search from "../Assets/search_15372880.png"
 
 
-const Reports = ({report_data}) => {
-  const[show_error_popup,setPopu1]= useState(false);
-  const [fromDate, setFromDate] = useState(null);
-  const [fromDate1, setFromDate1] = useState(null);
-  const [papup1,setpopup1]=useState(false)
-  const [papup2,setpopup2]=useState(false)
-  const [papup3,setpopup3]=useState(false)
-  const [papup4,setpopup4]=useState(false)
+// const Reports = ({report_data}) => {
+//   const[show_error_popup,setPopu1]= useState(false);
+//   const [fromDate, setFromDate] = useState(null);
+//   const [fromDate1, setFromDate1] = useState(null);
+//   const [papup1,setpopup1]=useState(false)
+//   const [papup2,setpopup2]=useState(false)
+//   const [papup3,setpopup3]=useState(false)
+//   const [papup4,setpopup4]=useState(false)
 
 
 
-  const sensordata=report_data.map(item=>item.s1);
-  const time=report_data.map(item=>item.timestamp)
-  const reversedata =sensordata.reverse()
-  const timestamp =time.reverse()
-console.log(time)
+//   const sensordata=report_data.map(item=>item.s1);
+//   const time=report_data.map(item=>item.timestamp)
+//   const reversedata =sensordata.reverse()
+//   const timestamp =time.reverse()
+// console.log(time)
 
-const data={
-  labels:timestamp,
-  datasets:[{
-      // label: 'Headers',
-      data: reversedata,
-      backgroundColor:'block',
-      borderColor:'red',
-      pointBordColor:'aqua',
-      fill:true,
-      tension:0.4,
-      pointLabel: ({ dataIndex }) => {
-          // Return the data value for the corresponding point
-          return data.datasets[0].data[dataIndex];
-      },
-  }]
-}
-const options ={
-  plugins:{
-    // legend:true,
-  },
-  scales:{
-      x: {
-          grid:{
-              color:'white'
-          },
-          ticks: {
-              color: '#2d2d2d', 
-          },
-      },
-      y: {
-          // min:lineSliderValues[0],
-          // max:lineSliderValues[1],
-          ticks: {
-              color: '#2d2d2d',
-          },
-          grid:{
-              color:'white'
-          },
-      },
-  }
-}
-  const handleClosePopup = () => {
-    setPopu1(false);
-    setpopup1(false);
-    setpopup2(false);
-    setpopup3(false);
-    setpopup4(false);
-  };
+// const data={
+//   labels:timestamp,
+//   datasets:[{
+//       // label: 'Headers',
+//       data: reversedata,
+//       backgroundColor:'block',
+//       borderColor:'red',
+//       pointBordColor:'aqua',
+//       fill:true,
+//       tension:0.4,
+//       pointLabel: ({ dataIndex }) => {
+//           // Return the data value for the corresponding point
+//           return data.datasets[0].data[dataIndex];
+//       },
+//   }]
+// }
+// const options ={
+//   plugins:{
+//     // legend:true,
+//   },
+//   scales:{
+//       x: {
+//           grid:{
+//               color:'white'
+//           },
+//           ticks: {
+//               color: '#2d2d2d', 
+//           },
+//       },
+//       y: {
+//           // min:lineSliderValues[0],
+//           // max:lineSliderValues[1],
+//           ticks: {
+//               color: '#2d2d2d',
+//           },
+//           grid:{
+//               color:'white'
+//           },
+//       },
+//   }
+// }
+//   const handleClosePopup = () => {
+//     setPopu1(false);
+//     setpopup1(false);
+//     setpopup2(false);
+//     setpopup3(false);
+//     setpopup4(false);
+//   };
 
-const handlechartAnalysis1 =()=>{
-  setPopu1(true);
-  setpopup1(true);
-}
+// const handlechartAnalysis1 =()=>{
+//   setPopu1(true);
+//   setpopup1(true);
+// }
 
-const handlechartAnalysis2 =()=>{
-  setPopu1(true);
-  setpopup2(true);
-}
+// const handlechartAnalysis2 =()=>{
+//   setPopu1(true);
+//   setpopup2(true);
+// }
 
-const handlechartAnalysis3 =()=>{
-  setPopu1(true);
-  setpopup3(true);
-}
+// const handlechartAnalysis3 =()=>{
+//   setPopu1(true);
+//   setpopup3(true);
+// }
 
-const handlechartAnalysis4 =()=>{
-  // setPopu1(true);
-  // setpopup4(true);
+// const handlechartAnalysis4 =()=>{
+//   // setPopu1(true);
+//   // setpopup4(true);
 
-}
-const handleFromDate = (date) => {
-    setFromDate(date);
-    console.log(date);
-  };
+// }
+// const handleFromDate = (date) => {
+//     setFromDate(date);
+//     console.log(date);
+//   };
 
-  const handleFromDate1 = (date) => {
-    setFromDate1(date);
-    console.log(date);
-  };
+//   const handleFromDate1 = (date) => {
+//     setFromDate1(date);
+//     console.log(date);
+//   };
 
-  const datastatus =(number)=>{
-    console.log("number",number)
-    if(number === 500){
-      localStorage.setItem('CountReportData',500)
-    } else if(number === 1000){
-      localStorage.setItem('CountReportData',1000)
-    }
-    else if(number === 2000){
-      localStorage.setItem('CountReportData',2000)
-    }
-  }
+//   const datastatus =(number)=>{
+//     console.log("number",number)
+//     if(number === 500){
+//       localStorage.setItem('CountReportData',500)
+//     } else if(number === 1000){
+//       localStorage.setItem('CountReportData',1000)
+//     }
+//     else if(number === 2000){
+//       localStorage.setItem('CountReportData',2000)
+//     }
+//   }
 
-  const a =4;
-  const b ="border-gray-600";
+//   const a =4;
+//   const b ="border-gray-600";
 
-  return (
-    <div className='grid grid-rows-2 md:flex md:flex-col w-[100%] h-[100%] overflow-hidden'>
-      <div className='md:flex h-[20%] gap-2 justify-center items-center'>
-        <div className=' gap-2 hover:scale-125 cursor-pointer duration-200 mt-2 w-full h-full flex justify-center items-center' onClick={handlechartAnalysis1}>
-          <img src={reportimg} className=''/>
-          <p className='font-bold text-white'>Chart Analysis</p>
-        </div>
-        <div className=' gap-2 hover:scale-125 cursor-pointer  duration-200 mt-2 w-full h-full flex justify-center items-center'onClick={handlechartAnalysis2}>
-        <img src={datepicker}/>
-        <p className='font-bold text-white'>Date Picker</p>
-        </div>
-        <div className=' gap-2 hover:scale-125 cursor-pointer  duration-200 mt-2 w-full h-full flex justify-center items-center'onClick={handlechartAnalysis3}>
-        <img src={db}/>
-        <p className='font-bold text-white'>Overall Data</p>
-        </div>
-        <div className=' gap-2 hover:scale-125 cursor-pointer  duration-200 mt-2 w-full h-full flex justify-center items-center'onClick={handlechartAnalysis4}>
-        <img src={count}/>
-        <p className='font-bold text-white'>Count wise Data</p>
-        </div>
-      </div>
-      <div className='h-[78%]'>
-        <div className='border border-white h-full mt-2'>
-          <div id="chart">
-            <Line data={data} width={1000} height={400}  options={options} />
-          </div>
-        </div>
-      </div>
-      {show_error_popup &&(
-         <div className='popup' id='popup-1'>
-         <div className='overlay'></div>
-         <div className='content'>
-           {/* <div className='close-btn' onClick={handleClosePopup}>&times;</div> */}
-           {papup2 && (
-            <div>
-              <div className='close-btn' onClick={handleClosePopup}>&times;</div>
-              <div className='flex justify-center items-center'>
-                <div className='w-[30%]'>
-                  <img className='block mx-auto' src={Search} />
-                </div>
-              </div>
-              <div className='gap-2'>
-                <span className='text-black font-bold'>From</span>
-                <div>
-                  <DatePicker
-                    className="rounded-lg border border-black p-1"
-                    selected={fromDate}
-                    name="fromdate"
-                    onChange={handleFromDate}
-                    dateFormat={"dd/MM/yyyy"}
-                    showIcon
-                  />
-                </div>
-              </div>
-              <div>
-                <span className='text-black font-bold'>To</span>
-                <div>
-                  <DatePicker
-                    className="rounded-lg border border-black p-1"
-                    selected={fromDate1}
-                    name="fromdate"
-                    onChange={handleFromDate1}
-                    dateFormat={"dd/MM/yyyy"}
-                    showIcon
-                  />
-                </div>
-              </div>
-              <div className='mt-2'>
-              <button className='border rounded-md bg-[#2d2d2d] text-white p-2 font-bold hover:scale-105'>Download</button>
-            </div>
-            </div>
-           )}
+//   return (
+//     <div className='grid grid-rows-2 md:flex md:flex-col w-[100%] h-[100%] overflow-hidden'>
+//       <div className='md:flex h-[20%] gap-2 justify-center items-center'>
+//         <div className=' gap-2 hover:scale-125 cursor-pointer duration-200 mt-2 w-full h-full flex justify-center items-center' onClick={handlechartAnalysis1}>
+//           <img src={reportimg} className=''/>
+//           <p className='font-bold text-white'>Chart Analysis</p>
+//         </div>
+//         <div className=' gap-2 hover:scale-125 cursor-pointer  duration-1000 mt-2 w-full h-full flex justify-center items-center'onClick={handlechartAnalysis2}>
+//         <img src={datepicker}/>
+//         <p className='font-bold text-white'>Date Picker</p>
+//         </div>
+//         <div className=' gap-2 hover:scale-125 cursor-pointer  duration-200 mt-2 w-full h-full flex justify-center items-center'onClick={handlechartAnalysis3}>
+//         <img src={db}/>
+//         <p className='font-bold text-white'>Overall Data</p>
+//         </div>
+//         <div className=' gap-2 hover:scale-125 cursor-pointer  duration-200 mt-2 w-full h-full flex justify-center items-center'onClick={handlechartAnalysis4}>
+//         <img src={count}/>
+//         <p className='font-bold text-white'>Count wise Data</p>
+//         </div>
+//       </div>
+      
+//       {show_error_popup &&(
+//          <div className='popup' id='popup-1'>
+//          <div className='overlay'></div>
+//          <div className='content'>
+//            {/* <div className='close-btn' onClick={handleClosePopup}>&times;</div> */}
+//            {papup2 && (
+//             <div>
+//               <div className='close-btn' onClick={handleClosePopup}>&times;</div>
+//               <div className='flex justify-center items-center'>
+//                 <div className='w-[30%]'>
+//                   <img className='block mx-auto' src={Search} />
+//                 </div>
+//               </div>
+//               <div className='gap-2'>
+//                 <span className='text-black font-bold'>From</span>
+//                 <div>
+//                   <DatePicker
+//                     className="rounded-lg border border-black p-1"
+//                     selected={fromDate}
+//                     name="fromdate"
+//                     onChange={handleFromDate}
+//                     dateFormat={"dd/MM/yyyy"}
+//                     showIcon
+//                   />
+//                 </div>
+//               </div>
+//               <div>
+//                 <span className='text-black font-bold'>To</span>
+//                 <div>
+//                   <DatePicker
+//                     className="rounded-lg border border-black p-1"
+//                     selected={fromDate1}
+//                     name="fromdate"
+//                     onChange={handleFromDate1}
+//                     dateFormat={"dd/MM/yyyy"}
+//                     showIcon
+//                   />
+//                 </div>
+//               </div>
+//               <div className='mt-2'>
+//               <button className='border rounded-md bg-[#2d2d2d] text-white p-2 font-bold hover:scale-105'>Download</button>
+//             </div>
+//             </div>
+//            )}
 
-           {papup1 &&(
+//            {papup1 &&(
             
-             <div className='content flex justify-center items-center h-screen'> 
-              <div className='close-btn' onClick={handleClosePopup}>&times;</div>
-             <div className='flex items-center justify-center'>
-                 <div className='flex justify-center gap-4'>
-                 <div className={`border-${a} ${b} p-6 rounded-lg cursor-pointer hover:scale-105 duration-50`} onClick={() => datastatus(500)}>
-                 <span className='font-bold text-black'>Last-500</span>
-                     </div>
-                     <div className={`border-${a} ${b} p-6 rounded-lg cursor-pointer hover:scale-105 duration-50`} onClick={() => datastatus(1000)}>
-                         <span className='font-bold text-black'>Last-1000</span>
-                     </div>
-                     <div className={`border-${a} ${b} p-6 rounded-lg cursor-pointer hover:scale-105 duration-50`} onClick={() => datastatus(2000)}>
-                         <span className='font-bold text-black'>Last-2000</span>
-                     </div>
-                 </div>
-              </div>
-            </div>
-           )}
-           {papup4 &&(
-            <div className='content flex justify-center items-center h-screen'> 
-            <div className='close-btn' onClick={handleClosePopup}>&times;</div>
-           <div className='flex items-center justify-center'>
-               <div className='flex justify-center gap-4'>
-                  <div className={`border-${a} ${b} p-6 rounded-lg cursor-pointer hover:scale-105 duration-50`}>
-                    <span className='font-bold text-black'>500</span>
-                    <p className='font-bold text-black'>Data</p>
-                  </div>
-                  <div className={`border-${a} ${b} p-6 rounded-lg cursor-pointer hover:scale-105 duration-50`}>
-                      <span className='font-bold text-black'>5000</span>
-                      <p className='font-bold text-black'>Data</p>
-                  </div>
-                  <div className={`border-${a} ${b} p-6 rounded-lg cursor-pointer hover:scale-105 duration-50`}>
-                      <span className='font-bold text-black'>10000</span>
-                      <p className='font-bold text-black'>Data</p>
-                  </div>
-               </div>
-            </div>
+//              <div className='content flex justify-center items-center h-screen'> 
+//               <div className='close-btn' onClick={handleClosePopup}>&times;</div>
+//              <div className='flex items-center justify-center'>
+//                  <div className='flex justify-center gap-4'>
+//                  <div className={`border-${a} ${b} p-6 rounded-lg cursor-pointer hover:scale-105 duration-50`} onClick={() => datastatus(500)}>
+//                  <span className='font-bold text-black'>Last-500</span>
+//                      </div>
+//                      <div className={`border-${a} ${b} p-6 rounded-lg cursor-pointer hover:scale-105 duration-50`} onClick={() => datastatus(1000)}>
+//                          <span className='font-bold text-black'>Last-1000</span>
+//                      </div>
+//                      <div className={`border-${a} ${b} p-6 rounded-lg cursor-pointer hover:scale-105 duration-50`} onClick={() => datastatus(2000)}>
+//                          <span className='font-bold text-black'>Last-2000</span>
+//                      </div>
+//                  </div>
+//               </div>
+//             </div>
+//            )}
+//            {papup4 &&(
+//             <div className='content flex justify-center items-center h-screen'> 
+//             <div className='close-btn' onClick={handleClosePopup}>&times;</div>
+//            <div className='flex items-center justify-center'>
+//                <div className='flex justify-center gap-4'>
+//                   <div className={`border-${a} ${b} p-6 rounded-lg cursor-pointer hover:scale-105 duration-50`}>
+//                     <span className='font-bold text-black'>500</span>
+//                     <p className='font-bold text-black'>Data</p>
+//                   </div>
+//                   <div className={`border-${a} ${b} p-6 rounded-lg cursor-pointer hover:scale-105 duration-50`}>
+//                       <span className='font-bold text-black'>5000</span>
+//                       <p className='font-bold text-black'>Data</p>
+//                   </div>
+//                   <div className={`border-${a} ${b} p-6 rounded-lg cursor-pointer hover:scale-105 duration-50`}>
+//                       <span className='font-bold text-black'>10000</span>
+//                       <p className='font-bold text-black'>Data</p>
+//                   </div>
+//                </div>
+//             </div>
+//           </div>
+//            )}
+//          </div>
+//        </div>
+//       )}
+//     </div>
+//   )
+// }
+
+// export default Reports
+
+import React from 'react';
+import dateIcon from '../Assets/datepicker.png';
+import countIcon from '../Assets/count.png';
+import { LuCalendarSearch } from "react-icons/lu";
+import { BsDatabaseDown } from "react-icons/bs";
+import { MdOutlineSensors } from "react-icons/md";
+import { TbHash } from "react-icons/tb";
+
+const Reports = () => {
+  return (
+    <>
+      <div className="h-screen text-white p-4 overflow-hidden flex flex-col gap-4">
+        <center className="font-medium text-xl underline">
+          Report Generation
+        </center>
+        <div className="flex justify-evenly">
+          <div className="flex flex-col items-center hover:scale-125 duration-200 cursor-pointer">
+            <LuCalendarSearch className="text-6xl" />
+            Date Picker
           </div>
-           )}
-         </div>
-       </div>
-      )}
-    </div>
-  )
+
+          <div className="flex flex-col items-center hover:scale-125 duration-200 cursor-pointer">
+            <TbHash className="text-6xl" />
+            Count-wise Data
+          </div>
+
+          <div className="flex flex-col items-center hover:scale-125 duration-200 cursor-pointer">
+            <BsDatabaseDown className="text-6xl" />
+            Overall Data
+          </div>
+
+          <div className="flex flex-col items-center hover:scale-125 duration-200 cursor-pointer">
+            <MdOutlineSensors className="text-6xl" />
+            Sensor-wise Data
+          </div>
+        </div>
+      </div>
+    </>
+  );
 }
 
 export default Reports
