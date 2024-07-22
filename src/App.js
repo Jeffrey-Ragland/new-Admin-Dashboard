@@ -118,8 +118,8 @@ const getInitialAutoDashCondition = () => {
 const [autoDashCondition, setAutoDashCondition] = useState(getInitialAutoDashCondition);
 
 useEffect(() => {
-  if(controls === 'AutomatedDashboard' && autoDashCondition === 0); {
-    localStorage.setItem("AutoDashLimit", 100);
+  if(controls === 'AutomatedDashboard' && autoDashCondition === 0) {
+    localStorage.setItem("AutoDashLimit", "100");
     setAutoDashCondition(1);
   };
 }, [controls, autoDashCondition]);
@@ -419,12 +419,7 @@ const getDemokitZtarData = async () => {
               />
               <Route
                 path="Graph"
-                element={
-                  <GraphPage
-                    all_sensor_data={projectData}
-                    Chartdata={chartdata}
-                  />
-                }
+                element={<GraphPage dataFromApp={autoDashData} />}
               />
               <Route
                 path="Report"

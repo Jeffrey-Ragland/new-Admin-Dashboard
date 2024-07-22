@@ -238,7 +238,6 @@ const DemokitUtmaps = (dataFromApp) => {
         }
       } else {
         console.error("createdAt field is missing in the data");
-        setActiveStatus("Inactive");
       }
     }
   }, [dataFromApp])

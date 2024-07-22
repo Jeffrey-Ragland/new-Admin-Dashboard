@@ -1,136 +1,170 @@
-  import React,{useState} from 'react'
+  import React,{useState, useEffect} from 'react'
   import {Line} from 'react-chartjs-2';
   import ReactSlider from 'react-slider';
   import { ToastContainer, toast } from 'react-toastify';
   import 'react-toastify/dist/ReactToastify.css';
 
 
-  const Graph = ({all_sensor_data,Chartdata}) => {
-    const [lineSliderValues, setLineSliderValues] = useState([0, 1000]); 
-    const [selectedKey, SetSelectedKey] = useState([]); 
-    const[inputvalues,setInput]=useState('')
-   
-    const data={
-      labels:Chartdata,
-      datasets:[{
-          // label: 'Headers',
-          data: Chartdata,
-          backgroundColor:'block',
-          borderColor:'red',
-          pointBordColor:'aqua',
-          fill:true,
-          tension:0.4,
-          pointLabel: ({ dataIndex }) => {
-              // Return the data value for the corresponding point
-              return data.datasets[0].data[dataIndex];
-          },
-      }]
-    }
-    const options ={
-      plugins:{
-        // legend:true,
-      },
-      scales:{
-          x: {
-              grid:{
-                  color:'white'
-              },
-              ticks: {
-                  color: '#2d2d2d', 
-              },
-          },
-          y: {
-              min:lineSliderValues[0],
-              max:lineSliderValues[1],
-              ticks: {
-                  color: '#2d2d2d',
-              },
-              grid:{
-                  color:'white'
-              },
-          },
+  const Graph = (dataFromApp) => {
+    const [lineSliderValues, setLineSliderValues] = useState([0, 1000]);
+    const [lineData, setLineData] = useState({
+      labels: [],
+      datasets: [],
+    });
+
+    const dataFromAppFile = dataFromApp.dataFromApp;
+
+    // local storage graph limit
+    const getInitialLimit = () => {
+      const storedLimit = localStorage.getItem("AutoDashLimit");
+      return storedLimit ? parseInt(storedLimit) : 100;
+    };
+
+    const [autoDashLineLimit, setAutoDashLineLimit] = useState(getInitialLimit);
+
+    const handleLineLimit = (e) => {
+      const limit = parseInt(e.target.value);
+      setAutoDashLineLimit(limit);
+      localStorage.setItem("AutoDashLimit", limit.toString());
+    };
+
+    // line chart
+    useEffect(() => {
+      if (dataFromAppFile.length > 0) {
+        const reversedData = [...dataFromAppFile].reverse();
+
+        const lineLabels = reversedData.map((item) => {
+          const createdAt = new Date(item.createdAt).toLocaleString("en-GB");
+          return createdAt;
+        });
+
+        
+          const parameterKeys = Object.keys(reversedData[0]).filter(key => key !== 'createdAt');
+
+          const datasets = parameterKeys.map((key, index) => ({
+            label: key,
+            data: reversedData.map((item) => item[key]),
+            borderColor: `hsl(${(index * 60) % 360}, 70%, 50%)`,
+            backgroundColor: `hsla(${(index * 60) % 360}, 70%, 50%, 0.2)`,
+          }));
+          setLineData({
+            labels: lineLabels,
+            datasets,
+          });
+       
       }
-    }
+    }, [dataFromAppFile]);
 
-
-
-    let cardData = 'N/A';
-    if(all_sensor_data && all_sensor_data.length > 0)
-    {
-        cardData = all_sensor_data[0];
-    }
+    const lineOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: "top",
+          labels: {
+            color: "white",
+            font: {
+              size: 8,
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: "white",
+            font: {
+              size: 5,
+            },
+          },
+        },
+        y: {
+          min: lineSliderValues[0],
+          max: lineSliderValues[1],
+          ticks: {
+            color: "white",
+            font: {
+              size: 6,
+            },
+          },
+          grid: {
+            color: "darkGray",
+          },
+        },
+      },
+    };
 
     const handleLineSliderChange = (value) => {
       setLineSliderValues(value);
     };
-    const handleKeyClick = (key) =>
-      {
-          SetSelectedKey(key);
-          sessionStorage.setItem('Chart_status',key)    
-      };
 
-      const CollectData=(event)=>{
-        const inputValue = event.target.value;
-        if (/^\d*$/.test(inputValue)) {
-          setInput(inputValue);
-        }
-      }
-      const handleKeyDown = (event) => {
-        if (event.key === 'Enter') {
-          console.log("error")
-          if(inputvalues == ""){
-            toast.error('Error Saving!!');
-          }else{
-            console.log("value",inputvalues)
-            sessionStorage.setItem("chartLength",inputvalues);
-            const a = sessionStorage.getItem("chartLength");
-            setLineSliderValues(a)
-          }
-        }
-      };
-
-      const range =sessionStorage.getItem("chartLength");
-      console.log(range)
     return (
-      <div>
-        <div className='flex p-2 mt-2 ml-2 mb-2 rounded-md border bottom-1 bg-slate-400'>
-          <div className='flex gap-2 w-[99%] overflow-auto' style={{scrollbarWidth : 'none'}}>
-          {
-                Object.keys(cardData)
-                .filter(key => key !== '_id' && key !== '__v' && key !== 'Time')
-                .map((key,index) => (
-                    <div key={key}  className=' text-white-700 flex text-current  text-xs font-medium rounded-md'>
-                        
-                        <input id={key} type='checkbox' className='cursor-pointer'
-                        onChange={() =>handleKeyClick(key)}
-                        checked={index === 0 && selectedKey.length === 0 ? true : selectedKey.includes(key)}></input>
-                        <div className='flex items-center'>{`${key}`}</div>
-                    </div>
-                ))
-                }
+      <>
+        <div className="p-4 flex flex-col gap-4 text-white text-sm font-medium xl:h-screen">
+          <div className="flex items-center justify-between px-3">
+            <div className="flex items-center ">
+              <div className="mr-2">Set Limit:</div>
+              <input
+                type="radio"
+                id="option1"
+                name="options"
+                value={100}
+                checked={autoDashLineLimit === 100}
+                className="cursor-pointer mt-0.5"
+                onChange={handleLineLimit}
+              />
+              <label htmlFor="option1" className="mr-2 cursor-pointer">
+                100
+              </label>
+              <input
+                type="radio"
+                id="option2"
+                name="options"
+                value={500}
+                checked={autoDashLineLimit === 500}
+                className="cursor-pointer mt-0.5"
+                onChange={handleLineLimit}
+              />
+              <label htmlFor="option2" className="mr-2 cursor-pointer">
+                500
+              </label>
+              <input
+                type="radio"
+                id="option3"
+                name="options"
+                value={1000}
+                checked={autoDashLineLimit === 1000}
+                className="cursor-pointer mt-0.5"
+                onChange={handleLineLimit}
+              />
+              <label htmlFor="option3" className="mr-2 cursor-pointer">
+                1000
+              </label>
+              <input
+                type="radio"
+                id="option4"
+                name="options"
+                value={1500}
+                checked={autoDashLineLimit === 1500}
+                className="cursor-pointer mt-0.5"
+                onChange={handleLineLimit}
+              />
+              <label htmlFor="option4" className="mr-2 cursor-pointer">
+                1500
+              </label>
+            </div>
+
+            {/* <div>Edit Range</div> */}
           </div>
-          <div className='border right-1'>
-          
-          </div>
-          <div className='flex'>
-            <div className='font-bold ml-2 text-white-700'>Range :</div >
-            <input type='text' id='email' name='email' autoComplete='off'  onKeyDown={handleKeyDown} onChange={CollectData}  className='w-[50%] ml-2 px-2 '>
-         
-            </input>
-            <ToastContainer />
-          </div>
-        </div>
-    
-        <div className="flex justify-center items-center">
-          <div className="flex bg-gray-600 rounded-lg p-4">
-            <div className='h-[1/2]'>
+          <div className="flex-1 flex w-full">
+            <div className="w-[8%] flex items-center justify-center">
               <ReactSlider
-                className="w-10 h-[95%] flex justify-center items-center"
-                thumbClassName="w-5 h-50 bg-[#2d2d2d] rounded-full flex items-center justify-center cursor-pointer text-white font-medium text-xs hover:scale-110"
-                trackClassName="w-1 rounded-full bg-gray-300"
+                className="w-10 h-[93%] flex justify-center items-center"
+                thumbClassName="w-6 h-6 bg-gray-700 rounded-full flex items-center justify-center cursor-pointer text-white font-medium text-xs hover:scale-110"
+                trackClassName="w-0.5 rounded-full bg-red-600"
                 min={0}
-                max={range}
-                defaultValue={[0, range]}
+                max={1000}
+                defaultValue={[0, 1000]}
                 renderThumb={(props, state) => (
                   <div {...props}>{state.valueNow}</div>
                 )}
@@ -141,15 +175,14 @@
                 onChange={(value) => handleLineSliderChange(value)}
               />
             </div>
-            {/* width={1700} height={800}  */}
-            <div className='w-full h-full'>
-              <Line data={data} width={1000} height={500}  options={options} />
+
+            <div className="w-[92%] bg-gray-700">
+              <Line data={lineData} options={lineOptions} width={"100%"} />
             </div>
           </div>
         </div>
-      </div>
-        
-    )
+      </>
+    );
   }
 
   export default Graph

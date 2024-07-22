@@ -13,7 +13,6 @@ import { FaTable } from "react-icons/fa6";
 import { MdOutlineSensors } from "react-icons/md";
 import { FaChartPie } from "react-icons/fa";
 import { MdInfo } from "react-icons/md";
-import ReactSpeedometer from "react-d3-speedometer"
 import '../Css/Source.css'
 import { FaChartArea } from "react-icons/fa";
 import {Line} from 'react-chartjs-2';
@@ -24,202 +23,192 @@ ChartJS.register(LineElement,CategoryScale,LinearScale,PointElement)
 
 const MainPage = (dataFromApp) => {
 
-    console.log(dataFromApp.dataFromApp);
-
+    const [filteredParameterData, setFilteredParameterData] = useState([]);
+    const [parameterCount, setParameterCount] = useState();
     const [pieData, setPieData] = useState([]);
-    const [activeStatus, setActiveStatus] = useState('ACTIVE'); 
-    const [lastUpdated, setLastUpdated] = useState(); //last update
+    const [activeStatus, setActiveStatus] = useState('Inactive');
     const [peakValues, setPeakValues] = useState([]); //peak value
-    const [leftoverKeys, setLeftoverKeys] = useState(0); //total parameters
-    const [limit, setLimit] = useState(25); //for line graph limit
-    // const alldata = all_sensor_data.all_sensor_data
-    const [selectedKey, SetSelectedKey] = useState([]); // line graph parameter selection
+    const [gaugeOptions, setGaugeOptions] = useState({});
+    const [lineData, setLineData] = useState({
+      labels: [],
+      datasets: [],
+    });
     const [lineSliderValues, setLineSliderValues] = useState([0, 1000]); 
-    let ChartSensor = sessionStorage.getItem("Chart_status");
-    // const chart_data = all_sensor_data.all_sensor_data.map(item=>item[ChartSensor]);
 
+    const dataFromAppFile = dataFromApp.dataFromApp;
 
-    const handleLimitChange = (e) =>
-    {
-        setLimit(parseInt(e.target.value));
-        sessionStorage.setItem('Chart_Limit',parseInt(e.target.value)) 
+    // filtering only the parameters
+    useEffect(() => {
+      if(dataFromAppFile.length > 0) {
+        const filteredData = dataFromAppFile.map(
+          ({ createdAt, ...rest }) => rest
+        );
 
-    };
- 
+        const count = filteredData.length > 0 ? Object.keys(filteredData[0]).length : 0;
 
-    const handleKeyClick = (key) =>
-    {
-        SetSelectedKey(key);
-        sessionStorage.setItem('Chart_status',key)    
-    };
+        // peak value
+        if(filteredData.length > 0) {
+          const entries = Object.entries(filteredData[0]);
+          const numericEntries = entries.map(([key,value]) => [key, parseFloat(value)]);
+          const max = Math.max(...numericEntries.map(([, value]) => value));
+
+          const peaks = numericEntries.filter(([, value]) => value === max);
+          setPeakValues(peaks); 
+          console.log('max gauge', max);
+          // gauge chart options
+          setGaugeOptions({
+            greenFrom: 0,
+            greenTo: max - 10,
+            yellowFrom: max - 40,
+            yellowTo: max + 10,
+            redFrom: max + 10,
+            redTo: max + 40,
+            minorTicks: 5,
+            max: max + 40,
+          });
+        };
+
+        setFilteredParameterData(filteredData);
+        setParameterCount(count); // NOS
+      }
+    }, [dataFromAppFile]);
+
+    console.log('data from app file',dataFromAppFile);
+    console.log('filtered parameter data', filteredParameterData);
   
-    
- 
-
-    // card data code
-    let cardData = 'N/A';
-    // if(alldata && alldata.length > 0)
-    // {
-    //     cardData = alldata[0];
-    // }
-
-
     //pie chart code
-    // useEffect(() => {
-    //     if (alldata.length > 0) {
-    //         const lastProjectData = alldata[0];
-    //         const keysBeforeFilter = Object.keys(lastProjectData);
-    //         const filteredkeys = keysBeforeFilter.filter(key => key !== '_id' && key !== '__v' && key !== 'Time')
-    //         const pieChartData =filteredkeys.map(key => [key, parseFloat(lastProjectData[key])]); 
-    //         setPieData([['Category', 'Value'], ...pieChartData]);
-    //         setLastUpdated(lastProjectData.Time); // for last updated
+    useEffect(() => {
+      if(filteredParameterData.length > 0) {
 
-    //         const peakValues = findPeakValue(lastProjectData); // for peak value
-    //         setPeakValues(peakValues);
-
-    //         const leftoverKeys = keysBeforeFilter.length - 3; //total parameters
-    //         setLeftoverKeys(leftoverKeys);
-    //     }
-    // }, [alldata]);
-
+        const lastData = filteredParameterData[0];
+        const pieChartData = Object.entries(lastData).map(([key, value]) => [key,parseFloat(value)]);
+        setPieData([["Category", "Value"], ...pieChartData]);
+      }
+    },[filteredParameterData]);
 
     const pieOptions = {
-      
         is3D: true,
         legend:{
             position: 'bottom',
             textStyle:{
-                fontSize: 7
+                fontSize: 7,
             }
         },
         backgroundColor: 'transparent'
     };
 
+    // activity status
+    useEffect (() => {
+      if (dataFromAppFile.length > 0) {
+        const currentDate = new Date();
+        const lastDataDate = new Date(dataFromAppFile[0].createdAt);
 
-    // function to find peak value
-    const findPeakValue = (data) =>
-    {
-        let maxValues = [];  
-        let maxValue = -Infinity;
-        
-        for (const key in data)
-        {
-            if(data.hasOwnProperty(key) && key !== '_id' && key !== '__v' && key !== 'Time')
-            {
-                const value = parseFloat(data[key]);
+        const timeDifference = currentDate.getTime() - lastDataDate.getTime();
+        const differenceInMinutes = timeDifference / (1000 * 60);
 
-                if(value > maxValue)
-                {
-                    maxValues = [{key,value}];
-                    maxValue = value;
-                }
-                else if(value === maxValue)
-                {
-                    maxValues.push({key,value});
-                }
-            }
+        if (differenceInMinutes < 5) {
+          setActiveStatus("Active");
+        } else {
+          setActiveStatus("Inactive");
         }
-        return maxValues;
+      } else {
+        console.error("createdAt field is missing in the data");
+      };
+    },[dataFromAppFile]);
+
+    // gauge chart
+    const gaugeData = [
+      ['Label', 'Value'],
+      ['Peak', peakValues.length > 0 ? peakValues[0][1] : 'N/A'],
+    ];
+    
+    // local storage graph limit
+    const getInitialLimit = () => {
+      const storedLimit = localStorage.getItem('AutoDashLimit');
+      return storedLimit ? parseInt(storedLimit) : 100;
     }
 
-    //for custom scrollbar
-    const customScrollbarStyle = {
-        scrollbarWidth: 'thin',
-        scrollbarColor: '#616161 transparent',
-    };
+    const [autoDashLineLimit, setAutoDashLineLimit] = useState(getInitialLimit);
 
-  
-    
+    const handleLineLimit = (e) => {
+      const limit = parseInt(e.target.value);
+      setAutoDashLineLimit(limit);
+      localStorage.setItem("AutoDashLimit",limit.toString());
+    }
 
+    // line chart
+    useEffect(() => {
+      if (dataFromAppFile.length > 0) {
+        const reversedData = [...dataFromAppFile].reverse();
 
+        const lineLabels = reversedData.map((item) => {
+          const createdAt = new Date(item.createdAt).toLocaleString("en-GB");
+          return createdAt;
+        });
 
-      //Linechart
+        if (filteredParameterData.length > 0) {
+          const parameterKeys = Object.keys(filteredParameterData[0]);
 
-      const data={
-        // labels:chart_data,
-        datasets:[{
-            // label: 'Headers',
-            // data:chart_data,
-            backgroundColor:'block',
-            borderColor:'red',
-            pointBordColor:'aqua',
-            fill:true,
-            tension:0.4,
-            pointLabel: ({ dataIndex }) => {
-                // Return the data value for the corresponding point
-                return data.datasets[0].data[dataIndex];
-            },
-        }]
-      }
-
-      const options ={
-        plugins:{
-            // legend:true,
-       
-        },
-        scales:{
-            x: {
-                grid:{
-                    color:'white'
-                },
-                ticks: {
-                    color: '#2d2d2d', 
-                },
-            },
-            y: {
-                min:lineSliderValues[0],
-                max:lineSliderValues[1],
-                ticks: {
-                    color: '#2d2d2d',
-                },
-                grid:{
-                    color:'white'
-                },
-            },
+          const datasets = parameterKeys.map((key, index) => ({
+            label: key,
+            data: reversedData.map((item) => item[key]),
+            borderColor: `hsl(${(index * 60) % 360}, 70%, 50%)`,
+            backgroundColor: `hsla(${(index * 60) % 360}, 70%, 50%, 0.2)`,
+          }));
+          setLineData({
+            labels: lineLabels,
+            datasets,
+          });
         }
       }
+    }, [dataFromAppFile]);
 
-    //   function valuetext(value: number) {
-    //     return `${value}°C`;
-    //   }
-
-      const marks = [
-        {
-          value: 0,
-          label: '0°C',
+    const lineOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: "top",
+          labels: {
+            color: "white",
+            font: {
+              size: 8,
+            },
+          },
         },
-        {
-          value: 20,
-          label: '20°C',
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: "white",
+            font: {
+              size: 5,
+            },
+          },
         },
-        {
-          value: 37,
-          label: '37°C',
+        y: {
+          min: lineSliderValues[0],
+          max: lineSliderValues[1],
+          ticks: {
+            color: "white",
+            font: {
+              size: 6,
+            },
+          },
+          grid: {
+            color: "darkGray",
+          },
         },
-        {
-          value: 100,
-          label: '100°C',
-        },
-      ];
+      },
+    };
 
+    const handleLineSliderChange = (value) => {
+      setLineSliderValues(value);
+    };
 
-      const handleLineSliderChange = (value) => {
-        setLineSliderValues(value);
-      };
-
-
-//   const keys = Object.keys(cardData).filter(key => key !== '_id' && key !== 'Time' && key !== '__v');
-//   const length = keys.length;
-//   keys.forEach(key => console.log(`${key}: ${cardData[key]}`));
-
-
-
-  const filteredKeys = Object.keys(cardData).filter(
-    key => key !== '_id' && key !== '__v' && key !== 'Time'
-  );
   return (
     <>
-      <div className="xl:h-screen flex flex-col">
+      <div className="xl:h-screen flex flex-col 2xl:text-2xl">
         <div className="h-[7%]">
           <Navbar />
         </div>
@@ -246,20 +235,17 @@ const MainPage = (dataFromApp) => {
                   scrollbarColor: "#4B5563 transparent",
                 }}
               >
-                {Object.keys(cardData)
-                  .filter(
-                    (key) => key !== "_id" && key !== "__v" && key !== "Time"
-                  )
-                  .map((key) => (
+                {filteredParameterData.length > 0 &&
+                  Object.keys(filteredParameterData[0]).map((key) => (
                     <div
                       key={key}
-                      className="font-medium border-2 bg-[#fcb599] text-gray-700 rounded-md h-28 flex flex-col items-center justify-center"
+                      className="font-medium border-2 bg-[#fcb599] text-gray-700 rounded-md h-28 2xl:h-56 flex flex-col items-center justify-center"
                     >
                       <div className="flex justify-center items-center text-2xl font-bold">
                         <div className="text-3xl">
                           <FaTemperatureArrowDown />
                         </div>
-                        <div>{`${cardData[key]}`}</div>
+                        <div>{`${filteredParameterData[0][key]}`}</div>
                       </div>
                       <div className="flex items-center justify-center">
                         {`${key} `}
@@ -299,7 +285,7 @@ const MainPage = (dataFromApp) => {
               </div>
               <div className="flex flex-col gap-2 w-full md:w-1/2">
                 {/* last update */}
-                <div className="h-1/2 flex flex-col shadow-lg shadow-gray-600">
+                <div className="h-[40%] flex flex-col shadow-lg shadow-gray-600">
                   <div className="flex text-white">
                     <div className="bg-gray-700 flex-1 p-1 font-medium">
                       Device Info
@@ -317,22 +303,28 @@ const MainPage = (dataFromApp) => {
                   >
                     <div className="h-[40%] flex gap-1 font-medium">
                       <div
-                        className="flex justify-center items-center gap-2 w-1/2 rounded-md"
+                        className="flex justify-center items-center gap-1 w-1/2 rounded-md"
                         style={{
                           background:
                             "linear-gradient(180deg, #e3ebfc 0%, #ccd3e3 100%)",
                         }}
                       >
-                        {activeStatus === "ACTIVE" ? (
+                        {activeStatus === "Active" ? (
                           <div className="text-green-500">
                             <IoMdCheckmarkCircleOutline className="text-xl" />
                           </div>
                         ) : (
-                          <div>
+                          <div className="text-red-500">
                             <AiOutlineWarning className="text-xl" />
                           </div>
                         )}
-                        <div className="text-green-500 py-4 md:py-0">
+                        <div
+                          className={`${
+                            activeStatus === "Active"
+                              ? "text-green-500"
+                              : "text-red-500"
+                          } py-4 md:py-0`}
+                        >
                           {activeStatus}
                         </div>
                       </div>
@@ -344,7 +336,7 @@ const MainPage = (dataFromApp) => {
                         }}
                       >
                         <div>NOS:</div>
-                        <div>{leftoverKeys}</div>
+                        <div>{parameterCount}</div>
                       </div>
                     </div>
                     <div
@@ -363,13 +355,16 @@ const MainPage = (dataFromApp) => {
                         </div>
                       </div>
                       <div className="flex justify-center items-center font-bold text-xs">
-                        {lastUpdated}
+                        {dataFromAppFile.length > 0 &&
+                          new Date(dataFromAppFile[0].createdAt).toLocaleString(
+                            "en-GB"
+                          )}
                       </div>
                     </div>
                   </div>
                 </div>
                 {/* speedometer */}
-                <div className="h-1/2 flex flex-col shadow-lg shadow-gray-600">
+                <div className="h-[60%] flex flex-col shadow-lg shadow-gray-600">
                   <div className="flex text-white">
                     <div className="bg-gray-700 flex-1 p-1 font-medium">
                       Peak Value
@@ -379,39 +374,38 @@ const MainPage = (dataFromApp) => {
                     </div>
                   </div>
                   <div
-                    className="flex-1 overflow-auto py-4 xl:py-0"
+                    className="flex-1 flex items-center justify-evenly py-4 xl:py-0 "
                     style={{
                       background:
                         "linear-gradient(180deg, #737780 0%, #6c7587 100%)",
                     }}
                   >
-                    {peakValues.map((peak, index) => (
-                      <div
-                        key={index}
-                        className="flex justify-around items-center font-medium"
-                      >
-                        <div className="text-white font-bold">
-                          {`${peak.key}`}
+                    <div className="flex gap-1">
+                      {peakValues.map(([key, value]) => (
+                        <div
+                          key={key}
+                          className=" font-medium w-full text-white  "
+                        >
+                          {`${key},`}
                         </div>
-                        <div>
-                          <ReactSpeedometer
-                            height={100}
-                            width={140}
-                            // style={chartStyle}
-                            maxValue={peak.value + 200}
-                            value={peak.value}
-                            needleColor="white"
-                            startColor="green"
-                            arcsLength={[0.3, 0.5, 0.2]}
-                            // forceRender={true}
-                            maxSegmentLabels={5}
-                            needleHeightRatio={0.7}
-                            endColor="red"
-                            valueTextFillColor="white"
-                          />
-                        </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
+                    <div className=" 2xl:hidden">
+                      <Chart
+                        chartType="Gauge"
+                        height={125}
+                        data={gaugeData}
+                        options={gaugeOptions}
+                      />
+                    </div>
+                    <div className=" hidden 2xl:block">
+                      <Chart
+                        chartType="Gauge"
+                        height={200}
+                        data={gaugeData}
+                        options={gaugeOptions}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -432,47 +426,44 @@ const MainPage = (dataFromApp) => {
               <table className="w-full">
                 <thead className="sticky top-0 bg-gray-700">
                   <tr>
-                    <th className="border text-white border-black">S.No</th>
-                    {Object.keys(cardData)
-                      .filter(
-                        (key) =>
-                          key !== "_id" && key !== "__v" && key !== "Time"
-                      )
-                      .map((key) => (
+                    <th className="border text-white border-gray-400">S.No</th>
+                    {filteredParameterData.length > 0 &&
+                      Object.keys(filteredParameterData[0]).map((key) => (
                         <th
                           key={key}
-                          className="text-white border border-black"
+                          className="text-white border border-gray-400"
                         >
                           {key}
                         </th>
                       ))}
-
-                    <th className="border text-white border-black">
+                    <th className="border text-white border-gray-400">
                       Updated At
                     </th>
                   </tr>
                 </thead>
                 <tbody className="text-xs">
-                  {/* {alldata.map((item, index) => (
-                    <tr key={index}>
-                      <td className="border border-black text-center">
-                        {index + 1}
-                      </td>
-                      {Object.keys(item)
-                        .filter((key) => !["_id", "Time", "__v"].includes(key))
-                        .map((key, i) => (
-                          <td
-                            key={i}
-                            className="border border-black text-center"
-                          >
-                            {item[key]}
-                          </td>
-                        ))}
-                      <td className="border border-black text-center">
-                        {item.Time}
-                      </td>
-                    </tr>
-                  ))} */}
+                  {dataFromAppFile.length > 0 &&
+                    dataFromAppFile.map((item, index) => (
+                      <tr key={index}>
+                        <td className="border border-gray-400 text-center">
+                          {index + 1}
+                        </td>
+                        {filteredParameterData.length > 0 &&
+                          Object.keys(filteredParameterData[0]).map(
+                            (key, i) => (
+                              <td
+                                key={i}
+                                className="border border-gray-400 text-center"
+                              >
+                                {item[key]}
+                              </td>
+                            )
+                          )}
+                        <td className="border border-gray-400 text-center">
+                          {new Date(item.createdAt).toLocaleString("en-GB")}
+                        </td>
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>
@@ -488,60 +479,73 @@ const MainPage = (dataFromApp) => {
                 </div>
               </div>
               <div
-                className="p-2 flex flex-col flex-1 py-8 xl:py-0"
+                className="p-2 flex flex-col flex-1 py-8 xl:py-0 text-white text-sm font-medium"
                 style={{
                   background:
                     "linear-gradient(180deg, #737780 0%, #6c7587 100%)",
                 }}
               >
-                <div className="flex h-[10%]">
-                  <div
-                    className="flex gap-2 w-[92%] overflow-auto"
-                    style={{ scrollbarWidth: "none" }}
-                  >
-                    {Object.keys(cardData)
-                      .filter(
-                        (key) =>
-                          key !== "_id" && key !== "__v" && key !== "Time"
-                      )
-                      .map((key, index) => (
-                        <div
-                          key={key}
-                          className=" text-white-700 flex text-xs font-medium rounded-md"
-                        >
-                          <input
-                            id={key}
-                            type="checkbox"
-                            className="cursor-pointer"
-                            onChange={() => handleKeyClick(key)}
-                            checked={
-                              index === 0 && selectedKey.length === 0
-                                ? true
-                                : selectedKey.includes(key)
-                            }
-                          ></input>
-                          <div className="flex items-center">{`${key}`}</div>
-                        </div>
-                      ))}
+                <div className="flex items-center justify-between px-3">
+                  <div className="flex items-center ">
+                    <div className="mr-2">Set Limit:</div>
+                    <input
+                      type="radio"
+                      id="option1"
+                      name="options"
+                      value={100}
+                      checked={autoDashLineLimit === 100}
+                      className="cursor-pointer mt-0.5"
+                      onChange={handleLineLimit}
+                    />
+                    <label htmlFor="option1" className="mr-2 cursor-pointer">
+                      100
+                    </label>
+                    <input
+                      type="radio"
+                      id="option2"
+                      name="options"
+                      value={500}
+                      checked={autoDashLineLimit === 500}
+                      className="cursor-pointer mt-0.5"
+                      onChange={handleLineLimit}
+                    />
+                    <label htmlFor="option2" className="mr-2 cursor-pointer">
+                      500
+                    </label>
+                    <input
+                      type="radio"
+                      id="option3"
+                      name="options"
+                      value={1000}
+                      checked={autoDashLineLimit === 1000}
+                      className="cursor-pointer mt-0.5"
+                      onChange={handleLineLimit}
+                    />
+                    <label htmlFor="option3" className="mr-2 cursor-pointer">
+                      1000
+                    </label>
+                    <input
+                      type="radio"
+                      id="option4"
+                      name="options"
+                      value={1500}
+                      checked={autoDashLineLimit === 1500}
+                      className="cursor-pointer mt-0.5"
+                      onChange={handleLineLimit}
+                    />
+                    <label htmlFor="option4" className="mr-2 cursor-pointer">
+                      1500
+                    </label>
                   </div>
-                  <select
-                    id="limit"
-                    value={limit}
-                    onChange={handleLimitChange}
-                    className="text-xs w-[8%] rounded-xl font-medium cursor-pointer"
-                  >
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                    <option value="75">75</option>
-                    <option value="100">100</option>
-                  </select>
+
+                  {/* <div>Edit Range</div> */}
                 </div>
-                <div className="flex w-full h-[90%]">
-                  <div className="w-[8%] flex justify-center">
+                <div className="flex-1 flex w-full">
+                  <div className="w-[8%] flex items-center justify-center">
                     <ReactSlider
-                      className="w-10 h-[95%] flex justify-center items-center"
-                      thumbClassName="w-5 h-50 bg-[#2d2d2d] rounded-full flex items-center justify-center cursor-pointer text-white font-medium text-xs hover:scale-110"
-                      trackClassName="w-1 rounded-full bg-gray-300"
+                      className="w-10 h-[94%] flex justify-center items-center"
+                      thumbClassName="w-6 h-6 bg-gray-700 rounded-full flex items-center justify-center cursor-pointer text-white font-medium text-xs hover:scale-110"
+                      trackClassName="w-0.5 rounded-full bg-red-600"
                       min={0}
                       max={1000}
                       defaultValue={[0, 1000]}
@@ -557,7 +561,11 @@ const MainPage = (dataFromApp) => {
                   </div>
 
                   <div className="w-[92%]">
-                    <Line data={data} options={options} height={"100%"}></Line>
+                    <Line
+                      data={lineData}
+                      options={lineOptions}
+                      width={"100%"}
+                    />
                   </div>
                 </div>
               </div>
