@@ -1,6 +1,7 @@
   import React,{useState, useEffect} from 'react'
   import {Line} from 'react-chartjs-2';
   import ReactSlider from 'react-slider';
+  import Navbar from "./Navbar";
   import { ToastContainer, toast } from 'react-toastify';
   import 'react-toastify/dist/ReactToastify.css';
 
@@ -101,84 +102,93 @@
 
     return (
       <>
-        <div className="p-4 flex flex-col gap-4 text-white text-sm font-medium xl:h-screen">
-          <div className="flex items-center justify-between px-3">
-            <div className="flex items-center ">
-              <div className="mr-2">Set Limit:</div>
-              <input
-                type="radio"
-                id="option1"
-                name="options"
-                value={100}
-                checked={autoDashLineLimit === 100}
-                className="cursor-pointer mt-0.5"
-                onChange={handleLineLimit}
-              />
-              <label htmlFor="option1" className="mr-2 cursor-pointer">
-                100
-              </label>
-              <input
-                type="radio"
-                id="option2"
-                name="options"
-                value={500}
-                checked={autoDashLineLimit === 500}
-                className="cursor-pointer mt-0.5"
-                onChange={handleLineLimit}
-              />
-              <label htmlFor="option2" className="mr-2 cursor-pointer">
-                500
-              </label>
-              <input
-                type="radio"
-                id="option3"
-                name="options"
-                value={1000}
-                checked={autoDashLineLimit === 1000}
-                className="cursor-pointer mt-0.5"
-                onChange={handleLineLimit}
-              />
-              <label htmlFor="option3" className="mr-2 cursor-pointer">
-                1000
-              </label>
-              <input
-                type="radio"
-                id="option4"
-                name="options"
-                value={1500}
-                checked={autoDashLineLimit === 1500}
-                className="cursor-pointer mt-0.5"
-                onChange={handleLineLimit}
-              />
-              <label htmlFor="option4" className="mr-2 cursor-pointer">
-                1500
-              </label>
-            </div>
-
-            {/* <div>Edit Range</div> */}
+        <div className="xl:h-screen flex flex-col 2xl:text-2xl">
+          {/* navbar */}
+          <div className="h-[7%]">
+            <Navbar />
           </div>
-          <div className="flex-1 flex w-full">
-            <div className="w-[8%] flex items-center justify-center">
-              <ReactSlider
-                className="w-10 h-[93%] flex justify-center items-center"
-                thumbClassName="w-6 h-6 bg-gray-700 rounded-full flex items-center justify-center cursor-pointer text-white font-medium text-xs hover:scale-110"
-                trackClassName="w-0.5 rounded-full bg-red-600"
-                min={0}
-                max={1000}
-                defaultValue={[0, 1000]}
-                renderThumb={(props, state) => (
-                  <div {...props}>{state.valueNow}</div>
-                )}
-                pearling
-                minDistance={5}
-                orientation="vertical"
-                invert
-                onChange={(value) => handleLineSliderChange(value)}
-              />
+
+          {/* main content */}
+          <div className="p-4 flex flex-col gap-4 text-white text-sm font-medium h-[93%]">
+            <div className="flex items-center justify-between px-3">
+              <div className="flex items-center ">
+                <div className="mr-2">Set Limit:</div>
+                <input
+                  type="radio"
+                  id="option1"
+                  name="options"
+                  value={100}
+                  checked={autoDashLineLimit === 100}
+                  className="cursor-pointer mt-0.5"
+                  onChange={handleLineLimit}
+                />
+                <label htmlFor="option1" className="mr-2 cursor-pointer">
+                  100
+                </label>
+                <input
+                  type="radio"
+                  id="option2"
+                  name="options"
+                  value={500}
+                  checked={autoDashLineLimit === 500}
+                  className="cursor-pointer mt-0.5"
+                  onChange={handleLineLimit}
+                />
+                <label htmlFor="option2" className="mr-2 cursor-pointer">
+                  500
+                </label>
+                <input
+                  type="radio"
+                  id="option3"
+                  name="options"
+                  value={1000}
+                  checked={autoDashLineLimit === 1000}
+                  className="cursor-pointer mt-0.5"
+                  onChange={handleLineLimit}
+                />
+                <label htmlFor="option3" className="mr-2 cursor-pointer">
+                  1000
+                </label>
+                <input
+                  type="radio"
+                  id="option4"
+                  name="options"
+                  value={1500}
+                  checked={autoDashLineLimit === 1500}
+                  className="cursor-pointer mt-0.5"
+                  onChange={handleLineLimit}
+                />
+                <label htmlFor="option4" className="mr-2 cursor-pointer">
+                  1500
+                </label>
+              </div>
+
+              {/* <div>Edit Range</div> */}
             </div>
 
-            <div className="w-[92%] bg-gray-700">
-              <Line data={lineData} options={lineOptions} width={"100%"} />
+            <div className="flex-1 flex w-full">
+              <div className="w-[8%] flex items-center justify-center">
+                <ReactSlider
+                  className="w-10 h-[93%] flex justify-center items-center"
+                  thumbClassName="w-6 h-6 bg-gray-700 rounded-full flex items-center justify-center cursor-pointer text-white font-medium text-xs hover:scale-110"
+                  trackClassName="w-0.5 rounded-full bg-red-600"
+                  min={0}
+                  max={1000}
+                  defaultValue={[0, 1000]}
+                  renderThumb={(props, state) => (
+                    <div {...props}>{state.valueNow}</div>
+                  )}
+                  pearling
+                  minDistance={5}
+                  orientation="vertical"
+                  invert
+                  onChange={(value) => handleLineSliderChange(value)}
+                />
+              </div>
+
+              <div className="w-[92%] bg-gray-700">
+                <Line data={lineData} options={lineOptions} width={"100%"} />
+              </div>
             </div>
           </div>
         </div>

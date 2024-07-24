@@ -14,7 +14,7 @@ import BpclAdmin from './Component/Bpcl/BpclAdmin'
 import GraphPage from './Component/Source/Graph'
 import Reports_Page from './Component/Source/Reports'
 import Source_Outlet from './Component/Route/Source_Outlet'
-import Settings_Page from './Component/Source/Settings_Page'
+import Settings_Page from './Component/Source/Settings'
 import Source_MainPage from './Component/Source/MainPage'
 import axios from 'axios'
 import { ToastContainer, toast } from 'react-toastify';
@@ -213,9 +213,6 @@ const getAutoDashData = async () => {
     console.error("Error fetching automated dashboard data", error);
   };
 };
-
-
-
 
 // const fetchProductData = async () => {
 //   try {
@@ -423,7 +420,7 @@ const getDemokitZtarData = async () => {
               />
               <Route
                 path="Report"
-                element={<Reports_Page report_data={ReportData} />}
+                element={<Reports_Page dataFromApp={autoDashData[0]} />}
               />
               <Route path="Settings" element={<Settings_Page />} />
             </Route>

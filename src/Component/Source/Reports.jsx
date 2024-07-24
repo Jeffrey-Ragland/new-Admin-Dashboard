@@ -519,40 +519,231 @@
 
 // export default Reports
 
-import React from 'react';
-import dateIcon from '../Assets/datepicker.png';
-import countIcon from '../Assets/count.png';
+import React, { useEffect, useState } from 'react';
 import { LuCalendarSearch } from "react-icons/lu";
 import { BsDatabaseDown } from "react-icons/bs";
 import { MdOutlineSensors } from "react-icons/md";
 import { TbHash } from "react-icons/tb";
+import Navbar from "./Navbar";
 
-const Reports = () => {
+const Reports = (dataFromApp) => {
+  const [selectedReportOption, setSelectedReportOption] =
+    useState("datePicker");
+  const [count, setCount] = useState(100);
+  const [enableCount, setEnableCount] = useState(false);
+  const [parameters, setParameters] = useState({});
+
+  const dataFromAppFile = dataFromApp.dataFromApp;
+
+  useEffect(() => {
+    if (dataFromAppFile) {
+      const { createdAt, ...filteredData } = dataFromAppFile;
+      setParameters(filteredData);
+    }
+  }, [dataFromAppFile]); 
+
   return (
     <>
-      <div className="h-screen text-white p-4 overflow-hidden flex flex-col gap-4">
-        <center className="font-medium text-xl underline">
-          Report Generation
-        </center>
-        <div className="flex justify-evenly">
-          <div className="flex flex-col items-center hover:scale-125 duration-200 cursor-pointer">
-            <LuCalendarSearch className="text-6xl" />
-            Date Picker
+      <div className="xl:h-screen flex flex-col 2xl:text-2xl">
+        {/* navbar */}
+        <div className="h-[7%]">
+          <Navbar />
+        </div>
+
+        {/* main content */}
+        <div className="h-[93%] text-white p-4 overflow-hidden flex flex-col gap-4">
+          <div className="flex justify-evenly font-medium">
+            <div
+              className="flex flex-col gap-1 items-center hover:scale-125 duration-200 cursor-pointer"
+              onClick={() => setSelectedReportOption("datePicker")}
+            >
+              <LuCalendarSearch className="text-6xl" />
+              Date Picker
+            </div>
+
+            <div
+              className="flex flex-col gap-1 items-center hover:scale-125 duration-200 cursor-pointer"
+              onClick={() => setSelectedReportOption("countWiseData")}
+            >
+              <TbHash className="text-6xl" />
+              Count-wise Data
+            </div>
+
+            <div
+              className="flex flex-col gap-1 items-center hover:scale-125 duration-200 cursor-pointer"
+              onClick={() => setSelectedReportOption("overallData")}
+            >
+              <BsDatabaseDown className="text-6xl" />
+              Overall Data
+            </div>
+
+            <div
+              className="flex flex-col gap-1 items-center hover:scale-125 duration-200 cursor-pointer"
+              onClick={() => setSelectedReportOption("sensorWiseData")}
+            >
+              <MdOutlineSensors className="text-6xl" />
+              Sensor-wise Data
+            </div>
           </div>
 
-          <div className="flex flex-col items-center hover:scale-125 duration-200 cursor-pointer">
-            <TbHash className="text-6xl" />
-            Count-wise Data
-          </div>
+          <div className="flex-1 border border-black flex items-center justify-center">
+            {selectedReportOption === "datePicker" && (
+              <div
+                className="border border-black"
+                // style={{
+                //   background: "linear-gradient(180deg, #737780 0%, #6c7587 100%)",
+                // }}
+              >
+                <center>Select date</center>
+                <div>
+                  <label>From</label>
+                  <input
+                    type="date"
+                    className="text-black rounded-md px-0.5 2xl:p-2"
+                    required
+                    // value={fromDate}
+                    // onChange={(e) => setFromDate(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label>To</label>
+                  <input
+                    type="date"
+                    className="text-black rounded-md px-0.5 2xl:p-2"
+                    required
+                    // value={fromDate}
+                    // onChange={(e) => setFromDate(e.target.value)}
+                  />
+                </div>
+                <div className="flex gap-4">
+                  <button className="border border-black ">PDF</button>
+                  <button className="border border-black ">Excel</button>
+                </div>
+              </div>
+            )}
 
-          <div className="flex flex-col items-center hover:scale-125 duration-200 cursor-pointer">
-            <BsDatabaseDown className="text-6xl" />
-            Overall Data
-          </div>
+            {selectedReportOption === "countWiseData" && (
+              <div className="border border-black ">
+                <center>Select Count</center>
+                <div className="flex gap-4">
+                  <div className="flex items-center">
+                    <input
+                      type="radio"
+                      id="option1"
+                      name="options"
+                      value={100}
+                      defaultChecked
+                      className="cursor-pointer mr-1"
+                      onClick={() => {
+                        setCount(100);
+                        setEnableCount(false);
+                      }}
+                    />
+                    <label htmlFor="option1" className="cursor-pointer">
+                      Last 100 Data
+                    </label>
+                  </div>
 
-          <div className="flex flex-col items-center hover:scale-125 duration-200 cursor-pointer">
-            <MdOutlineSensors className="text-6xl" />
-            Sensor-wise Data
+                  <div>
+                    <input
+                      type="radio"
+                      id="option2"
+                      name="options"
+                      value={500}
+                      className="cursor-pointer mr-1"
+                      onClick={() => {
+                        setCount(500);
+                        setEnableCount(false);
+                      }}
+                    />
+                    <label htmlFor="option2" className="cursor-pointer">
+                      Last 500 Data
+                    </label>
+                  </div>
+
+                  <div>
+                    <input
+                      type="radio"
+                      id="option3"
+                      name="options"
+                      value={1000}
+                      className="cursor-pointer mr-1"
+                      onClick={() => {
+                        setCount(1000);
+                        setEnableCount(false);
+                      }}
+                    />
+                    <label htmlFor="option3" className="cursor-pointer">
+                      Last 1000 Data
+                    </label>
+                  </div>
+
+                  <div>
+                    <input
+                      type="radio"
+                      id="option4"
+                      name="options"
+                      className="cursor-pointer mr-1"
+                      onClick={() => {
+                        setCount(0);
+                        setEnableCount(true);
+                      }}
+                    />
+                    <label htmlFor="option4" className="cursor-pointer">
+                      Custom Count
+                    </label>
+                  </div>
+                </div>
+                {enableCount && (
+                  <>
+                    <label htmlFor="count">Enter Count:</label>
+                    <input
+                      type="number"
+                      id="count"
+                      value={count}
+                      className="border border-black text-black"
+                      onChange={(e) => setCount(parseInt(e.target.value) || 0)}
+                    />
+                  </>
+                )}
+                <div className="flex gap-4">
+                  <button className="border border-black ">PDF</button>
+                  <button className="border border-black ">Excel</button>
+                </div>
+              </div>
+            )}
+
+            {selectedReportOption === "overallData" && (
+              <div className="border border-black ">
+                <div>Entire data from the database will be downloaded!</div>
+                <div className="flex gap-4">
+                  <button className="border border-black ">PDF</button>
+                  <button className="border border-black ">Excel</button>
+                </div>
+              </div>
+            )}
+
+            {selectedReportOption === "sensorWiseData" && (
+              <div className="border border-black ">
+                <center>Select sensor</center>
+                <div className="flex gap-4">
+                  {parameters &&
+                    Object.keys(parameters).length > 0 &&
+                    Object.keys(parameters).map((key) => (
+                      <div key={key}>
+                        <label>
+                          <input type="checkbox" value={key} />
+                          {key}
+                        </label>
+                      </div>
+                    ))}
+                </div>
+                <div className="flex gap-4">
+                  <button className="border border-black ">PDF</button>
+                  <button className="border border-black ">Excel</button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -561,3 +752,5 @@ const Reports = () => {
 }
 
 export default Reports
+
+// background-image: linear-gradient(to right top, );
