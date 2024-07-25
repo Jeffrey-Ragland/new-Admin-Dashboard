@@ -542,22 +542,47 @@ const Reports = (dataFromApp) => {
   const [enableCount, setEnableCount] = useState(false);
   const [parameters, setParameters] = useState({}); // for sensor-wise data
   const [selectedSensors, setSelectedSensors] = useState([]); //for sensor wise data
+  const [unselectedSensors, setUnselectedSensors] = useState([]);
   const [selectedSensorWiseReportOption, setSelectedSensorWiseReportOption] =
     useState("datePicker"); // for sensor wise data
   const [sensorWiseCount, setSensorWiseCount] = useState(100); // for sensor-wise data
   const [enableSensorWiseCount, setEnableSensorWiseCount] = useState(false); // for sensor-wise data
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
+  const [sensorWiseFromDate, setSensorWiseFromDate] = useState('');
+  const [sensorWiseToDate, setSensorWiseToDate] = useState('');
   const [reportData, setReportData] = useState('');
 
   const dataFromAppFile = dataFromApp.dataFromApp;
+  const projectName = localStorage.getItem('Project');
 
+  // console.log('selected sensors', selectedSensors)
+
+  // used for displaying the sensor names in sensor wise data option
   useEffect(() => {
     if (dataFromAppFile) {
       const { createdAt, ...filteredData } = dataFromAppFile;
       setParameters(filteredData);
     }
   }, [dataFromAppFile]);
+
+  // used for setting unselected sensor
+  useEffect(() => {
+    if (
+      parameters &&
+      selectedSensors &&
+      selectedReportOption === "sensorWiseData"
+    ) {
+      const allSensors = Object.keys(parameters);
+      const unselected = allSensors.filter(
+        (sensor) => !selectedSensors.includes(sensor)
+      );
+
+      setUnselectedSensors(unselected);
+    };
+  }, [parameters, selectedSensors]);
+
+  console.log("unselected sensors:", unselectedSensors);
 
   const handleSensorWiseDataSensorSelection = (key) => {
     setSelectedSensors((prevSelectedSensors) => {
@@ -569,14 +594,28 @@ const Reports = (dataFromApp) => {
     });
   };
 
+  // fetch data
   useEffect(() => {
     handleReportData();
-  }, [fromDate, toDate, count]);
+  }, [fromDate, toDate, count, unselectedSensors, sensorWiseFromDate, sensorWiseToDate, sensorWiseCount]);
 
   const handleReportData = async () => {
     try {
-      const projectName = localStorage.getItem('Project');
-      const response = await axios.get(`http://localhost:4000/sensor/getAutoDashReportData?projectName=${projectName}&fromDate=${fromDate}&toDate=${toDate}&count=${count}`);
+      const response = await axios.get(
+        "http://localhost:4000/sensor/getAutoDashReportData",
+        {
+          params: {
+            projectName: projectName,
+            fromDate: fromDate,
+            toDate: toDate,
+            count: count,
+            unselectedSensors: unselectedSensors.join(","),
+            sensorWiseFromDate: sensorWiseFromDate,
+            sensorWiseToDate: sensorWiseToDate,
+            sensorWiseCount: sensorWiseCount,
+          },
+        }
+      );
       setReportData(response.data.data);
       console.log('report data',response.data.data);
     } catch (error) {
@@ -629,7 +668,7 @@ const Reports = (dataFromApp) => {
         head: [headers],
         body: body,
         startY: 40,
-        headerStyles: {
+        headStyles: {
           fillColor: [222, 121, 13],
         },
       });
@@ -649,6 +688,24 @@ const Reports = (dataFromApp) => {
     window.open(url, "_blank");
   };
 
+  const generateExcel = () => {
+    const ws = XLSX.utils.json_to_sheet(
+      reportData.map(
+        ({ createdAt, ...rest }) => ({
+          ...rest,
+          createdAt: new Date(createdAt).toLocaleString("en-GB"),
+        })
+      )
+    );
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const info = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    saveAs(info, `${projectName}_Report.xlsx`);
+  }
+
   return (
     <>
       <div className="xl:h-screen flex flex-col 2xl:text-2xl">
@@ -662,7 +719,14 @@ const Reports = (dataFromApp) => {
           <div className="flex justify-evenly font-medium">
             <div
               className="flex flex-col gap-1 items-center hover:scale-125 duration-200 cursor-pointer"
-              onClick={() => setSelectedReportOption("datePicker")}
+              onClick={() => {
+                setSelectedReportOption("datePicker");
+                setCount();
+                setSensorWiseCount();
+                setUnselectedSensors([]);
+                setSensorWiseFromDate("");
+                setSensorWiseToDate("");
+              }}
             >
               <LuCalendarSearch className="text-6xl" />
               Date Picker
@@ -674,6 +738,11 @@ const Reports = (dataFromApp) => {
                 setSelectedReportOption("countWiseData");
                 setFromDate("");
                 setToDate("");
+                setCount(100);
+                setSensorWiseCount();
+                setUnselectedSensors([]);
+                setSensorWiseFromDate("");
+                setSensorWiseToDate("");
               }}
             >
               <TbHash className="text-6xl" />
@@ -686,6 +755,11 @@ const Reports = (dataFromApp) => {
                 setSelectedReportOption("overallData");
                 setFromDate("");
                 setToDate("");
+                setCount();
+                setSensorWiseCount();
+                setUnselectedSensors([]);
+                setSensorWiseFromDate("");
+                setSensorWiseToDate("");
               }}
             >
               <BsDatabaseDown className="text-6xl" />
@@ -698,6 +772,7 @@ const Reports = (dataFromApp) => {
                 setSelectedReportOption("sensorWiseData");
                 setFromDate("");
                 setToDate("");
+                setCount();
               }}
             >
               <MdOutlineSensors className="text-6xl" />
@@ -742,7 +817,12 @@ const Reports = (dataFromApp) => {
                   >
                     PDF
                   </button>
-                  <button className="border border-black ">Excel</button>
+                  <button
+                    className="border border-black "
+                    onClick={generateExcel}
+                  >
+                    Excel
+                  </button>
                 </div>
               </div>
             )}
@@ -839,7 +919,12 @@ const Reports = (dataFromApp) => {
                   >
                     PDF
                   </button>
-                  <button className="border border-black ">Excel</button>
+                  <button
+                    className="border border-black "
+                    onClick={generateExcel}
+                  >
+                    Excel
+                  </button>
                 </div>
               </div>
             )}
@@ -849,8 +934,18 @@ const Reports = (dataFromApp) => {
               <div className="border border-black ">
                 <div>Entire data from the database will be downloaded!</div>
                 <div className="flex gap-4">
-                  <button className="border border-black ">PDF</button>
-                  <button className="border border-black ">Excel</button>
+                  <button
+                    className="border border-black "
+                    onClick={generatePdf}
+                  >
+                    PDF
+                  </button>
+                  <button
+                    className="border border-black "
+                    onClick={generateExcel}
+                  >
+                    Excel
+                  </button>
                 </div>
               </div>
             )}
@@ -880,9 +975,10 @@ const Reports = (dataFromApp) => {
                 <div className="flex gap-4 font-medium">
                   <div
                     className="flex flex-col gap-1 items-center hover:scale-110 duration-200 cursor-pointer"
-                    onClick={() =>
-                      setSelectedSensorWiseReportOption("datePicker")
-                    }
+                    onClick={() => {
+                      setSelectedSensorWiseReportOption("datePicker");
+                      setSensorWiseCount();
+                    }}
                   >
                     <LuCalendarSearch className="text-5xl" />
                     Date Picker
@@ -890,9 +986,12 @@ const Reports = (dataFromApp) => {
 
                   <div
                     className="flex flex-col gap-1 items-center hover:scale-110 duration-200 cursor-pointer"
-                    onClick={() =>
-                      setSelectedSensorWiseReportOption("countWiseData")
-                    }
+                    onClick={() => {
+                      setSelectedSensorWiseReportOption("countWiseData");
+                      setSensorWiseFromDate("");
+                      setSensorWiseToDate("");
+                      setSensorWiseCount(100);
+                    }}
                   >
                     <TbHash className="text-5xl" />
                     Count-wise Data
@@ -900,9 +999,12 @@ const Reports = (dataFromApp) => {
 
                   <div
                     className="flex flex-col gap-1 items-center hover:scale-110 duration-200 cursor-pointer"
-                    onClick={() =>
-                      setSelectedSensorWiseReportOption("overallData")
-                    }
+                    onClick={() => {
+                      setSelectedSensorWiseReportOption("overallData");
+                      setSensorWiseFromDate("");
+                      setSensorWiseToDate("");
+                      setSensorWiseCount();
+                    }}
                   >
                     <BsDatabaseDown className="text-5xl" />
                     Overall Data
@@ -919,8 +1021,8 @@ const Reports = (dataFromApp) => {
                         type="date"
                         className="text-black rounded-md px-0.5 2xl:p-2"
                         required
-                        // value={fromDate}
-                        // onChange={(e) => setFromDate(e.target.value)}
+                        value={sensorWiseFromDate}
+                        onChange={(e) => setSensorWiseFromDate(e.target.value)}
                       />
                     </div>
                     <div>
@@ -929,8 +1031,8 @@ const Reports = (dataFromApp) => {
                         type="date"
                         className="text-black rounded-md px-0.5 2xl:p-2"
                         required
-                        // value={fromDate}
-                        // onChange={(e) => setFromDate(e.target.value)}
+                        value={sensorWiseToDate}
+                        onChange={(e) => setSensorWiseToDate(e.target.value)}
                       />
                     </div>
                   </div>
@@ -1032,8 +1134,18 @@ const Reports = (dataFromApp) => {
                 )}
 
                 <div className="flex gap-4">
-                  <button className="border border-black ">PDF</button>
-                  <button className="border border-black ">Excel</button>
+                  <button
+                    className="border border-black "
+                    onClick={generatePdf}
+                  >
+                    PDF
+                  </button>
+                  <button
+                    className="border border-black "
+                    onClick={generateExcel}
+                  >
+                    Excel
+                  </button>
                 </div>
               </div>
             )}
