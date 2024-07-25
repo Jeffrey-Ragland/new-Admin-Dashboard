@@ -520,18 +520,35 @@
 // export default Reports
 
 import React, { useEffect, useState } from 'react';
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 import { LuCalendarSearch } from "react-icons/lu";
 import { BsDatabaseDown } from "react-icons/bs";
 import { MdOutlineSensors } from "react-icons/md";
 import { TbHash } from "react-icons/tb";
+import axios from 'axios';
 import Navbar from "./Navbar";
+import xymaImg from "../Assets/xyma.png";
+import coverImg from "../Assets/pdfcover.jpg";
+import sensorPage from "../Assets/utmapsPage.jpg";
+import disclaimerPage from "../Assets/disclaimerPage.jpg";
 
 const Reports = (dataFromApp) => {
   const [selectedReportOption, setSelectedReportOption] =
     useState("datePicker");
   const [count, setCount] = useState(100);
   const [enableCount, setEnableCount] = useState(false);
-  const [parameters, setParameters] = useState({});
+  const [parameters, setParameters] = useState({}); // for sensor-wise data
+  const [selectedSensors, setSelectedSensors] = useState([]); //for sensor wise data
+  const [selectedSensorWiseReportOption, setSelectedSensorWiseReportOption] =
+    useState("datePicker"); // for sensor wise data
+  const [sensorWiseCount, setSensorWiseCount] = useState(100); // for sensor-wise data
+  const [enableSensorWiseCount, setEnableSensorWiseCount] = useState(false); // for sensor-wise data
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+  const [reportData, setReportData] = useState('');
 
   const dataFromAppFile = dataFromApp.dataFromApp;
 
@@ -540,7 +557,97 @@ const Reports = (dataFromApp) => {
       const { createdAt, ...filteredData } = dataFromAppFile;
       setParameters(filteredData);
     }
-  }, [dataFromAppFile]); 
+  }, [dataFromAppFile]);
+
+  const handleSensorWiseDataSensorSelection = (key) => {
+    setSelectedSensors((prevSelectedSensors) => {
+      if (prevSelectedSensors.includes(key)) {
+        return prevSelectedSensors.filter((sensor) => sensor !== key);
+      } else {
+        return [...prevSelectedSensors, key];
+      }
+    });
+  };
+
+  useEffect(() => {
+    handleReportData();
+  }, [fromDate, toDate, count]);
+
+  const handleReportData = async () => {
+    try {
+      const projectName = localStorage.getItem('Project');
+      const response = await axios.get(`http://localhost:4000/sensor/getAutoDashReportData?projectName=${projectName}&fromDate=${fromDate}&toDate=${toDate}&count=${count}`);
+      setReportData(response.data.data);
+      console.log('report data',response.data.data);
+    } catch (error) {
+      console.error(error);
+    };
+  };
+
+  const generatePdf = () => {
+    const doc = new jsPDF();
+    const logo = xymaImg;
+    const cover = coverImg;
+    const desc = sensorPage;
+    const disclaimer = disclaimerPage;
+
+    // cover img
+    doc.addImage(cover, "JPG", 0, 0, 210, 297);
+    doc.addPage();
+
+    //logo
+    doc.addImage(logo, "PNG", 10, 10, 40, 20);
+
+    //sensor description
+    doc.addImage(desc, "PNG", 0, 40, 220, 250);
+    doc.addPage();
+
+    //logo
+    doc.addImage(logo, "PNG", 10, 10, 40, 20);
+
+    // table
+    if(reportData.length > 0) {
+      // pdf headers 
+      const headers = [
+        'S.No',
+        ...Object.keys(reportData[0])
+      ];
+
+      // pdf table data
+      const body = reportData.map((item, index) => {
+        const rows = [
+          index + 1,
+          ...Object.keys(item)
+          .filter((key) => key !== 'createdAt')
+          .map((key) => item[key]),
+          new Date(item.createdAt).toLocaleString('en-GB')
+        ];
+        return rows;
+      });
+
+      doc.autoTable({
+        head: [headers],
+        body: body,
+        startY: 40,
+        headerStyles: {
+          fillColor: [222, 121, 13],
+        },
+      });
+    };
+
+    doc.addPage();
+
+    //logo
+    doc.addImage(logo, "PNG", 10, 10, 40, 20);
+
+    //disclaimer
+    doc.addImage(disclaimer, "PNG", 0, 50, 210, 250);
+
+    const blob = doc.output("blob");
+
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+  };
 
   return (
     <>
@@ -563,7 +670,11 @@ const Reports = (dataFromApp) => {
 
             <div
               className="flex flex-col gap-1 items-center hover:scale-125 duration-200 cursor-pointer"
-              onClick={() => setSelectedReportOption("countWiseData")}
+              onClick={() => {
+                setSelectedReportOption("countWiseData");
+                setFromDate("");
+                setToDate("");
+              }}
             >
               <TbHash className="text-6xl" />
               Count-wise Data
@@ -571,7 +682,11 @@ const Reports = (dataFromApp) => {
 
             <div
               className="flex flex-col gap-1 items-center hover:scale-125 duration-200 cursor-pointer"
-              onClick={() => setSelectedReportOption("overallData")}
+              onClick={() => {
+                setSelectedReportOption("overallData");
+                setFromDate("");
+                setToDate("");
+              }}
             >
               <BsDatabaseDown className="text-6xl" />
               Overall Data
@@ -579,7 +694,11 @@ const Reports = (dataFromApp) => {
 
             <div
               className="flex flex-col gap-1 items-center hover:scale-125 duration-200 cursor-pointer"
-              onClick={() => setSelectedReportOption("sensorWiseData")}
+              onClick={() => {
+                setSelectedReportOption("sensorWiseData");
+                setFromDate("");
+                setToDate("");
+              }}
             >
               <MdOutlineSensors className="text-6xl" />
               Sensor-wise Data
@@ -587,6 +706,7 @@ const Reports = (dataFromApp) => {
           </div>
 
           <div className="flex-1 border border-black flex items-center justify-center">
+            {/* datepicker option */}
             {selectedReportOption === "datePicker" && (
               <div
                 className="border border-black"
@@ -601,8 +721,8 @@ const Reports = (dataFromApp) => {
                     type="date"
                     className="text-black rounded-md px-0.5 2xl:p-2"
                     required
-                    // value={fromDate}
-                    // onChange={(e) => setFromDate(e.target.value)}
+                    value={fromDate}
+                    onChange={(e) => setFromDate(e.target.value)}
                   />
                 </div>
                 <div>
@@ -611,17 +731,23 @@ const Reports = (dataFromApp) => {
                     type="date"
                     className="text-black rounded-md px-0.5 2xl:p-2"
                     required
-                    // value={fromDate}
-                    // onChange={(e) => setFromDate(e.target.value)}
+                    value={toDate}
+                    onChange={(e) => setToDate(e.target.value)}
                   />
                 </div>
                 <div className="flex gap-4">
-                  <button className="border border-black ">PDF</button>
+                  <button
+                    className="border border-black "
+                    onClick={generatePdf}
+                  >
+                    PDF
+                  </button>
                   <button className="border border-black ">Excel</button>
                 </div>
               </div>
             )}
 
+            {/* countwise option */}
             {selectedReportOption === "countWiseData" && (
               <div className="border border-black ">
                 <center>Select Count</center>
@@ -707,12 +833,18 @@ const Reports = (dataFromApp) => {
                   </>
                 )}
                 <div className="flex gap-4">
-                  <button className="border border-black ">PDF</button>
+                  <button
+                    className="border border-black "
+                    onClick={generatePdf}
+                  >
+                    PDF
+                  </button>
                   <button className="border border-black ">Excel</button>
                 </div>
               </div>
             )}
 
+            {/* overall data option */}
             {selectedReportOption === "overallData" && (
               <div className="border border-black ">
                 <div>Entire data from the database will be downloaded!</div>
@@ -723,21 +855,182 @@ const Reports = (dataFromApp) => {
               </div>
             )}
 
+            {/* sensorwise data option */}
             {selectedReportOption === "sensorWiseData" && (
               <div className="border border-black ">
                 <center>Select sensor</center>
+                {/* sensor selection */}
                 <div className="flex gap-4">
                   {parameters &&
                     Object.keys(parameters).length > 0 &&
                     Object.keys(parameters).map((key) => (
                       <div key={key}>
-                        <label>
-                          <input type="checkbox" value={key} />
-                          {key}
-                        </label>
+                        <input
+                          type="checkbox"
+                          value={key}
+                          onClick={() =>
+                            handleSensorWiseDataSensorSelection(key)
+                          }
+                        />
+                        <label>{key}</label>
                       </div>
                     ))}
                 </div>
+
+                <div className="flex gap-4 font-medium">
+                  <div
+                    className="flex flex-col gap-1 items-center hover:scale-110 duration-200 cursor-pointer"
+                    onClick={() =>
+                      setSelectedSensorWiseReportOption("datePicker")
+                    }
+                  >
+                    <LuCalendarSearch className="text-5xl" />
+                    Date Picker
+                  </div>
+
+                  <div
+                    className="flex flex-col gap-1 items-center hover:scale-110 duration-200 cursor-pointer"
+                    onClick={() =>
+                      setSelectedSensorWiseReportOption("countWiseData")
+                    }
+                  >
+                    <TbHash className="text-5xl" />
+                    Count-wise Data
+                  </div>
+
+                  <div
+                    className="flex flex-col gap-1 items-center hover:scale-110 duration-200 cursor-pointer"
+                    onClick={() =>
+                      setSelectedSensorWiseReportOption("overallData")
+                    }
+                  >
+                    <BsDatabaseDown className="text-5xl" />
+                    Overall Data
+                  </div>
+                </div>
+
+                {/* sensorwise datepicker option */}
+                {selectedSensorWiseReportOption === "datePicker" && (
+                  <div>
+                    <center>Select date</center>
+                    <div>
+                      <label>From</label>
+                      <input
+                        type="date"
+                        className="text-black rounded-md px-0.5 2xl:p-2"
+                        required
+                        // value={fromDate}
+                        // onChange={(e) => setFromDate(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label>To</label>
+                      <input
+                        type="date"
+                        className="text-black rounded-md px-0.5 2xl:p-2"
+                        required
+                        // value={fromDate}
+                        // onChange={(e) => setFromDate(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* sensorwise countwise option */}
+                {selectedSensorWiseReportOption === "countWiseData" && (
+                  <div>
+                    <center>Select Count</center>
+                    <div className="flex gap-4">
+                      <div className="flex items-center">
+                        <input
+                          type="radio"
+                          id="option1"
+                          name="options"
+                          value={100}
+                          defaultChecked
+                          className="cursor-pointer mr-1"
+                          onClick={() => {
+                            setSensorWiseCount(100);
+                            setEnableSensorWiseCount(false);
+                          }}
+                        />
+                        <label htmlFor="option1" className="cursor-pointer">
+                          Last 100 Data
+                        </label>
+                      </div>
+
+                      <div>
+                        <input
+                          type="radio"
+                          id="option2"
+                          name="options"
+                          value={500}
+                          className="cursor-pointer mr-1"
+                          onClick={() => {
+                            setSensorWiseCount(500);
+                            setEnableSensorWiseCount(false);
+                          }}
+                        />
+                        <label htmlFor="option2" className="cursor-pointer">
+                          Last 500 Data
+                        </label>
+                      </div>
+
+                      <div>
+                        <input
+                          type="radio"
+                          id="option3"
+                          name="options"
+                          value={1000}
+                          className="cursor-pointer mr-1"
+                          onClick={() => {
+                            setSensorWiseCount(1000);
+                            setEnableSensorWiseCount(false);
+                          }}
+                        />
+                        <label htmlFor="option3" className="cursor-pointer">
+                          Last 1000 Data
+                        </label>
+                      </div>
+
+                      <div>
+                        <input
+                          type="radio"
+                          id="option4"
+                          name="options"
+                          className="cursor-pointer mr-1"
+                          onClick={() => {
+                            setSensorWiseCount(0);
+                            setEnableSensorWiseCount(true);
+                          }}
+                        />
+                        <label htmlFor="option4" className="cursor-pointer">
+                          Custom Count
+                        </label>
+                      </div>
+                    </div>
+                    {enableSensorWiseCount && (
+                      <>
+                        <label htmlFor="count">Enter Count:</label>
+                        <input
+                          type="number"
+                          id="count"
+                          value={sensorWiseCount}
+                          className="border border-black text-black"
+                          onChange={(e) =>
+                            setSensorWiseCount(parseInt(e.target.value) || 0)
+                          }
+                        />
+                      </>
+                    )}
+                  </div>
+                )}
+
+                {/* sensorwise overall data option */}
+                {selectedSensorWiseReportOption === "overallData" && (
+                  <div>Entire data from the database will be downloaded!</div>
+                )}
+
                 <div className="flex gap-4">
                   <button className="border border-black ">PDF</button>
                   <button className="border border-black ">Excel</button>
