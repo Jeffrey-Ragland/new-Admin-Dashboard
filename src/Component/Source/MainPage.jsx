@@ -92,6 +92,7 @@ const MainPage = (dataFromApp) => {
             position: 'bottom',
             textStyle:{
                 fontSize: 7,
+                color: '#FFFFFF'
             }
         },
         backgroundColor: 'transparent'

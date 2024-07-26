@@ -103,7 +103,7 @@
     return (
       <>
         <div
-          className="xl:h-screen flex flex-col 2xl:text-2xl"
+          className="h-screen flex flex-col 2xl:text-2xl mb-[8vh] xl:mb-0"
           style={{
             background:
               "linear-gradient(to right top, #000000, #1c191a, #2f2b2f, #423f47, #545560, #5e5f6d, #676a7b, #717589, #7a748c, #85738c, #917189, #9c7083)",
@@ -172,7 +172,7 @@
               {/* <div>Edit Range</div> */}
             </div>
 
-            <div className="flex-1 flex w-full">
+            <div className="flex-1 flex gap-4 w-full">
               <div className="w-[8%] flex items-center justify-center">
                 <ReactSlider
                   className="w-10 h-[93%] flex justify-center items-center"
