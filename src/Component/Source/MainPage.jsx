@@ -208,7 +208,13 @@ const MainPage = (dataFromApp) => {
 
   return (
     <>
-      <div className="xl:h-screen flex flex-col 2xl:text-2xl">
+      <div
+        className="xl:h-screen flex flex-col 2xl:text-2xl"
+        style={{
+          background:
+            "linear-gradient(to right top, #000000, #1c191a, #2f2b2f, #423f47, #545560, #5e5f6d, #676a7b, #717589, #7a748c, #85738c, #917189, #9c7083)",
+        }}
+      >
         <div className="h-[7%]">
           <Navbar />
         </div>
@@ -217,7 +223,7 @@ const MainPage = (dataFromApp) => {
           {/* top section */}
           <div className="flex flex-col-reverse md:flex-col xl:flex-row gap-2 xl:h-1/2">
             {/* section 1 - cards */}
-            <div className="w-full xl:w-1/2 flex flex-col shadow-lg shadow-gray-600">
+            <div className="w-full xl:w-1/2 flex flex-col shadow-lg shadow-gray-600 border border-gray-400">
               <div className="flex text-white">
                 <div className="bg-gray-700 flex-1 p-1 font-medium">
                   Sensor Data
@@ -227,10 +233,10 @@ const MainPage = (dataFromApp) => {
                 </div>
               </div>
               <div
-                className="grid grid-cols-3 gap-2 p-2 xl:flex-1 h-[250px] overflow-auto"
+                className="grid grid-cols-3 gap-2 p-2 xl:flex-1 h-[250px] overflow-auto bg-white/5"
                 style={{
-                  background:
-                    "linear-gradient(180deg, #737780 0%, #6c7587 100%)",
+                  // background:
+                  //   "linear-gradient(180deg, #737780 0%, #6c7587 100%)",
                   scrollbarWidth: "thin",
                   scrollbarColor: "#4B5563 transparent",
                 }}
@@ -255,6 +261,8 @@ const MainPage = (dataFromApp) => {
               </div>
             </div>
 
+            {/* bg-[#fcb599] */}
+
             {/* section 2 */}
             <div className="flex flex-col-reverse md:flex-row gap-2 w-full xl:w-1/2">
               {/* pie chart */}
@@ -268,11 +276,11 @@ const MainPage = (dataFromApp) => {
                   </div>
                 </div>
                 <div
-                  className="md:flex-1"
-                  style={{
-                    background:
-                      "linear-gradient(180deg, #737780 0%, #6c7587 100%)",
-                  }}
+                  className="md:flex-1 bg-white/5"
+                  // style={{
+                  //   background:
+                  //     "linear-gradient(180deg, #737780 0%, #6c7587 100%)",
+                  // }}
                 >
                   <Chart
                     chartType="PieChart"
@@ -295,11 +303,11 @@ const MainPage = (dataFromApp) => {
                     </div>
                   </div>
                   <div
-                    className="flex-1 p-1 flex flex-col gap-2"
-                    style={{
-                      background:
-                        "linear-gradient(180deg, #737780 0%, #6c7587 100%)",
-                    }}
+                    className="flex-1 p-1 flex flex-col gap-2 bg-white/5"
+                    // style={{
+                    //   background:
+                    //     "linear-gradient(180deg, #737780 0%, #6c7587 100%)",
+                    // }}
                   >
                     <div className="h-[40%] flex gap-1 font-medium">
                       <div
@@ -374,11 +382,11 @@ const MainPage = (dataFromApp) => {
                     </div>
                   </div>
                   <div
-                    className="flex-1 flex items-center justify-evenly py-4 xl:py-0 "
-                    style={{
-                      background:
-                        "linear-gradient(180deg, #737780 0%, #6c7587 100%)",
-                    }}
+                    className="flex-1 flex items-center justify-evenly py-4 xl:py-0 bg-white/5"
+                    // style={{
+                    //   background:
+                    //     "linear-gradient(180deg, #737780 0%, #6c7587 100%)",
+                    // }}
                   >
                     <div className="flex gap-1">
                       {peakValues.map(([key, value]) => (
@@ -416,9 +424,9 @@ const MainPage = (dataFromApp) => {
           <div className="flex flex-col-reverse xl:flex-row gap-2 xl:h-1/2 mb-[8vh] xl:mb-0">
             {/* section 3 - table */}
             <div
-              className="w-full xl:w-1/2 overflow-auto text-gray-200 h-[250px] xl:h-auto"
+              className="w-full xl:w-1/2 overflow-auto text-gray-200 h-[250px] xl:h-auto bg-white/5 border border-gray-400"
               style={{
-                background: "linear-gradient(180deg, #737780 0%, #6c7587 100%)",
+                // background: "linear-gradient(180deg, #737780 0%, #6c7587 100%)",
                 scrollbarWidth: "thin",
                 scrollbarColor: "#4B5563 transparent",
               }}
@@ -426,17 +434,17 @@ const MainPage = (dataFromApp) => {
               <table className="w-full">
                 <thead className="sticky top-0 bg-gray-700">
                   <tr>
-                    <th className="border text-white border-gray-400">S.No</th>
+                    <th className="border text-white border-gray-500">S.No</th>
                     {filteredParameterData.length > 0 &&
                       Object.keys(filteredParameterData[0]).map((key) => (
                         <th
                           key={key}
-                          className="text-white border border-gray-400"
+                          className="text-white border border-gray-500"
                         >
                           {key}
                         </th>
                       ))}
-                    <th className="border text-white border-gray-400">
+                    <th className="border text-white border-gray-500">
                       Updated At
                     </th>
                   </tr>
@@ -445,7 +453,7 @@ const MainPage = (dataFromApp) => {
                   {dataFromAppFile.length > 0 &&
                     dataFromAppFile.map((item, index) => (
                       <tr key={index}>
-                        <td className="border border-gray-400 text-center">
+                        <td className="border border-gray-500 text-center">
                           {index + 1}
                         </td>
                         {filteredParameterData.length > 0 &&
@@ -453,13 +461,13 @@ const MainPage = (dataFromApp) => {
                             (key, i) => (
                               <td
                                 key={i}
-                                className="border border-gray-400 text-center"
+                                className="border border-gray-500 text-center"
                               >
                                 {item[key]}
                               </td>
                             )
                           )}
-                        <td className="border border-gray-400 text-center">
+                        <td className="border border-gray-500 text-center">
                           {new Date(item.createdAt).toLocaleString("en-GB")}
                         </td>
                       </tr>
@@ -469,7 +477,7 @@ const MainPage = (dataFromApp) => {
             </div>
 
             {/* section 4 - line graph */}
-            <div className="w-full xl:w-1/2 flex flex-col">
+            <div className="w-full xl:w-1/2 flex flex-col border border-gray-400">
               <div className="flex text-white">
                 <div className="bg-gray-700 flex-1 p-1 font-medium">
                   Line Plot
@@ -479,11 +487,11 @@ const MainPage = (dataFromApp) => {
                 </div>
               </div>
               <div
-                className="p-2 flex flex-col flex-1 py-8 xl:py-0 text-white text-sm font-medium"
-                style={{
-                  background:
-                    "linear-gradient(180deg, #737780 0%, #6c7587 100%)",
-                }}
+                className="p-2 flex flex-col flex-1 py-8 xl:py-0 text-white text-sm font-medium bg-white/5"
+                // style={{
+                //   background:
+                //     "linear-gradient(180deg, #737780 0%, #6c7587 100%)",
+                // }}
               >
                 <div className="flex items-center justify-between px-3">
                   <div className="flex items-center ">

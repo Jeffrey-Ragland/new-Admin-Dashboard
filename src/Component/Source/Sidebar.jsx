@@ -32,12 +32,19 @@ const Sidebar = () => {
     
   return (
     <>
+      {/* background-image: linear-gradient(); */}
       {isLargeScreen ? (
-        <div className="flex flex-col bg-gray-600 h-screen text-gray-100">
+        <div
+          className="flex flex-col h-screen text-gray-100"
+          style={{
+            background:
+              "linear-gradient(to right, #161d27, #1c222b, #23272f, #292d34, #2f3238)",
+          }}
+        >
           <Link
             to="/"
-            className={`h-1/4 p-2 hover:bg-gray-800 duration-200 flex items-center ${
-              location.pathname === "/" && "bg-gray-800"
+            className={`h-1/4 p-2 hover:bg-gray-600 duration-200 flex items-center ${
+              location.pathname === "/" && "bg-gray-600"
             }`}
             onMouseEnter={() => setDashHover(true)}
             onMouseLeave={() => setDashHover(false)}
@@ -54,8 +61,8 @@ const Sidebar = () => {
 
           <Link
             to="/Graph"
-            className={`h-1/4 p-2 hover:bg-gray-800 duration-200 flex items-center ${
-              location.pathname === "/Graph" && "bg-gray-800"
+            className={`h-1/4 p-2 hover:bg-gray-600 duration-200 flex items-center ${
+              location.pathname === "/Graph" && "bg-gray-600"
             }`}
             onMouseEnter={() => setGraphHover(true)}
             onMouseLeave={() => setGraphHover(false)}
@@ -72,8 +79,8 @@ const Sidebar = () => {
 
           <Link
             to="/Report"
-            className={`h-1/4 p-2 hover:bg-gray-800 duration-200 flex items-center ${
-              location.pathname === "/Report" && "bg-gray-800"
+            className={`h-1/4 p-2 hover:bg-gray-600 duration-200 flex items-center ${
+              location.pathname === "/Report" && "bg-gray-600"
             }`}
             onMouseEnter={() => setReportHover(true)}
             onMouseLeave={() => setReportHover(false)}
@@ -90,8 +97,8 @@ const Sidebar = () => {
 
           <Link
             to="/Settings"
-            className={`h-1/4 p-2 hover:bg-gray-800 duration-200 flex items-center ${
-              location.pathname === "/Settings" && "bg-gray-800"
+            className={`h-1/4 p-2 hover:bg-gray-600 duration-200 flex items-center ${
+              location.pathname === "/Settings" && "bg-gray-600"
             }`}
             onMouseEnter={() => setSettingsHover(true)}
             onMouseLeave={() => setSettingsHover(false)}

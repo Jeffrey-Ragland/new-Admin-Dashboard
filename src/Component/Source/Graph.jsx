@@ -102,7 +102,13 @@
 
     return (
       <>
-        <div className="xl:h-screen flex flex-col 2xl:text-2xl">
+        <div
+          className="xl:h-screen flex flex-col 2xl:text-2xl"
+          style={{
+            background:
+              "linear-gradient(to right top, #000000, #1c191a, #2f2b2f, #423f47, #545560, #5e5f6d, #676a7b, #717589, #7a748c, #85738c, #917189, #9c7083)",
+          }}
+        >
           {/* navbar */}
           <div className="h-[7%]">
             <Navbar />
@@ -186,7 +192,7 @@
                 />
               </div>
 
-              <div className="w-[92%] bg-gray-700">
+              <div className="w-[92%] bg-white/10">
                 <Line data={lineData} options={lineOptions} width={"100%"} />
               </div>
             </div>
