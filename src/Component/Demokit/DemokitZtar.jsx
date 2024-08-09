@@ -6,6 +6,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import ThreeDModelZtar from "./ThreeDModelZtar";
 import xymaLogo from "../Assets/xyma - Copy.png";
 import xymaImg from "../Assets/xyma.png";
 import coverImg from "../Assets/pdfcover.jpg";
@@ -329,7 +330,7 @@ const DemokitZtar = (dataFromApp) => {
       <div className="xl:h-[92%] flex flex-col-reverse xl:flex-row gap-4 xl:gap-2">
         {/* 3d model - left section */}
         <div className="h-[300px] md:h-[500px] xl:h-auto w-full xl:w-1/3 flex justify-center items-center border border-white bg-white/5 rounded-md mb-4 xl:mb-0">
-          3d model
+          <ThreeDModelZtar />
         </div>
 
         {/* right section */}
