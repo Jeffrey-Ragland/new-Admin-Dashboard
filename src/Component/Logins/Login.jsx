@@ -13,7 +13,7 @@ const Login = () => {
     event.preventDefault(); 
     try {
 
-      const response = await fetch('http://localhost:4000/sensor/login', {
+      const response = await fetch('http://34.93.162.58:4000/sensor/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
