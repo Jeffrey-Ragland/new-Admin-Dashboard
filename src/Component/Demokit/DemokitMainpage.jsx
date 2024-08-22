@@ -10,7 +10,9 @@ const DemokitMainpage = () => {
 
   const handleProjectChange = async (projectName) => {
     try {
-      await axios.post('http://localhost:4000/sensor/updateProcessControl', {projectName});
+      await axios.post("http://34.93.162.58:4000/sensor/updateProcessControl", {
+        projectName,
+      });
     } catch(error) {
       console.error('Error updating project', error);
     };

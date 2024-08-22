@@ -189,7 +189,7 @@ useEffect(() => {
 // admin
 const fetch_tof_fata =async()=>{
   try{
-    const response = await fetch("http://localhost:4000/sensor/BPCL_READ");
+    const response = await fetch("http://34.93.162.58:4000/sensor/BPCL_READ");
     const info = await response.json();
     setTofdata(info.data)
     
@@ -203,7 +203,7 @@ const getAutoDashData = async () => {
   try {
     const projectName = localStorage.getItem('Project');
     const autoDashLimit = localStorage.getItem('AutoDashLimit');
-    const response = await axios.get(`http://localhost:4000/sensor/getAutoDashData?project=${projectName}&limit=${autoDashLimit}`);
+    const response = await axios.get(`http://34.93.162.58:4000/sensor/getAutoDashData?project=${projectName}&limit=${autoDashLimit}`);
     if (response.data.success) {
       setAutoDashData(response.data.data);
     } else {
@@ -226,8 +226,8 @@ const getAutoDashData = async () => {
 //         Count_final =localStorage.getItem('CountReportData')
 //       }
 
-//       const response = await axios (`http://localhost:4000/sensor/displayProjectData?project=${projectName}`);
-//       const report = await axios(`http://localhost:4000/sensor/DisplayProjectReport?project=${projectName}&Count=${Count_final}`);
+//       const response = await axios (`http://34.93.162.58:4000/sensor/displayProjectData?project=${projectName}`);
+//       const report = await axios(`http://34.93.162.58:4000/sensor/DisplayProjectReport?project=${projectName}&Count=${Count_final}`);
 
 //       if(response.data.success)
 //       {
@@ -275,7 +275,7 @@ const getAutoDashData = async () => {
 //     const  chartlength =sessionStorage.getItem("chartLength");
 //     const  sensorname = sessionStorage.getItem("Chart_status");
 //     const projectName = localStorage.getItem('Project');
-//     const response = await axios(`http://localhost:4000/sensor/project_all_data?project=${projectName}&sensorname=${sensorname}&chartlength=${chartlength}`);
+//     const response = await axios(`http://34.93.162.58:4000/sensor/project_all_data?project=${projectName}&sensorname=${sensorname}&chartlength=${chartlength}`);
 //     if(response.data.success){
 //         setChartData(response.data.data);
 //     }else{
@@ -289,7 +289,7 @@ const getAutoDashData = async () => {
 const getIOCLData = async () => {
   try {
     const ioclLimit = localStorage.getItem('IOCLLimit');
-    const response = await axios.get(`http://localhost:4000/sensor/getIOCLData?limit=${ioclLimit}`);
+    const response = await axios.get(`http://34.93.162.58:4000/sensor/getIOCLData?limit=${ioclLimit}`);
     if(response.data.success) {
       setIoclData(response.data.data);
     } else {
@@ -306,7 +306,7 @@ const getDemokitUtmapsData = async() => {
     const projectNumber = localStorage.getItem("projectNumber");
     const utmapsLimit = localStorage.getItem("UtmapsLimit");
     const response = await axios.get(
-      `http://localhost:4000/sensor/getDemokitUtmapsData?projectNumber=${projectNumber}&limit=${utmapsLimit}`
+      `http://34.93.162.58:4000/sensor/getDemokitUtmapsData?projectNumber=${projectNumber}&limit=${utmapsLimit}`
     );
     if (response.data.success) {
       setUtmapsData(response.data.data);
@@ -324,7 +324,7 @@ const getDemokitPortsData = async () => {
     const projectNumber = localStorage.getItem("projectNumber");
     const portsLimit = localStorage.getItem("PortsLimit");
     const response = await axios.get(
-      `http://localhost:4000/sensor/getDemokitPortsData?projectNumber=${projectNumber}&limit=${portsLimit}`
+      `http://34.93.162.58:4000/sensor/getDemokitPortsData?projectNumber=${projectNumber}&limit=${portsLimit}`
     );
     if (response.data.success) {
       setPortsData(response.data.data);
@@ -342,7 +342,7 @@ const getDemokitZtarData = async () => {
     const projectNumber = localStorage.getItem("projectNumber");
     const ztarLimit = localStorage.getItem("ZtarLimit");
     const response = await axios.get(
-      `http://localhost:4000/sensor/getDemokitZtarData?projectNumber=${projectNumber}&limit=${ztarLimit}`
+      `http://34.93.162.58:4000/sensor/getDemokitZtarData?projectNumber=${projectNumber}&limit=${ztarLimit}`
     );
     if (response.data.success) {
       setZtarData(response.data.data);

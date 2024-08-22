@@ -17,7 +17,7 @@ import '../Css/Source.css'
 import { FaChartArea } from "react-icons/fa";
 import {Line} from 'react-chartjs-2';
 
-import { Chart as ChartJS,LineElement,CategoryScale,LinearScale,PointElement, scales } from 'chart.js';
+import { Chart as ChartJS,LineElement,CategoryScale,LinearScale,PointElement, scales } from 'chart.js'; 
 import ReactSlider from 'react-slider';
 ChartJS.register(LineElement,CategoryScale,LinearScale,PointElement)
 

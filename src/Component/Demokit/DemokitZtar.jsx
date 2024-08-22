@@ -215,7 +215,7 @@ const DemokitZtar = (dataFromApp) => {
     try {
       const projectName = localStorage.getItem("projectNumber");
       const response = await axios.get(
-        `http://localhost:4000/sensor/getDemokitZtarReport?fromDate=${fromDate}&toDate=${toDate}&projectName=${projectName}`
+        `http://34.93.162.58:4000/sensor/getDemokitZtarReport?fromDate=${fromDate}&toDate=${toDate}&projectName=${projectName}`
       );
       setFilteredReportData(response.data.data);
       console.log("report data", response.data.data);
