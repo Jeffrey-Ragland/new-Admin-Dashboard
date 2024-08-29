@@ -66,7 +66,7 @@ const Model = ({ lastData }) => {
     <primitive
       ref={group}
       object={scene}
-      rotation={[Math.PI, 0, 0]}
+      // rotation={[Math.PI, 0, 0]}
       // {...props}
       // onPointerOver={handlePointerOver}
       // onPointerOut={handlePointerOut}

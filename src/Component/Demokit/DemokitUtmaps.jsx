@@ -369,7 +369,7 @@ const DemokitUtmaps = (dataFromApp) => {
       <div className="xl:h-[92%] flex flex-col-reverse xl:flex-row gap-4 xl:gap-2">
         {/* 3d model - left section */}
         <div className="h-[300px] md:h-[500px] xl:h-auto w-full xl:w-1/3 flex justify-center items-center border border-white bg-white/5 rounded-md mb-4 xl:mb-0">
-          <ThreeDModelUtmaps lastData={dataFromApp.dataFromApp[0]}/>
+          <ThreeDModelUtmaps lastData={dataFromApp.length > 0 && dataFromApp.dataFromApp[0]}/>
         </div>
 
         {/* right section */}
