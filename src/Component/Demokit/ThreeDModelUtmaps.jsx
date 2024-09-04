@@ -7,25 +7,27 @@ import {
   PresentationControls,
 } from "@react-three/drei";
 
-const Model = ({ lastData }) => {
+const Model = ({ lastData, updatedLimitS1, updatedLimitS2 }) => {
   const group = useRef();
   const { scene } = useGLTF("./utmaps_curve.glb");
-  const [cylinder001Color, setCylinder001Color] = useState('white');
+  const [cylinder001Color, setCylinder001Color] = useState("white");
   const [cylinder002Color, setCylinder002Color] = useState("white");
   // const [hoveredMesh, setHoveredMesh] = useState(null);
 
-  // console.log("last data in model function in threedmodel file", lastData);
+  // console.log("last data", lastData);
 
-  console.log('last sensor1 data', lastData.Sensor1);
+  // console.log('last sensor1 data', lastData.Sensor1);
+
+  // console.log("updated limit in 3d file", updatedLimit);
 
   useEffect(() => {
     if (lastData && lastData.Sensor2 !== undefined) {
-      setCylinder001Color(lastData.Sensor2 >= 75 ? "red" : "white");
-    };
+      setCylinder001Color(lastData.Sensor2 >= updatedLimitS2 ? "red" : "white");
+    }
     if (lastData && lastData.Sensor1 !== undefined) {
-      setCylinder002Color(lastData.Sensor1 >= 75 ? "red" : "white");
-    };
-  },[lastData]);
+      setCylinder002Color(lastData.Sensor1 >= updatedLimitS1 ? "red" : "white");
+    }
+  }, [lastData]);
 
   useFrame(() => {
     if (group.current) {
@@ -42,13 +44,13 @@ const Model = ({ lastData }) => {
           //   );
           // }
           if (child.name === "Cylinder001") {
-            child.material.color.set(cylinder001Color); 
+            child.material.color.set(cylinder001Color);
           } else if (child.name === "Cylinder002") {
-            child.material.color.set(cylinder002Color); 
+            child.material.color.set(cylinder002Color);
           }
-        };
+        }
       });
-    };
+    }
   });
 
   // const handlePointerOver = (e) => {
@@ -74,8 +76,7 @@ const Model = ({ lastData }) => {
   );
 };
 
-const ThreeDModelUtmaps = ({lastData}) => {
-
+const ThreeDModelUtmaps = ({ lastData, updatedLimitS1, updatedLimitS2 }) => {
   // console.log("data in three d file ", lastData);
   return (
     <Canvas dpr={[1, 2]} shadows camera={{ fov: 30 }}>
@@ -87,12 +88,16 @@ const ThreeDModelUtmaps = ({lastData}) => {
         // polar={[-Math.PI / 4, Math.PI / 4]}
       >
         <Stage environment={"warehouse"}>
-          <Model lastData={lastData} />
+          <Model
+            lastData={lastData}
+            updatedLimitS1={updatedLimitS1}
+            updatedLimitS2={updatedLimitS2}
+          />
         </Stage>
       </PresentationControls>
       <OrbitControls />
     </Canvas>
   );
-}
+};
 
 export default ThreeDModelUtmaps;

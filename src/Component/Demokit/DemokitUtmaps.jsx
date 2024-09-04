@@ -14,6 +14,7 @@ import disclaimerPage from "../Assets/disclaimerPage.jpg";
 import { BsThermometerSun } from "react-icons/bs";
 import { MdManageHistory, MdOutlineCloudDone } from "react-icons/md";
 import { PiCloudWarningBold } from "react-icons/pi";
+import { ImUpload3 } from "react-icons/im";
 import { Line } from "react-chartjs-2";
 import { Bar } from "react-chartjs-2";
 import {
@@ -38,12 +39,17 @@ ChartJS.register(
   Legend
 );
 
-const DemokitUtmaps = (dataFromApp) => {
+const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) => {
 
   const [activeStatus, setActiveStatus] = useState('');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
   const [filteredReportData, setFilteredReportData] = useState([]);
+  const [modelLimitS1, setModelLimitS1] = useState('');
+  const [modelLimitS2, setModelLimitS2] = useState("");
+
+  // console.log('model limit', modelLimit);
+  // console.log("model limit in dashboard file", modelLimitFromApp);
 
   const [lineData, setLineData] = useState({
     labels: [],
@@ -51,6 +57,7 @@ const DemokitUtmaps = (dataFromApp) => {
   });
 
   console.log('utmaps data from app', dataFromApp);
+  // console.log(dataFromApp[0]);
 
   const getInitialLimit = () => {
     const storedLimit = localStorage.getItem("UtmapsLimit");
@@ -68,10 +75,10 @@ const DemokitUtmaps = (dataFromApp) => {
   // line chart data
     useEffect(() => {
       if (
-        Array.isArray(dataFromApp.dataFromApp) &&
-        dataFromApp.dataFromApp.length > 0
+        Array.isArray(dataFromApp) &&
+        dataFromApp.length > 0
       ) {
-        const reversedData = [...dataFromApp.dataFromApp].reverse();
+        const reversedData = [...dataFromApp].reverse();
 
         const lineLabels = reversedData.map((item) => {
           const createdAt = new Date(item.createdAt).toLocaleString("en-GB");
@@ -154,14 +161,14 @@ const DemokitUtmaps = (dataFromApp) => {
     datasets: [
       {
         data: [
-          dataFromApp.dataFromApp.length > 0 &&
-            dataFromApp.dataFromApp[0].Sensor1,
-          dataFromApp.dataFromApp.length > 0 &&
-            dataFromApp.dataFromApp[0].Sensor2,
-          dataFromApp.dataFromApp.length > 0 &&
-            dataFromApp.dataFromApp[0].Sensor3,
-          dataFromApp.dataFromApp.length > 0 &&
-            dataFromApp.dataFromApp[0].Sensor4,
+          dataFromApp.length > 0 &&
+            dataFromApp[0].Sensor1,
+          dataFromApp.length > 0 &&
+            dataFromApp[0].Sensor2,
+          dataFromApp.length > 0 &&
+            dataFromApp[0].Sensor3,
+          dataFromApp.length > 0 &&
+            dataFromApp[0].Sensor4,
         ],
         borderColor: [
           "rgb(255, 99, 132)",
@@ -221,9 +228,9 @@ const DemokitUtmaps = (dataFromApp) => {
 
   // for activity status 
   useEffect (() => {
-    if (dataFromApp.dataFromApp.length > 0) {
+    if (dataFromApp.length > 0) {
       const currentDate = new Date();
-      const lastDataEntry = dataFromApp.dataFromApp[0];
+      const lastDataEntry = dataFromApp[0];
 
       if (lastDataEntry && lastDataEntry.createdAt) {
         const lastDataTime = new Date(lastDataEntry.createdAt);
@@ -336,6 +343,28 @@ const DemokitUtmaps = (dataFromApp) => {
     });
     saveAs(info, "Utmaps_Report.xlsx");
   };
+
+  const handleModelLimit = async(e) => {
+    try {
+      e.preventDefault();
+      const projectNumber = localStorage.getItem("projectNumber");
+      const response = await axios.post(
+        "http://localhost:4000/sensor/updateDemokitUtmapsModelLimit",
+        {
+          projectNumber, modelLimitS1, modelLimitS2
+        }
+      );
+      if(response.status === 200) {
+        console.log('Limit updated');
+        setModelLimitS1('');
+        setModelLimitS2("");
+      } else {
+        console.error('Failed to update model limit', response);
+      }
+    } catch (error) {
+      console.error("Error updating model limit", error);
+    };
+  };
   
   return (
     <div
@@ -368,8 +397,67 @@ const DemokitUtmaps = (dataFromApp) => {
 
       <div className="xl:h-[92%] flex flex-col-reverse xl:flex-row gap-4 xl:gap-2">
         {/* 3d model - left section */}
-        <div className="h-[300px] md:h-[500px] xl:h-auto w-full xl:w-1/3 flex justify-center items-center border border-white bg-white/5 rounded-md mb-4 xl:mb-0">
-          <ThreeDModelUtmaps lastData={dataFromApp.length > 0 && dataFromApp.dataFromApp[0]}/>
+        <div className="flex flex-col gap-2 w-full xl:w-1/3">
+          <div className="border border-white bg-white/5 rounded-md p-1 text-sm flex flex-col gap-2">
+            <form
+              className=" flex gap-4 items-center justify-between"
+              onSubmit={handleModelLimit}
+            >
+              <div className="flex gap-2">
+                <div>Indication Limit [S1]:</div>
+                <div className="text-red-500 font-medium">
+                  {modelLimitS1FromApp}°C
+                </div>
+              </div>
+              <div>-</div>
+              <div className="flex gap-2 items-center">
+                <div>Change S1 Limit:</div>
+                <input
+                  type="number"
+                  required
+                  value={modelLimitS1}
+                  className="border border-white w-10 rounded-sm focus:outline-none text-gray-800"
+                  onChange={(e) => setModelLimitS1(e.target.value)}
+                />
+                <button className="bg-green-500 rounded-md text-lg py-0.5 px-2 hover:scale-110 duration-200">
+                  <ImUpload3 />
+                </button>
+              </div>
+            </form>
+
+            <form
+              className=" flex gap-4 items-center justify-between"
+              onSubmit={handleModelLimit}
+            >
+              <div className="flex gap-2">
+                <div>Indication Limit [S2]:</div>
+                <div className="text-red-500 font-medium">
+                  {modelLimitS2FromApp}°C
+                </div>
+              </div>
+              <div>-</div>
+              <div className="flex gap-2 items-center">
+                <div>Change S2 Limit:</div>
+                <input
+                  type="number"
+                  required
+                  value={modelLimitS2}
+                  className="border border-white w-10 rounded-sm focus:outline-none text-gray-800"
+                  onChange={(e) => setModelLimitS2(e.target.value)}
+                />
+                <button className="bg-green-500 rounded-md text-lg py-0.5 px-2 hover:scale-110 duration-200">
+                  <ImUpload3 />
+                </button>
+              </div>
+            </form>
+          </div>
+          <div className="h-[300px] md:h-[500px] xl:h-full  flex justify-center items-center border border-white bg-white/5 rounded-md mb-4 xl:mb-0">
+            <ThreeDModelUtmaps
+              lastData={dataFromApp.length > 0 && dataFromApp[0]}
+              updatedLimitS1={modelLimitS1FromApp}
+              updatedLimitS2={modelLimitS2FromApp}
+            />
+          </div>
         </div>
 
         {/* right section */}
@@ -388,11 +476,17 @@ const DemokitUtmaps = (dataFromApp) => {
                 >
                   <div className="flex items-center gap-2">
                     <BsThermometerSun className="text-5xl 2xl:text-7xl" />
-                    <div className="flex flex-col text-base 2xl:text-2xl">
+                    <div className="flex flex-col items-center text-base 2xl:text-2xl">
                       <div>Sensor 1</div>
-                      <div className="text-2xl md:text-3xl 2xl:text-6xl text-green-400">
-                        {dataFromApp.dataFromApp.length > 0 &&
-                          dataFromApp.dataFromApp[0].Sensor1}
+                      <div
+                        className={`text-2xl md:text-3xl 2xl:text-6xl  ${
+                          (dataFromApp.length > 0 && dataFromApp[0].Sensor1) >=
+                          modelLimitS1FromApp
+                            ? "text-red-500"
+                            : "text-green-400"
+                        }`}
+                      >
+                        {dataFromApp.length > 0 && dataFromApp[0].Sensor1} °C
                       </div>
                     </div>
                   </div>
@@ -406,11 +500,17 @@ const DemokitUtmaps = (dataFromApp) => {
                 >
                   <div className="flex items-center gap-2">
                     <BsThermometerSun className="text-5xl 2xl:text-7xl" />
-                    <div className="flex flex-col text-base 2xl:text-2xl">
+                    <div className="flex flex-col items-center text-base 2xl:text-2xl">
                       <div>Sensor 2</div>
-                      <div className="text-2xl md:text-3xl 2xl:text-6xl text-green-400">
-                        {dataFromApp.dataFromApp.length > 0 &&
-                          dataFromApp.dataFromApp[0].Sensor2}
+                      <div
+                        className={`text-2xl md:text-3xl 2xl:text-6xl  ${
+                          (dataFromApp.length > 0 && dataFromApp[0].Sensor2) >=
+                          modelLimitS2FromApp
+                            ? "text-red-500"
+                            : "text-green-400"
+                        }`}
+                      >
+                        {dataFromApp.length > 0 && dataFromApp[0].Sensor2} °C
                       </div>
                     </div>
                   </div>
@@ -427,11 +527,10 @@ const DemokitUtmaps = (dataFromApp) => {
                 >
                   <div className="flex items-center gap-2">
                     <BsThermometerSun className="text-5xl 2xl:text-7xl" />
-                    <div className="flex flex-col text-base 2xl:text-2xl">
+                    <div className="flex flex-col items-center text-base 2xl:text-2xl">
                       <div>Sensor 3</div>
                       <div className="text-2xl md:text-3xl 2xl:text-6xl text-green-400">
-                        {dataFromApp.dataFromApp.length > 0 &&
-                          dataFromApp.dataFromApp[0].Sensor3}
+                        {dataFromApp.length > 0 && dataFromApp[0].Sensor3}
                       </div>
                     </div>
                   </div>
@@ -445,11 +544,10 @@ const DemokitUtmaps = (dataFromApp) => {
                 >
                   <div className="flex items-center gap-2">
                     <BsThermometerSun className="text-5xl 2xl:text-7xl" />
-                    <div className="flex flex-col text-base 2xl:text-2xl">
+                    <div className="flex flex-col items-center text-base 2xl:text-2xl">
                       <div>Sensor 4</div>
                       <div className="text-2xl md:text-3xl 2xl:text-6xl text-green-400">
-                        {dataFromApp.dataFromApp.length > 0 &&
-                          dataFromApp.dataFromApp[0].Sensor4}
+                        {dataFromApp.length > 0 && dataFromApp[0].Sensor4}
                       </div>
                     </div>
                   </div>
@@ -466,10 +564,10 @@ const DemokitUtmaps = (dataFromApp) => {
                     <div>Last&nbsp;Update:</div>
                   </div>
                   <div className="text-sm 2xl:text-base font-normal">
-                    {dataFromApp.dataFromApp.length > 0 &&
-                      new Date(
-                        dataFromApp.dataFromApp[0].createdAt
-                      ).toLocaleString("en-GB")}
+                    {dataFromApp.length > 0 &&
+                      new Date(dataFromApp[0].createdAt).toLocaleString(
+                        "en-GB"
+                      )}
                   </div>
                 </div>
                 <div
@@ -514,8 +612,8 @@ const DemokitUtmaps = (dataFromApp) => {
                   </thead>
 
                   <tbody className="text-sm 2xl:text-base text-gray-600">
-                    {dataFromApp.dataFromApp.length > 0 &&
-                      dataFromApp.dataFromApp.map((data, index) => (
+                    {dataFromApp.length > 0 &&
+                      dataFromApp.map((data, index) => (
                         <tr
                           key={index}
                           className={`${index % 2 === 0 ? "" : "bg-stone-200"}`}

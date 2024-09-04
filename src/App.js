@@ -39,6 +39,8 @@ const[chartdata,setChartData]=useState([]);
 const[ReportData,setReportData]=useState([]);
 const [ioclData, setIoclData] = useState([]);
 const [utmapsData, setUtmapsData] = useState([]);
+const [demokitUtmapsModelLimitS1, setDemokitUtmapsModelLimitS1] = useState();
+const [demokitUtmapsModelLimitS2, setDemokitUtmapsModelLimitS2] = useState();
 const [portsData, setPortsData] = useState([]);
 const [ztarData, setZtarData] = useState([]);
 const [autoDashData, setAutoDashData] = useState([]);
@@ -158,12 +160,15 @@ useEffect(() => {
     getDemokitUtmapsData();
     getDemokitPortsData();
     getDemokitZtarData();
+    getDemokitUtmapsModelLimit();
     const utmapsData = setInterval(getDemokitUtmapsData, 2000);
+    const utmapsModelLimit = setInterval(getDemokitUtmapsModelLimit, 2000);
     const portsData = setInterval(getDemokitPortsData, 2000);
     const ztarData = setInterval(getDemokitZtarData, 2000);
 
     return () => {
       clearInterval(utmapsData);
+      clearInterval(utmapsModelLimit);
       clearInterval(portsData);
       clearInterval(ztarData);
     };
@@ -318,6 +323,22 @@ const getDemokitUtmapsData = async() => {
   };
 };
 
+const getDemokitUtmapsModelLimit = async() => {
+  try {
+    const projectNumber = localStorage.getItem("projectNumber");
+    const response = await axios.post('http://localhost:4000/sensor/getDemokitUtmapsModelLimit', {projectNumber});
+    if(response.data.success) {
+      setDemokitUtmapsModelLimitS1(response.data.data.ModelLimitS1);
+      setDemokitUtmapsModelLimitS2(response.data.data.ModelLimitS2);
+    }
+  } catch(error) {
+    console.error(error);
+  };
+};
+
+// console.log('model limit in app', demokitUtmapsModelLimit);
+// console.log('utmaps data', utmapsData);
+
 // ports
 const getDemokitPortsData = async () => {
   try {
@@ -396,7 +417,13 @@ const getDemokitZtarData = async () => {
               <Route index element={<DemokitMainpage />} />
               <Route
                 path="utmaps"
-                element={<DemokitUtmaps dataFromApp={utmapsData} />}
+                element={
+                  <DemokitUtmaps
+                    dataFromApp={utmapsData}
+                    modelLimitS1FromApp={demokitUtmapsModelLimitS1}
+                    modelLimitS2FromApp={demokitUtmapsModelLimitS2}
+                  />
+                }
               />
               <Route
                 path="ports"
