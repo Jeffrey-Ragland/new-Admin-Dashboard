@@ -79,6 +79,21 @@ useEffect(() => {
   }
 }, [controls, utmapsCondition]);
 
+// utmaps unit selection
+const getInitialUtmapsUnit = () => {
+  const storedUnit = localStorage.getItem('UtmapsUnit');
+  return storedUnit ? 1 : 0
+};
+
+const [utmapsUnitCondition, setUtmapsUnitCondition] = useState(getInitialUtmapsUnit);
+
+useEffect(() => {
+  if(controls === "DEMOKIT" && utmapsUnitCondition === 0) {
+    localStorage.setItem("UtmapsUnit", 'C');
+    setUtmapsUnitCondition(1);
+  }
+}, [controls, utmapsUnitCondition]);
+
 // ports
 const getInitialPortsCondition = () => {
   const storedLimit = localStorage.getItem("PortsLimit");
@@ -310,8 +325,10 @@ const getDemokitUtmapsData = async() => {
   try {
     const projectNumber = localStorage.getItem("projectNumber");
     const utmapsLimit = localStorage.getItem("UtmapsLimit");
+    const utmapsUnit = localStorage.getItem('UtmapsUnit');
     const response = await axios.get(
-      `http://34.93.162.58:4000/sensor/getDemokitUtmapsData?projectNumber=${projectNumber}&limit=${utmapsLimit}`
+      // `http://34.93.162.58:4000/sensor/getDemokitUtmapsData?projectNumber=${projectNumber}&limit=${utmapsLimit}&unit=${utmapsUnit}`
+      `http://localhost:4000/sensor/getDemokitUtmapsData?projectNumber=${projectNumber}&limit=${utmapsLimit}&unit=${utmapsUnit}`
     );
     if (response.data.success) {
       setUtmapsData(response.data.data);

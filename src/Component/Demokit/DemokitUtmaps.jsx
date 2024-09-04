@@ -15,6 +15,7 @@ import { BsThermometerSun } from "react-icons/bs";
 import { MdManageHistory, MdOutlineCloudDone } from "react-icons/md";
 import { PiCloudWarningBold } from "react-icons/pi";
 import { ImUpload3 } from "react-icons/im";
+import { LiaRulerHorizontalSolid } from "react-icons/lia";
 import { Line } from "react-chartjs-2";
 import { Bar } from "react-chartjs-2";
 import {
@@ -71,6 +72,28 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
     setUtmapsLineLimit(limit);
     localStorage.setItem("UtmapsLimit", limit.toString());
   };
+
+  // console.log('utmaps unit', localStorage.getItem('UtmapsUnit'));
+
+  const storedUnit = localStorage.getItem("UtmapsUnit");
+
+  const [selectedUnit, setSelectedUnit] = useState(storedUnit);
+
+  const handleUnitChange = (e) => {
+    const unit = e.target.value;
+    setSelectedUnit(unit);
+    localStorage.setItem("UtmapsUnit", unit);
+  };
+
+  // console.log('selected unit',selectedUnit);
+
+  // if(storedUnit === 'C') {
+  //   setSelectedUnit('C');
+  // } else if(storedUnit === 'F') {
+  //   setSelectedUnit('F');
+  // } else if(storedUnit === 'K') {
+  //   setSelectedUnit('K');
+  // };
 
   // line chart data
     useEffect(() => {
@@ -269,6 +292,11 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
 
   // to generate report pdf
   const generatePdf = () => {
+    if(fromDate) {
+      console.log('yes')
+    } else {
+      console.log('no')
+    }
     const doc = new jsPDF();
     const logo = xymaImg;
     const cover = coverImg;
@@ -556,10 +584,10 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
             </div>
 
             <div className=" w-full xl:w-[50%] flex flex-col gap-2">
-              {/* recent update and activity status */}
-              <div className="h-[15%] flex gap-2 font-medium 2xl:text-xl">
-                <div className="w-1/2 xl:w-[75%] border border-white rounded-md bg-white/5 flex flex-col xl:flex-row items-center gap-2 px-2 py-2 xl:py-0 ">
-                  <div className="flex gap-2">
+              <div className="h-[25%] flex gap-2 font-medium 2xl:text-xl">
+                {/* recent update */}
+                <div className="w-1/2 xl:w-[40%] border border-white rounded-md bg-white/5 flex flex-col items-center justify-center gap-2 px-2 py-2 xl:py-0 ">
+                  <div className="flex items-center gap-2">
                     <MdManageHistory className="text-xl 2xl:text-3xl" />
                     <div>Last&nbsp;Update:</div>
                   </div>
@@ -570,24 +598,80 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                       )}
                   </div>
                 </div>
+
+                {/* unit selection */}
+                <div className="xl:w-[50%] border border-white rounded-md bg-white/5 px-2 py-2 xl:py-0 flex flex-col items-center justify-center gap-1">
+                  <div className="flex gap-2 items-center">
+                    <LiaRulerHorizontalSolid className="text-xl 2xl:text-3xl" />
+                    <div>Unit preference</div>
+                  </div>
+                  <div className="text-base 2xl:text-lg font-normal flex gap-4">
+                    <div className="flex gap-1">
+                      <input
+                        type="radio"
+                        id="cel"
+                        name="unit"
+                        value="C"
+                        className="cursor-pointer"
+                        checked={selectedUnit === "C"}
+                        onChange={handleUnitChange}
+                      />
+                      <label htmlFor="cel" className="cursor-pointer">
+                        (°C)
+                      </label>
+                    </div>
+
+                    <div className="flex gap-1">
+                      <input
+                        type="radio"
+                        id="fah"
+                        name="unit"
+                        value="F"
+                        className="cursor-pointer"
+                        checked={selectedUnit === "F"}
+                        onChange={handleUnitChange}
+                      />
+                      <label htmlFor="fah" className="cursor-pointer">
+                        (°F)
+                      </label>
+                    </div>
+
+                    <div className="flex gap-1">
+                      <input
+                        type="radio"
+                        id="kel"
+                        name="unit"
+                        value="K"
+                        className="cursor-pointer"
+                        checked={selectedUnit === "K"}
+                        onChange={handleUnitChange}
+                      />
+                      <label htmlFor="kel" className="cursor-pointer">
+                        (K)
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* recent update */}
                 <div
-                  className={`w-1/2 xl:w-[25%] border border-white rounded-md bg-white/5 ${
+                  className={`w-1/2 xl:w-[10%] border border-white rounded-md bg-white/5 ${
                     activeStatus === "Active"
                       ? "text-green-400 shadow-green-800"
                       : "text-red-400 shadow-red-800"
-                  }  shadow-lg  flex justify-center items-center px-2 gap-2`}
+                  }  shadow-lg  flex justify-center items-center `}
                 >
                   {activeStatus === "Active" ? (
-                    <MdOutlineCloudDone className="text-xl 2xl:text-3xl" />
+                    <MdOutlineCloudDone className="text-3xl 2xl:text-3xl" />
                   ) : (
-                    <PiCloudWarningBold className="text-xl 2xl:text-3xl" />
+                    <PiCloudWarningBold className="text-3xl 2xl:text-3xl" />
                   )}
-                  {activeStatus}
+                  {/* {activeStatus} */}
                 </div>
               </div>
               {/* table */}
               <div
-                className="bg-white rounded-md h-[250px] md:h-[300px] xl:h-[85%] overflow-auto text-center"
+                className="bg-white rounded-md h-[250px] md:h-[300px] xl:h-[75%] overflow-auto text-center"
                 style={{
                   scrollbarWidth: "thin",
                   scrollbarColor: "gray transparent",
