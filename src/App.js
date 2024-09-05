@@ -327,8 +327,8 @@ const getDemokitUtmapsData = async() => {
     const utmapsLimit = localStorage.getItem("UtmapsLimit");
     const utmapsUnit = localStorage.getItem('UtmapsUnit');
     const response = await axios.get(
-      // `http://34.93.162.58:4000/sensor/getDemokitUtmapsData?projectNumber=${projectNumber}&limit=${utmapsLimit}&unit=${utmapsUnit}`
-      `http://localhost:4000/sensor/getDemokitUtmapsData?projectNumber=${projectNumber}&limit=${utmapsLimit}&unit=${utmapsUnit}`
+      `http://34.93.162.58:4000/sensor/getDemokitUtmapsData?projectNumber=${projectNumber}&limit=${utmapsLimit}&unit=${utmapsUnit}`
+      // `http://localhost:4000/sensor/getDemokitUtmapsData?projectNumber=${projectNumber}&limit=${utmapsLimit}&unit=${utmapsUnit}`
     );
     if (response.data.success) {
       setUtmapsData(response.data.data);
@@ -343,7 +343,10 @@ const getDemokitUtmapsData = async() => {
 const getDemokitUtmapsModelLimit = async() => {
   try {
     const projectNumber = localStorage.getItem("projectNumber");
-    const response = await axios.post('http://localhost:4000/sensor/getDemokitUtmapsModelLimit', {projectNumber});
+    const response = await axios.post(
+      "http://34.93.162.58:4000/sensor/getDemokitUtmapsModelLimit",
+      { projectNumber }
+    );
     if(response.data.success) {
       setDemokitUtmapsModelLimitS1(response.data.data.ModelLimitS1);
       setDemokitUtmapsModelLimitS2(response.data.data.ModelLimitS2);

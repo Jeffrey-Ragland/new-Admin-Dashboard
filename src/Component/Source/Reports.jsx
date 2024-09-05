@@ -84,7 +84,7 @@ const Reports = (dataFromApp) => {
   const handleReportData = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:4000/sensor/getAutoDashReportData",
+        "http://34.93.162.58:4000/sensor/getAutoDashReportData",
         {
           params: {
             projectName: projectName,

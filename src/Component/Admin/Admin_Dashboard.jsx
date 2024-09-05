@@ -69,20 +69,20 @@ const handleSubmit = async(e) =>
     const formData_1 = { data: formData}; 
 
     const response_data = await fetch(
-      'http://localhost:4000/sensor/Creating_project',
+      "http://34.93.162.58:4000/sensor/Creating_project",
       {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData_1), 
+        body: JSON.stringify(formData_1),
       }
     );
     const data = await response_data.json();
     if(data.message === 'Project already exists'){
       window.alert('Project already exists');
     } else {
-          let insertLink = `http://localhost:4000/sensor/insertProjectData?projectName=${projectName}`;
+          let insertLink = `http://34.93.162.58:4000/sensor/insertProjectData?projectName=${projectName}`;
           parameterValues.forEach((value) => {
           insertLink += `&${value}=[insertValue]`;
           });

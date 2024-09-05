@@ -377,9 +377,11 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
       e.preventDefault();
       const projectNumber = localStorage.getItem("projectNumber");
       const response = await axios.post(
-        "http://localhost:4000/sensor/updateDemokitUtmapsModelLimit",
+        "http://34.93.162.58:4000/sensor/updateDemokitUtmapsModelLimit",
         {
-          projectNumber, modelLimitS1, modelLimitS2
+          projectNumber,
+          modelLimitS1,
+          modelLimitS2,
         }
       );
       if(response.status === 200) {
@@ -508,13 +510,20 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                       <div>Sensor 1</div>
                       <div
                         className={`text-2xl md:text-3xl 2xl:text-6xl  ${
-                          (dataFromApp.length > 0 && dataFromApp[0].Sensor1) >=
-                          modelLimitS1FromApp
+                          dataFromApp.length > 0 &&
+                          (dataFromApp[0].Sensor1 === "N/A" ||
+                            dataFromApp[0].Sensor1 === "n/a")
+                            ? "text-gray-400"
+                            : dataFromApp.length > 0 &&
+                              dataFromApp[0].Sensor1 >= modelLimitS1FromApp
                             ? "text-red-500"
                             : "text-green-400"
                         }`}
                       >
-                        {dataFromApp.length > 0 && dataFromApp[0].Sensor1} °C
+                        {parseFloat(dataFromApp.length > 0 && dataFromApp[0].Sensor1).toFixed(1)}{" "}
+                        {selectedUnit === "C" && "°C"}
+                        {selectedUnit === "F" && "°F"}
+                        {selectedUnit === "K" && "K"}
                       </div>
                     </div>
                   </div>
@@ -532,13 +541,20 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                       <div>Sensor 2</div>
                       <div
                         className={`text-2xl md:text-3xl 2xl:text-6xl  ${
-                          (dataFromApp.length > 0 && dataFromApp[0].Sensor2) >=
-                          modelLimitS2FromApp
+                          dataFromApp.length > 0 &&
+                          (dataFromApp[0].Sensor2 === "N/A" ||
+                            dataFromApp[0].Sensor2 === "n/a")
+                            ? "text-gray-400"
+                            : dataFromApp.length > 0 &&
+                              dataFromApp[0].Sensor2 >= modelLimitS2FromApp
                             ? "text-red-500"
                             : "text-green-400"
                         }`}
                       >
-                        {dataFromApp.length > 0 && dataFromApp[0].Sensor2} °C
+                        {parseFloat(dataFromApp.length > 0 && dataFromApp[0].Sensor2).toFixed(1)}{" "}
+                        {selectedUnit === "C" && "°C"}
+                        {selectedUnit === "F" && "°F"}
+                        {selectedUnit === "K" && "K"}
                       </div>
                     </div>
                   </div>
@@ -557,7 +573,14 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                     <BsThermometerSun className="text-5xl 2xl:text-7xl" />
                     <div className="flex flex-col items-center text-base 2xl:text-2xl">
                       <div>Sensor 3</div>
-                      <div className="text-2xl md:text-3xl 2xl:text-6xl text-green-400">
+                      <div
+                        className={`text-2xl md:text-3xl 2xl:text-6xl ${
+                          (dataFromApp.length > 0 && dataFromApp[0].Sensor3) ===
+                          ("N/A" || "n/a")
+                            ? "text-gray-400"
+                            : "text-green-400"
+                        } `}
+                      >
                         {dataFromApp.length > 0 && dataFromApp[0].Sensor3}
                       </div>
                     </div>
@@ -574,7 +597,14 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                     <BsThermometerSun className="text-5xl 2xl:text-7xl" />
                     <div className="flex flex-col items-center text-base 2xl:text-2xl">
                       <div>Sensor 4</div>
-                      <div className="text-2xl md:text-3xl 2xl:text-6xl text-green-400">
+                      <div
+                        className={`text-2xl md:text-3xl 2xl:text-6xl ${
+                          (dataFromApp.length > 0 && dataFromApp[0].Sensor3) ===
+                          ("N/A" || "n/a")
+                            ? "text-gray-400"
+                            : "text-green-400"
+                        } `}
+                      >
                         {dataFromApp.length > 0 && dataFromApp[0].Sensor4}
                       </div>
                     </div>
@@ -612,7 +642,7 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                         id="cel"
                         name="unit"
                         value="C"
-                        className="cursor-pointer"
+                        className="cursor-pointer mt-0.5"
                         checked={selectedUnit === "C"}
                         onChange={handleUnitChange}
                       />
@@ -627,7 +657,7 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                         id="fah"
                         name="unit"
                         value="F"
-                        className="cursor-pointer"
+                        className="cursor-pointer mt-0.5"
                         checked={selectedUnit === "F"}
                         onChange={handleUnitChange}
                       />
@@ -642,7 +672,7 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                         id="kel"
                         name="unit"
                         value="K"
-                        className="cursor-pointer"
+                        className="cursor-pointer mt-0.5"
                         checked={selectedUnit === "K"}
                         onChange={handleUnitChange}
                       />
@@ -747,7 +777,7 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                     onChange={handleLineLimit}
                   />
                   <label htmlFor="option1" className="mr-2 cursor-pointer">
-                    100
+                    100 Data
                   </label>
                   <input
                     type="radio"
@@ -759,7 +789,7 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                     onChange={handleLineLimit}
                   />
                   <label htmlFor="option2" className="mr-2 cursor-pointer">
-                    500
+                    500 Data
                   </label>
                   <input
                     type="radio"
@@ -771,7 +801,7 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                     onChange={handleLineLimit}
                   />
                   <label htmlFor="option3" className="mr-2 cursor-pointer">
-                    1000
+                    1000 Data
                   </label>
                   <input
                     type="radio"
@@ -783,7 +813,7 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                     onChange={handleLineLimit}
                   />
                   <label htmlFor="option4" className="mr-2 cursor-pointer">
-                    1500
+                    1500 Data
                   </label>
                 </div>
               </div>
