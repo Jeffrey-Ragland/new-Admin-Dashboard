@@ -520,7 +520,9 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                             : "text-green-400"
                         }`}
                       >
-                        {parseFloat(dataFromApp.length > 0 && dataFromApp[0].Sensor1).toFixed(1)}{" "}
+                        {parseFloat(
+                          dataFromApp.length > 0 && dataFromApp[0].Sensor1
+                        ).toFixed(1)}{" "}
                         {selectedUnit === "C" && "°C"}
                         {selectedUnit === "F" && "°F"}
                         {selectedUnit === "K" && "K"}
@@ -551,7 +553,9 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                             : "text-green-400"
                         }`}
                       >
-                        {parseFloat(dataFromApp.length > 0 && dataFromApp[0].Sensor2).toFixed(1)}{" "}
+                        {parseFloat(
+                          dataFromApp.length > 0 && dataFromApp[0].Sensor2
+                        ).toFixed(1)}{" "}
                         {selectedUnit === "C" && "°C"}
                         {selectedUnit === "F" && "°F"}
                         {selectedUnit === "K" && "K"}
@@ -717,10 +721,26 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                   >
                     <tr>
                       <th className="px-2">S.No</th>
-                      <th className="px-2">S1</th>
-                      <th className="px-2">S2</th>
-                      <th className="px-2">S3</th>
-                      <th className="px-2">S4</th>
+                      <th className="px-2">
+                        S1{selectedUnit === "C" && "(°C)"}
+                        {selectedUnit === "F" && "(°F)"}
+                        {selectedUnit === "K" && "(K)"}
+                      </th>
+                      <th className="px-2">
+                        S2{selectedUnit === "C" && "(°C)"}
+                        {selectedUnit === "F" && "(°F)"}
+                        {selectedUnit === "K" && "(K)"}
+                      </th>
+                      <th className="px-2">
+                        S3{selectedUnit === "C" && "(°C)"}
+                        {selectedUnit === "F" && "(°F)"}
+                        {selectedUnit === "K" && "(K)"}
+                      </th>
+                      <th className="px-2">
+                        S4{selectedUnit === "C" && "(°C)"}
+                        {selectedUnit === "F" && "(°F)"}
+                        {selectedUnit === "K" && "(K)"}
+                      </th>
                       <th className="px-2">Updated&nbsp;At</th>
                     </tr>
                   </thead>
