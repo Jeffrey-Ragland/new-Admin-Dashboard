@@ -436,7 +436,10 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
               <div className="flex gap-2">
                 <div>Indication Limit [S1]:</div>
                 <div className="text-red-500 font-medium">
-                  {modelLimitS1FromApp}°C
+                  {modelLimitS1FromApp}
+                  {selectedUnit === "C" && "°C"}
+                  {selectedUnit === "F" && "°F"}
+                  {selectedUnit === "K" && "K"}
                 </div>
               </div>
               <div>-</div>
@@ -462,7 +465,10 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
               <div className="flex gap-2">
                 <div>Indication Limit [S2]:</div>
                 <div className="text-red-500 font-medium">
-                  {modelLimitS2FromApp}°C
+                  {modelLimitS2FromApp}
+                  {selectedUnit === "C" && "°C"}
+                  {selectedUnit === "F" && "°F"}
+                  {selectedUnit === "K" && "K"}
                 </div>
               </div>
               <div>-</div>
