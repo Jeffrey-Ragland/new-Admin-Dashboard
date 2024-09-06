@@ -1,23 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import axios from 'axios';
-import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import ThreeDModelUtmaps from './ThreeDModelUtmaps';
 import xymaLogo from "../Assets/xyma - Copy.png";
-import xymaImg from "../Assets/xyma.png";
-import coverImg from "../Assets/pdfcover.jpg";
-import sensorPage from "../Assets/utmapsPage.jpg";
-import disclaimerPage from "../Assets/disclaimerPage.jpg";
+import loadingGif from '../Assets/loading.gif';
 import { BsThermometerSun } from "react-icons/bs";
-import { MdManageHistory, MdOutlineCloudDone } from "react-icons/md";
-import { PiCloudWarningBold } from "react-icons/pi";
+import { MdManageHistory } from "react-icons/md";
 import { ImUpload3 } from "react-icons/im";
 import { LiaRulerHorizontalSolid } from "react-icons/lia";
 import { BsDatabaseFillCheck } from "react-icons/bs";
 import { MdSystemSecurityUpdateWarning } from "react-icons/md";
+import { FaFileDownload } from "react-icons/fa";
 import "react-tooltip/dist/react-tooltip.css";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import { Line } from "react-chartjs-2";
@@ -49,9 +45,9 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
   const [activeStatus, setActiveStatus] = useState('');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
-  const [filteredReportData, setFilteredReportData] = useState([]);
   const [modelLimitS1, setModelLimitS1] = useState('');
   const [modelLimitS2, setModelLimitS2] = useState("");
+  const [reportLoading, setReportLoading] = useState(false);
 
   // console.log('model limit', modelLimit);
   // console.log("model limit in dashboard file", modelLimitFromApp);
@@ -61,7 +57,7 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
     datasets: []
   });
 
-  console.log('utmaps data from app', dataFromApp);
+  // console.log('utmaps data from app', dataFromApp);
   // console.log(dataFromApp[0]);
 
   const getInitialLimit = () => {
@@ -277,104 +273,36 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
   }, [dataFromApp])
 
   // report data
-  useEffect(() => {
-    handleReportData();
-  },[fromDate, toDate]);
-
-  const handleReportData = async () => {
-    try {
-      const projectName = localStorage.getItem('projectNumber');
-      const response = await axios.get(
+  const generateExcel = async() => {
+    if(fromDate && toDate) {
+      try {
+        setReportLoading(true);
+        const projectName = localStorage.getItem('projectNumber');
+        const response = await axios.get(
         `http://34.93.162.58:4000/sensor/getDemokitUtmapsReport?fromDate=${fromDate}&toDate=${toDate}&projectName=${projectName}`
         // `http://localhost:4000/sensor/getDemokitUtmapsReport?fromDate=${fromDate}&toDate=${toDate}&projectName=${projectName}`
-      );
-      setFilteredReportData(response.data.data);
-      console.log('report data',response.data.data);
-    } catch (error) {
-      console.error('Error fetching data: ', error);
-    };
-  };
-
-  // to generate report pdf
-  const generatePdf = () => {
-    if(fromDate && toDate) {
-      const doc = new jsPDF();
-      const logo = xymaImg;
-      const cover = coverImg;
-      const desc = sensorPage;
-      const disclaimer = disclaimerPage;
-
-      // cover img
-      doc.addImage(cover, "JPG", 0, 0, 210, 297);
-      doc.addPage();
-
-      //logo
-      doc.addImage(logo, "PNG", 10, 10, 40, 20);
-
-      //sensor description
-      doc.addImage(desc, "PNG", 0, 40, 220, 250);
-      doc.addPage();
-
-      //logo
-      doc.addImage(logo, "PNG", 10, 10, 40, 20);
-
-      if (filteredReportData && filteredReportData.length > 0) {
-        // table
-        doc.autoTable({
-          head: [["S.No", "S1", "S2", "S3", "S4", "Updated At"]],
-          body: filteredReportData.map(
-            ({ Sensor1, Sensor2, Sensor3, Sensor4, createdAt }, index) => [
-              index + 1,
-              Sensor1,
-              Sensor2,
-              Sensor3,
-              Sensor4,
-              new Date(createdAt).toLocaleString("en-GB"),
-            ]
-          ),
-          startY: 40,
-          headerStyles: {
-            fillColor: [222, 121, 13],
-          },
+        );
+        setReportLoading(false);
+        setFromDate('');
+        setToDate('');
+        const ws = XLSX.utils.json_to_sheet(
+          response.data.data.map(
+            ({ _id, ProjectName, createdAt, updatedAt, __v, ...rest }) => ({
+              ...rest,
+              createdAt: new Date(createdAt).toLocaleString("en-GB"),
+            })
+          )
+        );
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+        const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+        const info = new Blob([excelBuffer], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         });
+        saveAs(info, "Utmaps_Report.xlsx");
+      } catch(error) {
+        console.error("Error fetching data: ", error);
       }
-
-      doc.addPage();
-
-      //logo
-      doc.addImage(logo, "PNG", 10, 10, 40, 20);
-
-      //disclaimer
-      doc.addImage(disclaimer, "PNG", 0, 50, 210, 250);
-
-      //  doc.save("sensor_adminData.pdf");
-      const blob = doc.output("blob");
-
-      const url = URL.createObjectURL(blob);
-      window.open(url, "_blank");
-    } else {
-      alert('Date Range Required')
-    }
-  };
-
-  // to generate report excel
-  const generateExcel = () => {
-    if(fromDate && toDate) {
-      const ws = XLSX.utils.json_to_sheet(
-        filteredReportData.map(
-          ({ _id, ProjectName, createdAt, updatedAt, __v, ...rest }) => ({
-            ...rest,
-            createdAt: new Date(createdAt).toLocaleString("en-GB"),
-          })
-        )
-      );
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-      const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-      const info = new Blob([excelBuffer], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      });
-      saveAs(info, "Utmaps_Report.xlsx");
     } else {
       alert("Date Range Required");
     }
@@ -896,7 +824,7 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
               </div>
 
               {/* report */}
-              <div className="xl:h-[40%] md:w-[35%] xl:w-full border border-white bg-white/5 rounded-md text-sm 2xl:text-lg px-2 py-4 md:py-1 flex flex-col gap-3">
+              <div className="relative xl:h-[40%] md:w-[35%] xl:w-full border border-white bg-white/5 rounded-md text-sm 2xl:text-lg px-2 py-6 md:py-1 flex flex-col gap-2">
                 <center className="font-medium">Report Analysis</center>
 
                 <div className="flex md:flex-col xl:flex-row justify-center items-center gap-2 text-xs h-1/2">
@@ -923,19 +851,26 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                 </div>
 
                 <div className="flex md:flex-col xl:flex-row gap-2 justify-center items-center h-1/2">
-                  <button
+                  {/* <button
                     className="rounded-md bg-red-500 hover:scale-105 duration-200 py-1 px-2 md:w-28 xl:w-auto 2xl:py-2 2xl:px-4"
                     onClick={generatePdf}
                   >
                     PDF
-                  </button>
+                  </button> */}
                   <button
-                    className="rounded-md bg-green-500 hover:scale-105 duration-200 py-1 px-2 2xl:py-2 2xl:px-4 md:w-28 xl:w-auto"
+                    className="rounded-md bg-green-500 hover:scale-105 duration-200 py-1 px-2 2xl:py-2 2xl:px-4 md:w-28 xl:w-auto flex items-center gap-1"
                     onClick={generateExcel}
                   >
-                    Excel
+                    <FaFileDownload className="text-lg 2xl:text-xl" />
+                    Download Excel
                   </button>
                 </div>
+                {reportLoading && (
+                  <div className="absolute inset-0 rounded-md bg-black/70 flex flex-col justify-center items-center font-semibold text-sm">
+                    <div>Your report is being downloaded!</div>
+                    <img src={loadingGif} className='max-w-[40px]' /> 
+                  </div>
+                )}
               </div>
             </div>
           </div>
