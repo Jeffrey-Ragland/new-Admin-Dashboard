@@ -323,7 +323,6 @@ const getIOCLData = async () => {
 // utmaps
 const getDemokitUtmapsData = async() => {
   try {
-    console.log('yes')
     const projectNumber = localStorage.getItem("projectNumber");
     const utmapsLimit = localStorage.getItem("UtmapsLimit");
     const utmapsUnit = localStorage.getItem('UtmapsUnit');

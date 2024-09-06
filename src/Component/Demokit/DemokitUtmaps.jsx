@@ -16,6 +16,10 @@ import { MdManageHistory, MdOutlineCloudDone } from "react-icons/md";
 import { PiCloudWarningBold } from "react-icons/pi";
 import { ImUpload3 } from "react-icons/im";
 import { LiaRulerHorizontalSolid } from "react-icons/lia";
+import { BsDatabaseFillCheck } from "react-icons/bs";
+import { MdSystemSecurityUpdateWarning } from "react-icons/md";
+import "react-tooltip/dist/react-tooltip.css";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 import { Line } from "react-chartjs-2";
 import { Bar } from "react-chartjs-2";
 import {
@@ -282,6 +286,7 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
       const projectName = localStorage.getItem('projectNumber');
       const response = await axios.get(
         `http://34.93.162.58:4000/sensor/getDemokitUtmapsReport?fromDate=${fromDate}&toDate=${toDate}&projectName=${projectName}`
+        // `http://localhost:4000/sensor/getDemokitUtmapsReport?fromDate=${fromDate}&toDate=${toDate}&projectName=${projectName}`
       );
       setFilteredReportData(response.data.data);
       console.log('report data',response.data.data);
@@ -292,84 +297,87 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
 
   // to generate report pdf
   const generatePdf = () => {
-    if(fromDate) {
-      console.log('yes')
+    if(fromDate && toDate) {
+      const doc = new jsPDF();
+      const logo = xymaImg;
+      const cover = coverImg;
+      const desc = sensorPage;
+      const disclaimer = disclaimerPage;
+
+      // cover img
+      doc.addImage(cover, "JPG", 0, 0, 210, 297);
+      doc.addPage();
+
+      //logo
+      doc.addImage(logo, "PNG", 10, 10, 40, 20);
+
+      //sensor description
+      doc.addImage(desc, "PNG", 0, 40, 220, 250);
+      doc.addPage();
+
+      //logo
+      doc.addImage(logo, "PNG", 10, 10, 40, 20);
+
+      if (filteredReportData && filteredReportData.length > 0) {
+        // table
+        doc.autoTable({
+          head: [["S.No", "S1", "S2", "S3", "S4", "Updated At"]],
+          body: filteredReportData.map(
+            ({ Sensor1, Sensor2, Sensor3, Sensor4, createdAt }, index) => [
+              index + 1,
+              Sensor1,
+              Sensor2,
+              Sensor3,
+              Sensor4,
+              new Date(createdAt).toLocaleString("en-GB"),
+            ]
+          ),
+          startY: 40,
+          headerStyles: {
+            fillColor: [222, 121, 13],
+          },
+        });
+      }
+
+      doc.addPage();
+
+      //logo
+      doc.addImage(logo, "PNG", 10, 10, 40, 20);
+
+      //disclaimer
+      doc.addImage(disclaimer, "PNG", 0, 50, 210, 250);
+
+      //  doc.save("sensor_adminData.pdf");
+      const blob = doc.output("blob");
+
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
     } else {
-      console.log('no')
+      alert('Date Range Required')
     }
-    const doc = new jsPDF();
-    const logo = xymaImg;
-    const cover = coverImg;
-    const desc = sensorPage;
-    const disclaimer = disclaimerPage;
-
-    // cover img
-    doc.addImage(cover, "JPG", 0, 0, 210, 297);
-    doc.addPage();
-
-    //logo
-    doc.addImage(logo, "PNG", 10, 10, 40, 20);
-
-    //sensor description
-    doc.addImage(desc, "PNG", 0, 40, 220, 250);
-    doc.addPage();
-
-    //logo
-    doc.addImage(logo, "PNG", 10, 10, 40, 20);
-
-    if (filteredReportData && filteredReportData.length > 0) {
-      // table
-      doc.autoTable({
-        head: [["S.No", "S1", "S2", "S3", "S4", "Updated At"]],
-        body: filteredReportData.map(
-          ({ Sensor1, Sensor2, Sensor3, Sensor4, createdAt }, index) => [
-            index + 1,
-            Sensor1,
-            Sensor2,
-            Sensor3,
-            Sensor4,
-            new Date(createdAt).toLocaleString("en-GB"),
-          ]
-        ),
-        startY: 40,
-        headerStyles: {
-          fillColor: [222, 121, 13],
-        },
-      });
-    }
-
-     doc.addPage();
-
-     //logo
-     doc.addImage(logo, "PNG", 10, 10, 40, 20);
-
-     //disclaimer
-     doc.addImage(disclaimer, "PNG", 0, 50, 210, 250);
-
-    //  doc.save("sensor_adminData.pdf");
-    const blob = doc.output('blob');
-
-    const url = URL.createObjectURL(blob);
-    window.open(url, "_blank");
-  }
+  };
 
   // to generate report excel
   const generateExcel = () => {
-    const ws = XLSX.utils.json_to_sheet(
-      filteredReportData.map(
-        ({ _id, ProjectName, createdAt, updatedAt, __v, ...rest }) => ({
-          ...rest,
-          createdAt: new Date(createdAt).toLocaleString("en-GB"),
-        })
-      )
-    );
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-    const info = new Blob([excelBuffer], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    });
-    saveAs(info, "Utmaps_Report.xlsx");
+    if(fromDate && toDate) {
+      const ws = XLSX.utils.json_to_sheet(
+        filteredReportData.map(
+          ({ _id, ProjectName, createdAt, updatedAt, __v, ...rest }) => ({
+            ...rest,
+            createdAt: new Date(createdAt).toLocaleString("en-GB"),
+          })
+        )
+      );
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+      const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+      const info = new Blob([excelBuffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      saveAs(info, "Utmaps_Report.xlsx");
+    } else {
+      alert("Date Range Required");
+    }
   };
 
   const handleModelLimit = async(e) => {
@@ -452,7 +460,11 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                   className="border border-white w-10 rounded-sm focus:outline-none text-gray-800"
                   onChange={(e) => setModelLimitS1(e.target.value)}
                 />
-                <button className="bg-green-500 rounded-md text-lg py-0.5 px-2 hover:scale-110 duration-200">
+                <button
+                  className="bg-green-500 rounded-md text-lg py-0.5 px-2 hover:scale-110 duration-200"
+                  data-tooltip-id="tooltip-style"
+                  data-tooltip-content="Change Limit"
+                >
                   <ImUpload3 />
                 </button>
               </div>
@@ -481,7 +493,11 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                   className="border border-white w-10 rounded-sm focus:outline-none text-gray-800"
                   onChange={(e) => setModelLimitS2(e.target.value)}
                 />
-                <button className="bg-green-500 rounded-md text-lg py-0.5 px-2 hover:scale-110 duration-200">
+                <button
+                  className="bg-green-500 rounded-md text-lg py-0.5 px-2 hover:scale-110 duration-200"
+                  data-tooltip-id="tooltip-style"
+                  data-tooltip-content="Change Limit"
+                >
                   <ImUpload3 />
                 </button>
               </div>
@@ -515,7 +531,7 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                     <div className="flex flex-col items-center text-base 2xl:text-2xl">
                       <div>Sensor 1</div>
                       <div
-                        className={`text-2xl md:text-3xl 2xl:text-6xl  ${
+                        className={`text-2xl md:text-3xl 2xl:text-5xl  ${
                           dataFromApp.length > 0 &&
                           (dataFromApp[0].Sensor1 === "N/A" ||
                             dataFromApp[0].Sensor1 === "n/a")
@@ -548,7 +564,7 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                     <div className="flex flex-col items-center text-base 2xl:text-2xl">
                       <div>Sensor 2</div>
                       <div
-                        className={`text-2xl md:text-3xl 2xl:text-6xl  ${
+                        className={`text-2xl md:text-3xl 2xl:text-5xl  ${
                           dataFromApp.length > 0 &&
                           (dataFromApp[0].Sensor2 === "N/A" ||
                             dataFromApp[0].Sensor2 === "n/a")
@@ -584,7 +600,7 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                     <div className="flex flex-col items-center text-base 2xl:text-2xl">
                       <div>Sensor 3</div>
                       <div
-                        className={`text-2xl md:text-3xl 2xl:text-6xl ${
+                        className={`text-2xl md:text-3xl 2xl:text-5xl ${
                           (dataFromApp.length > 0 && dataFromApp[0].Sensor3) ===
                           ("N/A" || "n/a")
                             ? "text-gray-400"
@@ -608,7 +624,7 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                     <div className="flex flex-col items-center text-base 2xl:text-2xl">
                       <div>Sensor 4</div>
                       <div
-                        className={`text-2xl md:text-3xl 2xl:text-6xl ${
+                        className={`text-2xl md:text-3xl 2xl:text-5xl ${
                           (dataFromApp.length > 0 && dataFromApp[0].Sensor3) ===
                           ("N/A" || "n/a")
                             ? "text-gray-400"
@@ -624,9 +640,9 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
             </div>
 
             <div className=" w-full xl:w-[50%] flex flex-col gap-2">
-              <div className="h-[25%] flex gap-2 font-medium 2xl:text-xl">
+              <div className="xl:h-[25%] flex flex-col-reverse md:flex-row gap-2 font-medium 2xl:text-xl">
                 {/* recent update */}
-                <div className="w-1/2 xl:w-[40%] border border-white rounded-md bg-white/5 flex flex-col items-center justify-center gap-2 px-2 py-2 xl:py-0 ">
+                <div className="w-full xl:w-[40%] border border-white rounded-md bg-white/5 flex flex-row md:flex-col items-center justify-center gap-2 px-2 py-2 xl:py-0 ">
                   <div className="flex items-center gap-2">
                     <MdManageHistory className="text-xl 2xl:text-3xl" />
                     <div>Last&nbsp;Update:</div>
@@ -639,74 +655,91 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                   </div>
                 </div>
 
-                {/* unit selection */}
-                <div className="xl:w-[50%] border border-white rounded-md bg-white/5 px-2 py-2 xl:py-0 flex flex-col items-center justify-center gap-1">
-                  <div className="flex gap-2 items-center">
-                    <LiaRulerHorizontalSolid className="text-xl 2xl:text-3xl" />
-                    <div>Unit preference</div>
+                <div className="w-full xl:w-[60%] flex gap-2">
+                  {/* unit selection */}
+                  <div className="xl:w-[80%] border border-white rounded-md bg-white/5 px-2 py-2 xl:py-0 flex flex-row md:flex-col items-center justify-center gap-1 text-sm md:text-base 2xl:text-lg">
+                    <div className="flex gap-2 items-center">
+                      <LiaRulerHorizontalSolid className="text-xl 2xl:text-3xl" />
+                      <div>Unit&nbsp;preference</div>
+                    </div>
+                    <div className="text-base 2xl:text-lg font-normal flex gap-2 md:gap-4">
+                      <div
+                        className="flex gap-1"
+                        data-tooltip-id="tooltip-style"
+                        data-tooltip-content="Celsius"
+                      >
+                        <input
+                          type="radio"
+                          id="cel"
+                          name="unit"
+                          value="C"
+                          className="cursor-pointer mt-0.5"
+                          checked={selectedUnit === "C"}
+                          onChange={handleUnitChange}
+                        />
+                        <label htmlFor="cel" className="cursor-pointer">
+                          (°C)
+                        </label>
+                      </div>
+
+                      <div
+                        className="flex gap-1"
+                        data-tooltip-id="tooltip-style"
+                        data-tooltip-content="Fahrenheit"
+                      >
+                        <input
+                          type="radio"
+                          id="fah"
+                          name="unit"
+                          value="F"
+                          className="cursor-pointer mt-0.5"
+                          checked={selectedUnit === "F"}
+                          onChange={handleUnitChange}
+                        />
+                        <label htmlFor="fah" className="cursor-pointer">
+                          (°F)
+                        </label>
+                      </div>
+
+                      <div
+                        className="flex gap-1"
+                        data-tooltip-id="tooltip-style"
+                        data-tooltip-content="Kelvin"
+                      >
+                        <input
+                          type="radio"
+                          id="kel"
+                          name="unit"
+                          value="K"
+                          className="cursor-pointer mt-0.5"
+                          checked={selectedUnit === "K"}
+                          onChange={handleUnitChange}
+                        />
+                        <label htmlFor="kel" className="cursor-pointer">
+                          (K)
+                        </label>
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-base 2xl:text-lg font-normal flex gap-4">
-                    <div className="flex gap-1">
-                      <input
-                        type="radio"
-                        id="cel"
-                        name="unit"
-                        value="C"
-                        className="cursor-pointer mt-0.5"
-                        checked={selectedUnit === "C"}
-                        onChange={handleUnitChange}
-                      />
-                      <label htmlFor="cel" className="cursor-pointer">
-                        (°C)
-                      </label>
-                    </div>
 
-                    <div className="flex gap-1">
-                      <input
-                        type="radio"
-                        id="fah"
-                        name="unit"
-                        value="F"
-                        className="cursor-pointer mt-0.5"
-                        checked={selectedUnit === "F"}
-                        onChange={handleUnitChange}
-                      />
-                      <label htmlFor="fah" className="cursor-pointer">
-                        (°F)
-                      </label>
-                    </div>
-
-                    <div className="flex gap-1">
-                      <input
-                        type="radio"
-                        id="kel"
-                        name="unit"
-                        value="K"
-                        className="cursor-pointer mt-0.5"
-                        checked={selectedUnit === "K"}
-                        onChange={handleUnitChange}
-                      />
-                      <label htmlFor="kel" className="cursor-pointer">
-                        (K)
-                      </label>
-                    </div>
-                  </div>
-                </div>
-
-                {/* recent update */}
-                <div
-                  className={`w-1/2 xl:w-[10%] border border-white rounded-md bg-white/5 ${
-                    activeStatus === "Active"
-                      ? "text-green-400 shadow-green-800"
-                      : "text-red-400 shadow-red-800"
-                  }  shadow-lg  flex justify-center items-center `}
-                >
+                  {/* activity status */}
                   {activeStatus === "Active" ? (
-                    <MdOutlineCloudDone className="text-3xl 2xl:text-3xl" />
+                    <div
+                      className="flex-1 xl:w-[20%] border border-white rounded-md bg-white/5 text-green-400 shadow-green-800 shadow-lg flex justify-center items-center"
+                      data-tooltip-id="tooltip-style"
+                      data-tooltip-content="Data is being recieved!"
+                    >
+                      <BsDatabaseFillCheck className="text-2xl md:text-3xl 2xl:text-5xl" />
+                    </div>
                   ) : (
-                    <PiCloudWarningBold className="text-3xl 2xl:text-3xl" />
+                    <div
+                      className="flex-1 xl:w-[20%] border border-white rounded-md bg-white/5 text-red-400 shadow-red-800 shadow-lg flex justify-center items-center"
+                      data-tooltip-id="tooltip-style"
+                      data-tooltip-content="No data is being recieved for more than 5 minutes"
+                    >
+                      <MdSystemSecurityUpdateWarning className="text-2xl md:text-3xl 2xl:text-5xl" />
+                    </div>
                   )}
-                  {/* {activeStatus} */}
                 </div>
               </div>
               {/* table */}
@@ -787,60 +820,68 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
           <div className=" xl:h-[60%] rounded-md flex flex-col xl:flex-row gap-4 xl:gap-2">
             {/* line graph */}
             <div className="border border-white bg-white/5 rounded-md w-full xl:w-[70%] px-2 pb-2 h-[250px] md:h-[300px] lg:h-[400px] xl:h-full flex flex-col">
-              <div>
-                <center className="font-medium">
-                  Sensor Temperature Measurement
-                </center>
-                <div className="flex items-center px-2 py-1 text-sm font-medium">
-                  <div className="mr-2">Set Limit:</div>
-                  <input
-                    type="radio"
-                    id="option1"
-                    name="options"
-                    value={100}
-                    checked={utmapsLineLimit === 100}
-                    className="cursor-pointer mt-0.5"
-                    onChange={handleLineLimit}
-                  />
-                  <label htmlFor="option1" className="mr-2 cursor-pointer">
-                    100 Data
-                  </label>
-                  <input
-                    type="radio"
-                    id="option2"
-                    name="options"
-                    value={500}
-                    checked={utmapsLineLimit === 500}
-                    className="cursor-pointer mt-0.5"
-                    onChange={handleLineLimit}
-                  />
-                  <label htmlFor="option2" className="mr-2 cursor-pointer">
-                    500 Data
-                  </label>
-                  <input
-                    type="radio"
-                    id="option3"
-                    name="options"
-                    value={1000}
-                    checked={utmapsLineLimit === 1000}
-                    className="cursor-pointer mt-0.5"
-                    onChange={handleLineLimit}
-                  />
-                  <label htmlFor="option3" className="mr-2 cursor-pointer">
-                    1000 Data
-                  </label>
-                  <input
-                    type="radio"
-                    id="option4"
-                    name="options"
-                    value={1500}
-                    checked={utmapsLineLimit === 1500}
-                    className="cursor-pointer mt-0.5"
-                    onChange={handleLineLimit}
-                  />
-                  <label htmlFor="option4" className="mr-2 cursor-pointer">
-                    1500 Data
-                  </label>
+              <div className="flex items-start md:items-center gap-2 px-2 py-1 text-sm 2xl:text-lg font-medium">
+                <div>Set&nbsp;Data&nbsp;Limit:</div>
+                <div className="flex gap-2 flex-wrap">
+                  <div className="flex items-center gap-0.5">
+                    <input
+                      type="radio"
+                      id="option1"
+                      name="options"
+                      value={100}
+                      checked={utmapsLineLimit === 100}
+                      className="cursor-pointer"
+                      onChange={handleLineLimit}
+                    />
+                    <label htmlFor="option1" className="cursor-pointer">
+                      100&nbsp;Data
+                    </label>
+                  </div>
+
+                  <div className="flex items-center gap-0.5">
+                    <input
+                      type="radio"
+                      id="option2"
+                      name="options"
+                      value={500}
+                      checked={utmapsLineLimit === 500}
+                      className="cursor-pointer mt-0.5"
+                      onChange={handleLineLimit}
+                    />
+                    <label htmlFor="option2" className="cursor-pointer">
+                      500&nbsp;Data
+                    </label>
+                  </div>
+
+                  <div className="flex items-center gap-0.5">
+                    <input
+                      type="radio"
+                      id="option3"
+                      name="options"
+                      value={1000}
+                      checked={utmapsLineLimit === 1000}
+                      className="cursor-pointer mt-0.5"
+                      onChange={handleLineLimit}
+                    />
+                    <label htmlFor="option3" className="cursor-pointer">
+                      1000&nbsp;Data
+                    </label>
+                  </div>
+
+                  <div className="flex items-center gap-0.5">
+                    <input
+                      type="radio"
+                      id="option4"
+                      name="options"
+                      value={1500}
+                      checked={utmapsLineLimit === 1500}
+                      className="cursor-pointer mt-0.5"
+                      onChange={handleLineLimit}
+                    />
+                    <label htmlFor="option4" className="cursor-pointer">
+                      1500&nbsp;Data
+                    </label>
+                  </div>
                 </div>
               </div>
               <div className="flex-1">
@@ -855,15 +896,15 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
               </div>
 
               {/* report */}
-              <div className="h-[200px] md:h-auto xl:h-[40%] md:w-[35%] xl:w-full border border-white bg-white/5 rounded-md text-sm 2xl:text-lg px-2 py-1 flex flex-col">
-                <center className="font-medium">Report Generation</center>
+              <div className="xl:h-[40%] md:w-[35%] xl:w-full border border-white bg-white/5 rounded-md text-sm 2xl:text-lg px-2 py-4 md:py-1 flex flex-col gap-3">
+                <center className="font-medium">Report Analysis</center>
 
                 <div className="flex md:flex-col xl:flex-row justify-center items-center gap-2 text-xs h-1/2">
                   <div className="flex flex-col gap-1">
                     <label>From</label>
                     <input
                       type="date"
-                      className="text-black rounded-md px-0.5 2xl:p-2"
+                      className="text-black rounded-md p-1 px-0.5 2xl:p-2"
                       required
                       value={fromDate}
                       onChange={(e) => setFromDate(e.target.value)}
@@ -873,7 +914,7 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                     <label>To</label>
                     <input
                       type="date"
-                      className="text-black rounded-md px-0.5 2xl:p-2"
+                      className="text-black rounded-md p-1 px-0.5 2xl:p-2"
                       required
                       value={toDate}
                       onChange={(e) => setToDate(e.target.value)}
@@ -900,6 +941,14 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
           </div>
         </div>
       </div>
+      <ReactTooltip
+        id="tooltip-style"
+        style={{
+          backgroundColor: "white",
+          color: "#4B5563",
+          fontSize: "0.75rem",
+        }}
+      />
     </div>
   );
 };
