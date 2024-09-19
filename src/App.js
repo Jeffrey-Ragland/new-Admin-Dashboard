@@ -459,7 +459,7 @@ const getDemokitZtarData = async () => {
             <Route path="/" element={<Source_Outlet />}>
               <Route
                 index
-                element={<Source_MainPage dataFromApp={autoDashData} />}
+                element={<Source_MainPage dataFromApp={autoDashData.length > 0 && autoDashData} />}
               />
               <Route
                 path="Graph"
@@ -480,3 +480,6 @@ const getDemokitZtarData = async () => {
 }
 
 export default App
+
+
+// http://34.93.162.58:4000/sensor/insertProjectData?projectName=testing&s1=[insertValue]&s2=[insertValue]&s3=[insertValue]

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from "react-router-dom";
 import axios from 'axios';
 import 'jspdf-autotable';
@@ -28,7 +28,10 @@ import {
   Tooltip,
   Legend,
   scales,
+  Zoom
 } from "chart.js";
+
+import zoomPlugin from "chartjs-plugin-zoom";
 
 ChartJS.register(
   CategoryScale,
@@ -37,7 +40,8 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  zoomPlugin
 );
 
 const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) => {
@@ -85,16 +89,6 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
     localStorage.setItem("UtmapsUnit", unit);
   };
 
-  // console.log('selected unit',selectedUnit);
-
-  // if(storedUnit === 'C') {
-  //   setSelectedUnit('C');
-  // } else if(storedUnit === 'F') {
-  //   setSelectedUnit('F');
-  // } else if(storedUnit === 'K') {
-  //   setSelectedUnit('K');
-  // };
-
   // line chart data
     useEffect(() => {
       if (
@@ -120,63 +114,139 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
               data: sensor1Data,
               borderColor: "rgb(255, 99, 132)",
               backgroundColor: "rgba(255, 99, 132, 0.2)",
+              pointRadius: 0,
+              pointHoverRadius: 0,
+              borderWidth: 1.25,
             },
             {
               label: "S2",
               data: sensor2Data,
               borderColor: "rgb(54, 162, 235)",
               backgroundColor: "rgba(54, 162, 235, 0.2)",
+              pointRadius: 0,
+              pointHoverRadius: 0,
+              borderWidth: 1.25,
             },
             {
               label: "S3",
               data: sensor3Data,
               borderColor: "rgb(75, 192, 192)",
               backgroundColor: "rgba(75, 192, 192, 0.2)",
+              pointRadius: 0,
+              pointHoverRadius: 0,
             },
             {
               label: "S4",
               data: sensor4Data,
               borderColor: "rgb(255, 255, 0)",
               backgroundColor: "rgba(255, 255, 0, 0.2)",
+              pointRadius: 0,
+              pointHoverRadius: 0,
             },
           ],
         });
       }
     }, [dataFromApp]);
 
-  const lineOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "top",
-        labels: {
-          color: "white",
-          font: {
-            size: 8,
-          },
-        },
-      },
-    },
-    scales: {
-      x: {
-        ticks: {
-          color: "white",
-          font: {
-            size: 6,
-          },
-        },
-      },
-      y: {
-        ticks: {
-          color: "white",
-          font: {
-            size: 6,
-          },
-        },
-      },
-    },
-  };
+  // const lineOptions = {
+  //   responsive: true,
+  //   maintainAspectRatio: false,
+  //   plugins: {
+  //     legend: {
+  //       position: "top",
+  //       labels: {
+  //         color: "white",
+  //         font: {
+  //           size: 8,
+  //         },
+  //       },
+  //     },
+  //     zoom: {
+  //       pan: {
+  //         enabled: true, // Enable panning
+  //         mode: "x", // Allow panning only in the x-direction
+  //       },
+  //       zoom: {
+  //         enabled: true, // Enable zooming
+  //         mode: "x", // Allow zooming only in the x-direction
+  //         wheel: {
+  //           enabled: true, // Enable zooming with the mouse wheel
+  //         },
+  //         pinch: {
+  //           enabled: true, // Enable zooming with pinch gestures on touch devices
+  //         },
+  //       },
+  //     },
+  //   },
+  //   scales: {
+  //     x: {
+  //       ticks: {
+  //         color: "white",
+  //         font: {
+  //           size: 6,
+  //         },
+  //       },
+  //     },
+  //     y: {
+  //       ticks: {
+  //         color: "white",
+  //         font: {
+  //           size: 6,
+  //         },
+  //       },
+  //     },
+  //   },
+  // };
+
+   const lineOptions = useMemo(() => ({
+       responsive: true,
+       maintainAspectRatio: false,
+       plugins: {
+         legend: {
+           position: "top",
+           labels: {
+             color: "white",
+             font: {
+               size: 8,
+             },
+           },
+         },
+         zoom: {
+           pan: {
+             enabled: true,
+             mode: "x",
+           },
+           zoom: {
+             enabled: true,
+             mode: "x",
+             wheel: {
+               enabled: true,
+             },
+             pinch: {
+               enabled: true,
+             },
+           },
+         },
+       },
+       scales: {
+         x: {
+           ticks: {
+             color: "white",
+             font: {
+               size: 6,
+             },
+           },
+         },
+         y: {
+           ticks: {
+             color: "white",
+             font: {
+               size: 6,
+             },
+           },
+         },
+       },
+     }),[]);
 
   // bar chart data
   const barData = {
@@ -285,6 +355,7 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
         setReportLoading(false);
         setFromDate('');
         setToDate('');
+        console.log('report data', response.data.data);
         const ws = XLSX.utils.json_to_sheet(
           response.data.data.map(
             ({ _id, ProjectName, createdAt, updatedAt, __v, ...rest }) => ({
@@ -293,6 +364,7 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
             })
           )
         );
+        // const ws = XLSX.utils.json_to_sheet(response.data.data);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
         const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
@@ -570,7 +642,7 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
             <div className=" w-full xl:w-[50%] flex flex-col gap-2">
               <div className="xl:h-[25%] flex flex-col-reverse md:flex-row gap-2 font-medium 2xl:text-xl">
                 {/* recent update */}
-                <div className="w-full xl:w-[40%] border border-white rounded-md bg-white/5 flex flex-row md:flex-col items-center justify-center gap-2 px-2 py-2 xl:py-0 ">
+                <div className="w-full md:w-[40%] border border-white rounded-md bg-white/5 flex flex-row md:flex-col items-center justify-center gap-2 px-2 py-2 xl:py-0 ">
                   <div className="flex items-center gap-2">
                     <MdManageHistory className="text-xl 2xl:text-3xl" />
                     <div>Last&nbsp;Update:</div>
@@ -583,9 +655,9 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                   </div>
                 </div>
 
-                <div className="w-full xl:w-[60%] flex gap-2">
+                <div className="w-full md:w-[60%] flex gap-2">
                   {/* unit selection */}
-                  <div className="xl:w-[80%] border border-white rounded-md bg-white/5 px-2 py-2 xl:py-0 flex flex-row md:flex-col items-center justify-center gap-1 text-sm md:text-base 2xl:text-lg">
+                  <div className="md:w-[80%] border border-white rounded-md bg-white/5 px-2 py-2 xl:py-0 flex flex-row md:flex-col items-center justify-center gap-1 text-sm md:text-base 2xl:text-lg">
                     <div className="flex gap-2 items-center">
                       <LiaRulerHorizontalSolid className="text-xl 2xl:text-3xl" />
                       <div>Unit&nbsp;preference</div>
@@ -653,7 +725,7 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                   {/* activity status */}
                   {activeStatus === "Active" ? (
                     <div
-                      className="flex-1 xl:w-[20%] border border-white rounded-md bg-white/5 text-green-400 shadow-green-800 shadow-lg flex justify-center items-center"
+                      className="flex-1 md:w-[20%] border border-white rounded-md bg-white/5 text-green-400 shadow-green-800 shadow-lg flex justify-center items-center"
                       data-tooltip-id="tooltip-style"
                       data-tooltip-content="Data is being recieved!"
                     >
@@ -824,10 +896,10 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
               </div>
 
               {/* report */}
-              <div className="relative xl:h-[40%] md:w-[35%] xl:w-full border border-white bg-white/5 rounded-md text-sm 2xl:text-lg px-2 py-6 md:py-1 flex flex-col gap-2">
+              <div className="relative xl:h-[40%] md:w-[35%] xl:w-full border border-white bg-white/5 rounded-md text-sm 2xl:text-lg px-2 py-6 md:py-1 flex flex-col justify-evenly gap-6 md:gap-2">
                 <center className="font-medium">Report Analysis</center>
 
-                <div className="flex md:flex-col xl:flex-row justify-center items-center gap-2 text-xs h-1/2">
+                <div className="flex md:flex-col xl:flex-row justify-center items-center gap-2 text-xs xl:h-1/2">
                   <div className="flex flex-col gap-1">
                     <label>From</label>
                     <input
@@ -850,7 +922,7 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                   </div>
                 </div>
 
-                <div className="flex md:flex-col xl:flex-row gap-2 justify-center items-center h-1/2">
+                <div className="flex md:flex-col xl:flex-row gap-2 justify-center items-center xl:h-1/2">
                   {/* <button
                     className="rounded-md bg-red-500 hover:scale-105 duration-200 py-1 px-2 md:w-28 xl:w-auto 2xl:py-2 2xl:px-4"
                     onClick={generatePdf}
@@ -858,11 +930,11 @@ const DemokitUtmaps = ({dataFromApp, modelLimitS1FromApp, modelLimitS2FromApp}) 
                     PDF
                   </button> */}
                   <button
-                    className="rounded-md bg-green-500 hover:scale-105 duration-200 py-1 px-2 2xl:py-2 2xl:px-4 md:w-28 xl:w-auto flex items-center gap-1"
+                    className="rounded-md bg-green-500 hover:scale-105 duration-200 py-1 px-2 2xl:py-2 2xl:px-4 flex items-center gap-1"
                     onClick={generateExcel}
                   >
                     <FaFileDownload className="text-lg 2xl:text-xl" />
-                    Download Excel
+                    Download&nbsp;Excel
                   </button>
                 </div>
                 {reportLoading && (
