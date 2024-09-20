@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import Login from './Component/Logins/Login'
 import { Route, Routes } from 'react-router-dom'
 import Route_Page from './Component/Route/Route_Page'
-import OutletPage from './Component/Route/OutletPage'
 import Mainpage from './Component/skf/Mainpage'
 import Graph from './Component/skf/Graph'
 import Reports from './Component/skf/Reports'
@@ -31,6 +30,8 @@ import DemokitMainpage from "./Component/Demokit/DemokitMainpage";
 import DemokitUtmaps from "./Component/Demokit/DemokitUtmaps";
 import DemokitPorts from "./Component/Demokit/DemokitPorts";
 import DemokitZtar from "./Component/Demokit/DemokitZtar";
+import Ascan from './Component/Fpga/Ascan'
+import Tof from './Component/Fpga/Tof'
 
 const App = () => {
 const [Tof_data,setTofdata]=useState('')
@@ -401,7 +402,7 @@ const getDemokitZtarData = async () => {
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<Route_Page />}>
           {controls === "SKF" ? (
-            <Route path="/" element={<OutletPage />}>
+            <Route path="/" element={<OnlyOutlet />}>
               <Route index element={<Mainpage />} />
               <Route path="dashgraph" element={<Graph />} />
               <Route path="dashreports" element={<Reports />} />
@@ -409,14 +410,16 @@ const getDemokitZtarData = async () => {
             </Route>
           ) : null}
           {controls === "ADMIN" ? (
-            <Route path="/" element={<OutletPage />}>
+            <Route path="/" element={<OnlyOutlet />}>
               <Route index element={<Admin_Dashboard />} />
               <Route path="skfadmin" element={<SkfAdmin />} />
+              <Route path="Ascan" element={<Ascan />} />
+              <Route path="Tof" element={<Tof />} />
               <Route path="Bpcl_Admin" element={<BpclAdmin Tof={Tof_data} />} />
             </Route>
           ) : null}
           {controls === "BPCL" ? (
-            <Route path="/" element={<OutletPage />}>
+            <Route path="/" element={<OnlyOutlet />}>
               <Route index element={<Bpcl_MainPage />} />
               <Route path="Bpcl_Report" element={<Bpcl_report />} />
               <Route path="Bpcl_Settings" element={<Bpcl_Setting />} />
