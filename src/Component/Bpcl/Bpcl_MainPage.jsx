@@ -49,56 +49,58 @@ const Bpcl_MainPage = () => {
     const levelChartDataInterval = setInterval(getLevelChartData, 2000);
     const volumeChartDataInterval = setInterval(getVolumeChartData, 2000);
 
-    // chart data assignment
-    if (
-      Array.isArray(levelChartData) &&
-      levelChartData.length > 0 &&
-      Array.isArray(volumeData) &&
-      volumeData.length > 0 
-    ) {
-      const reversedData = [...levelChartData].reverse();
-      const reversedVolumeData = [...volumeData].reverse();
-
-      const lineLabels = reversedData.map((item) => {
-        const createdAt = new Date(item.createdAt).toLocaleString("en-GB");
-        return createdAt;
-      });
-
-      const levelData = reversedData.map((item) => item.level);
-      const volume = reversedVolumeData.map((item) => item.devicetemp);;
-
-      setLineData({
-        labels: lineLabels,
-        datasets: [
-          {
-            label: "Level",
-            data: levelData,
-            borderColor: "rgb(0, 123, 255)",
-            backgroundColor: "rgba(0, 123, 255, 0.2)",
-            pointRadius: 0,
-            pointHoverRadius: 0,
-            borderWidth: 1.25,
-          },
-          {
-            label: "Volume",
-            data: volume,
-            borderColor: "rgb(40, 167, 69)",
-            backgroundColor: "rgba(40, 167, 69, 0.2)",
-            pointRadius: 0,
-            pointHoverRadius: 0,
-            borderWidth: 1.25,
-            hidden: true
-          },
-        ],
-      });
-    }
-
     return () => {
       clearInterval(levelDataInterval);
       clearInterval(levelChartDataInterval);
       clearInterval(volumeChartDataInterval);
     };
-  }, [levelChartData, volumeData]);
+  }, []);
+
+    useEffect(() => {
+      // chart data assignment
+      if (
+        Array.isArray(levelChartData) &&
+        levelChartData.length > 0 &&
+        Array.isArray(volumeData) &&
+        volumeData.length > 0
+      ) {
+        const reversedData = [...levelChartData].reverse();
+        const reversedVolumeData = [...volumeData].reverse();
+
+        const lineLabels = reversedData.map((item) => {
+          const createdAt = new Date(item.createdAt).toLocaleString("en-GB");
+          return createdAt;
+        });
+
+        const levelData = reversedData.map((item) => item.level);
+        const volume = reversedVolumeData.map((item) => item.devicetemp);
+
+        setLineData({
+          labels: lineLabels,
+          datasets: [
+            {
+              label: "Level",
+              data: levelData,
+              borderColor: "rgb(0, 123, 255)",
+              backgroundColor: "rgba(0, 123, 255, 0.2)",
+              pointRadius: 0,
+              pointHoverRadius: 0,
+              borderWidth: 1.25,
+            },
+            {
+              label: "Volume",
+              data: volume,
+              borderColor: "rgb(40, 167, 69)",
+              backgroundColor: "rgba(40, 167, 69, 0.2)",
+              pointRadius: 0,
+              pointHoverRadius: 0,
+              borderWidth: 1.25,
+              hidden: true,
+            },
+          ],
+        });
+      }
+    }, [levelChartData, volumeData]);
 
   const lineOptions = useMemo(
     () => ({
@@ -114,6 +116,19 @@ const Bpcl_MainPage = () => {
             },
           },
         },
+        // tooltip: {
+        //   enabled: true,
+        //   callbacks: {
+        //     label: function (context) {
+        //       return `${context.dataset.label}: ${context.formattedValue}`;
+        //     },
+        //   },
+        // },
+        // interaction: {
+        //   mode: "nearest", // Control hover behavior
+        //   intersect: false, // Allows hover even if not directly on the point
+        //   axis: "x", // Only trigger on the x-axis
+        // },
         zoom: {
           pan: {
             enabled: true,
@@ -152,6 +167,8 @@ const Bpcl_MainPage = () => {
     }),
     []
   );
+
+
 
   const getLevelData = async() => {
     try {
