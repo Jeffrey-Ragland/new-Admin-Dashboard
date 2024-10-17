@@ -11,7 +11,9 @@ import xymaImg from "../Assets/xyma.png";
 import coverImg from "../Assets/pdfcover.jpg";
 import sensorPage from "../Assets/utmapsPage.jpg";
 import disclaimerPage from "../Assets/disclaimerPage.jpg";
+import loadingGif from '../Assets/loading.gif';
 import { BsThermometerSun, BsDropletHalf } from "react-icons/bs";
+import { FaFileDownload } from "react-icons/fa";
 import { HiMiniBeaker } from "react-icons/hi2";
 import { MdManageHistory, MdOutlineCloudDone } from "react-icons/md";
 import { PiCloudWarningBold } from "react-icons/pi";
@@ -45,7 +47,7 @@ const DemokitPorts = (dataFromApp) => {
   const [activeStatus, setActiveStatus] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-  const [filteredReportData, setFilteredReportData] = useState([]);
+  const [reportLoading, setReportLoading] = useState(false);
 
   const [lineData, setLineData] = useState({
     labels: [],
@@ -318,12 +320,16 @@ const DemokitPorts = (dataFromApp) => {
   const generateExcel = async () => {
     if(fromDate && toDate) {
     try {
+      setReportLoading(true);
       const projectName = localStorage.getItem("projectNumber");
       const response = await axios.get(
         `http://34.93.162.58:4000/sensor/getDemokitPortsReport?fromDate=${fromDate}&toDate=${toDate}&projectName=${projectName}`
       );
       // setFilteredReportData(response.data.data);
       console.log("report data", response.data.data);
+      setReportLoading(false);
+      setFromDate('');
+      setToDate('');
       const ws = XLSX.utils.json_to_sheet(
         response.data.data.map(
           ({ _id, ProjectName, createdAt, updatedAt, __v, ...rest }) => ({
@@ -399,9 +405,9 @@ const DemokitPorts = (dataFromApp) => {
                 <BsThermometerSun className="text-6xl xl:text-7xl 2xl:text-8xl" />
                 <div className="flex flex-col text-base 2xl:text-2xl">
                   <div>Temperature</div>
-                  <div className="text-2xl md:text-3xl 2xl:text-6xl text-green-400">
+                  <div className="text-2xl md:text-3xl 2xl:text-5xl text-green-400">
                     {dataFromApp.dataFromApp.length > 0 &&
-                      dataFromApp.dataFromApp[0].Temperature}
+                      dataFromApp.dataFromApp[0].Temperature+"℃"}
                   </div>
                 </div>
               </div>
@@ -418,9 +424,9 @@ const DemokitPorts = (dataFromApp) => {
                     <HiMiniBeaker className="text-5xl 2xl:text-7xl" />
                     <div className="flex flex-col text-base 2xl:text-2xl">
                       <div>Density</div>
-                      <div className="text-2xl md:text-3xl 2xl:text-6xl text-green-400">
+                      <div className="text-2xl md:text-3xl 2xl:text-5xl text-green-400">
                         {dataFromApp.dataFromApp.length > 0 &&
-                          dataFromApp.dataFromApp[0].Density}
+                          dataFromApp.dataFromApp[0].Density+" kg/m³"}
                       </div>
                     </div>
                   </div>
@@ -436,9 +442,9 @@ const DemokitPorts = (dataFromApp) => {
                     <BsDropletHalf className="text-5xl 2xl:text-7xl" />
                     <div className="flex flex-col text-base 2xl:text-2xl">
                       <div>Viscosity</div>
-                      <div className="text-2xl md:text-3xl 2xl:text-6xl text-green-400">
+                      <div className="text-2xl md:text-3xl 2xl:text-5xl text-green-400">
                         {dataFromApp.dataFromApp.length > 0 &&
-                          dataFromApp.dataFromApp[0].Viscosity}
+                          dataFromApp.dataFromApp[0].Viscosity+ " cP"}
                       </div>
                     </div>
                   </div>
@@ -602,7 +608,7 @@ const DemokitPorts = (dataFromApp) => {
               </div>
 
               {/* report */}
-              <div className="h-[200px] md:h-auto xl:h-[40%] md:w-[35%] xl:w-full border border-white bg-white/5 rounded-md text-sm 2xl:text-lg px-2 py-1 flex flex-col">
+              <div className="relative h-[200px] md:h-auto xl:h-[40%] md:w-[35%] xl:w-full border border-white bg-white/5 rounded-md text-sm 2xl:text-lg px-2 py-1 flex flex-col">
                 <center className="font-medium">Report Generation</center>
 
                 <div className="flex md:flex-col xl:flex-row justify-center items-center gap-2 text-xs h-1/2">
@@ -636,12 +642,19 @@ const DemokitPorts = (dataFromApp) => {
                     PDF
                   </button> */}
                   <button
-                    className="rounded-md bg-green-500 hover:scale-105 duration-200 py-1 px-2 2xl:py-2 2xl:px-4 md:w-28 xl:w-auto"
+                    className="rounded-md bg-green-500 hover:scale-105 duration-200 py-1 px-2 2xl:py-2 2xl:px-4 flex items-center gap-1"
                     onClick={generateExcel}
                   >
-                    Excel
+                    <FaFileDownload className="text-lg 2xl:text-xl" />
+                    Download&nbsp;Excel
                   </button>
                 </div>
+                {reportLoading && (
+                  <div className="absolute inset-0 rounded-md bg-black/70 flex flex-col justify-center items-center font-semibold text-sm">
+                    <div>Your report is being downloaded!</div>
+                    <img src={loadingGif} className='max-w-[40px]' /> 
+                  </div>
+                )}
               </div>
             </div>
           </div>
