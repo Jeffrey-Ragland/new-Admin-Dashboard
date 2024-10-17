@@ -31,7 +31,6 @@ ChartJS.register(
 );
 
 const Bpcl_MainPage = () => {
-
   const [levelData, setLevelData] = useState([]);
   const [levelChartData, setLevelChartData] = useState([]);
   const [volumeData, setVolumeData] = useState([]);
@@ -198,7 +197,7 @@ const Bpcl_MainPage = () => {
 
   // console.log("level data", levelData);
   // console.log('level chart data', levelChartData);
-  console.log('volumedata', volumeData)
+
 
   return (
     <div className="text-white p-2 flex flex-col gap-2 xl:h-screen">

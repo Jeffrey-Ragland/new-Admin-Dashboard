@@ -30,7 +30,7 @@ const BpclAdmin = (Tof) => {
 
 
   const tofbutton =()=>{
-
+    navigate('/Tof')
 
   }
   const ascanbutton =()=>{

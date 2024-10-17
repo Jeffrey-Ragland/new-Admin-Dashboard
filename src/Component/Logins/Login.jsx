@@ -12,7 +12,6 @@ const Login = () => {
   const LoginSubmit=async(event) =>{
     event.preventDefault(); 
     try {
-
       const response = await fetch('http://34.93.162.58:4000/sensor/login', {
             method: 'POST',
             headers: {

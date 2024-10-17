@@ -1,9 +1,10 @@
 import React from 'react'
 
 const Tof = () => {
+
   return (
     <div>
-      Tof
+     
     </div>
   )
 }
