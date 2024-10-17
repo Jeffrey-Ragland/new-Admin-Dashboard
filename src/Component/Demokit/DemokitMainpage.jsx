@@ -5,7 +5,7 @@ import xymaLogo from '../Assets/xyma - Copy.png';
 import homePageCover from '../Assets/homePage.png';
 import { BsThermometerSun } from "react-icons/bs";
 import { BiWater } from "react-icons/bi";
-
+import { RiOilLine } from "react-icons/ri";
 const DemokitMainpage = () => {
 
   const handleProjectChange = async (projectName) => {
@@ -71,17 +71,21 @@ const DemokitMainpage = () => {
           </Link>
         </div>
 
-        {/* <Link to="/ports">
-          <button
-            className="py-2 px-6 2xl:py-4 w-40 2xl:w-80 rounded-md hover:scale-110 duration-200  border border-white hover:border-4"
-            style={{
-              background: "linear-gradient(180deg, #75736f 0%, #3d3c3a 100%)",
-            }}
-          >
-            PoRTS
-          </button>
-        </Link> */}
-
+        <div>
+          <div className="flex justify-center mb-4 text-6xl xl:text-7xl 2xl:text-8xl">
+            <RiOilLine/>
+          </div>
+            <Link to="/ports">
+            <button
+              className="py-2 px-6 2xl:py-4 w-40 2xl:w-80 rounded-md hover:scale-110 duration-200  border border-white hover:border-4"
+              style={{
+                background: "linear-gradient(180deg, #75736f 0%, #3d3c3a 100%)",
+              }}
+            >
+              PoRTS
+            </button>
+          </Link> 
+        </div>
         <div>
           <div className="flex justify-center mb-4 text-6xl xl:text-7xl 2xl:text-8xl">
             <BiWater />
