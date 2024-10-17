@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect,useMemo } from "react";
 import axios from "axios";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -28,6 +28,7 @@ import {
   Legend,
   scales,
 } from "chart.js";
+import zoomPlugin from "chartjs-plugin-zoom";
 
 ChartJS.register(
   CategoryScale,
@@ -36,7 +37,8 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  zoomPlugin
 );
 
 const DemokitPorts = (dataFromApp) => {
@@ -107,7 +109,7 @@ const DemokitPorts = (dataFromApp) => {
     }
   }, [dataFromApp]);
 
-  const lineOptions = {
+  const lineOptions = useMemo(() => ({
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -117,6 +119,22 @@ const DemokitPorts = (dataFromApp) => {
           color: "white",
           font: {
             size: 8,
+          },
+        },
+      },
+      zoom: {
+        pan: {
+          enabled: true,
+          mode: "x",
+        },
+        zoom: {
+          enabled: true,
+          mode: "x",
+          wheel: {
+            enabled: true,
+          },
+          pinch: {
+            enabled: true,
           },
         },
       },
@@ -139,7 +157,7 @@ const DemokitPorts = (dataFromApp) => {
         },
       },
     },
-  };
+  }),[]);
 
   // bar chart data
   const barData = {
@@ -233,97 +251,101 @@ const DemokitPorts = (dataFromApp) => {
   }, [dataFromApp]);
 
   // report data
-  useEffect(() => {
-    handleReportData();
-  }, [fromDate, toDate]);
+  // useEffect(() => {
+  //   handleReportData();
+  // }, [fromDate, toDate]);
 
-  const handleReportData = async () => {
+ 
+
+  // to generate report pdf
+  // const generatePdf = () => {
+  //   const doc = new jsPDF();
+  //   const logo = xymaImg;
+  //   const cover = coverImg;
+  //   const desc = sensorPage;
+  //   const disclaimer = disclaimerPage;
+
+  //   // cover img
+  //   doc.addImage(cover, "JPG", 0, 0, 210, 297);
+  //   doc.addPage();
+
+  //   //logo
+  //   doc.addImage(logo, "PNG", 10, 10, 40, 20);
+
+  //   //sensor description
+  //   doc.addImage(desc, "PNG", 0, 40, 220, 250);
+  //   doc.addPage();
+
+  //   //logo
+  //   doc.addImage(logo, "PNG", 10, 10, 40, 20);
+
+  //   if (filteredReportData && filteredReportData.length > 0) {
+  //     // table
+  //     doc.autoTable({
+  //       head: [["S.No", "Temperature", "Density", "Viscosity", "Updated At"]],
+  //       body: filteredReportData.map(
+  //         ({ Temperature, Density, Viscosity, createdAt }, index) => [
+  //           index + 1,
+  //           Temperature,
+  //           Density,
+  //           Viscosity,
+  //           new Date(createdAt).toLocaleString("en-GB"),
+  //         ]
+  //       ),
+  //       startY: 40,
+  //       headerStyles: {
+  //         fillColor: [222, 121, 13],
+  //       },
+  //     });
+  //   }
+
+  //   doc.addPage();
+
+  //   //logo
+  //   doc.addImage(logo, "PNG", 10, 10, 40, 20);
+
+  //   //disclaimer
+  //   doc.addImage(disclaimer, "PNG", 0, 50, 210, 250);
+
+  //   //  doc.save("sensor_adminData.pdf");
+  //   const blob = doc.output("blob");
+
+  //   const url = URL.createObjectURL(blob);
+  //   window.open(url, "_blank");
+  // };
+
+  // to generate report excel
+  const generateExcel = async () => {
+    if(fromDate && toDate) {
     try {
       const projectName = localStorage.getItem("projectNumber");
       const response = await axios.get(
         `http://34.93.162.58:4000/sensor/getDemokitPortsReport?fromDate=${fromDate}&toDate=${toDate}&projectName=${projectName}`
       );
-      setFilteredReportData(response.data.data);
+      // setFilteredReportData(response.data.data);
       console.log("report data", response.data.data);
+      const ws = XLSX.utils.json_to_sheet(
+        response.data.data.map(
+          ({ _id, ProjectName, createdAt, updatedAt, __v, ...rest }) => ({
+            ...rest,
+            createdAt: new Date(createdAt).toLocaleString("en-GB"),
+          })
+        )
+      );
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+      const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+      const info = new Blob([excelBuffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      saveAs(info, "Ports_Report.xlsx");
     } catch (error) {
       console.error("Error fetching data: ", error);
     }
-  };
-
-  // to generate report pdf
-  const generatePdf = () => {
-    const doc = new jsPDF();
-    const logo = xymaImg;
-    const cover = coverImg;
-    const desc = sensorPage;
-    const disclaimer = disclaimerPage;
-
-    // cover img
-    doc.addImage(cover, "JPG", 0, 0, 210, 297);
-    doc.addPage();
-
-    //logo
-    doc.addImage(logo, "PNG", 10, 10, 40, 20);
-
-    //sensor description
-    doc.addImage(desc, "PNG", 0, 40, 220, 250);
-    doc.addPage();
-
-    //logo
-    doc.addImage(logo, "PNG", 10, 10, 40, 20);
-
-    if (filteredReportData && filteredReportData.length > 0) {
-      // table
-      doc.autoTable({
-        head: [["S.No", "Temperature", "Density", "Viscosity", "Updated At"]],
-        body: filteredReportData.map(
-          ({ Temperature, Density, Viscosity, createdAt }, index) => [
-            index + 1,
-            Temperature,
-            Density,
-            Viscosity,
-            new Date(createdAt).toLocaleString("en-GB"),
-          ]
-        ),
-        startY: 40,
-        headerStyles: {
-          fillColor: [222, 121, 13],
-        },
-      });
-    }
-
-    doc.addPage();
-
-    //logo
-    doc.addImage(logo, "PNG", 10, 10, 40, 20);
-
-    //disclaimer
-    doc.addImage(disclaimer, "PNG", 0, 50, 210, 250);
-
-    //  doc.save("sensor_adminData.pdf");
-    const blob = doc.output("blob");
-
-    const url = URL.createObjectURL(blob);
-    window.open(url, "_blank");
-  };
-
-  // to generate report excel
-  const generateExcel = () => {
-    const ws = XLSX.utils.json_to_sheet(
-      filteredReportData.map(
-        ({ _id, ProjectName, createdAt, updatedAt, __v, ...rest }) => ({
-          ...rest,
-          createdAt: new Date(createdAt).toLocaleString("en-GB"),
-        })
-      )
-    );
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-    const info = new Blob([excelBuffer], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    });
-    saveAs(info, "Ports_Report.xlsx");
+  } else {
+    alert("Date Range Required");
+  }
+    
   };
 
   return (
@@ -607,12 +629,12 @@ const DemokitPorts = (dataFromApp) => {
                 </div>
 
                 <div className="flex md:flex-col xl:flex-row gap-2 justify-center items-center h-1/2">
-                  <button
+                  {/* <button
                     className="rounded-md bg-red-500 hover:scale-105 duration-200 py-1 px-2 md:w-28 xl:w-auto 2xl:py-2 2xl:px-4"
                     onClick={generatePdf}
                   >
                     PDF
-                  </button>
+                  </button> */}
                   <button
                     className="rounded-md bg-green-500 hover:scale-105 duration-200 py-1 px-2 2xl:py-2 2xl:px-4 md:w-28 xl:w-auto"
                     onClick={generateExcel}
