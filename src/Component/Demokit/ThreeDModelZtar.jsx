@@ -7,6 +7,7 @@ import {
   PresentationControls,
 } from "@react-three/drei";
 
+
 const Model = () => {
   const group = useRef();
   const { scene } = useGLTF("./ztar.glb");
