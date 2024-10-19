@@ -9,7 +9,13 @@ import {
 
 const Model = ({ lastData, updatedLimitS1, updatedLimitS2 }) => {
   const group = useRef();
-  const { scene } = useGLTF("./utmaps_curve.glb");
+  const projectNumber = localStorage.getItem('Project');
+
+  const gltfPath = projectNumber === 'DEMOKIT01' ? "./utmaps_curve.glb" : projectNumber === 'DEMOKIT02' ? "./utmapsDemokit02.glb" : null;
+  
+  const {scene} = useGLTF(gltfPath);
+  // const { scene } = useGLTF("./utmaps_curve.glb");
+  // const { scene } = useGLTF("./utmapsDemokit02.glb");
   const [cylinder001Color, setCylinder001Color] = useState("white");
   const [cylinder002Color, setCylinder002Color] = useState("white");
   // const [hoveredMesh, setHoveredMesh] = useState(null);
@@ -68,7 +74,7 @@ const Model = ({ lastData, updatedLimitS1, updatedLimitS2 }) => {
     <primitive
       ref={group}
       object={scene}
-      // rotation={[Math.PI, 0, 0]}
+      // srotation={[Math.PI, 0, 0]}
       // {...props}
       // onPointerOver={handlePointerOver}
       // onPointerOut={handlePointerOut}
