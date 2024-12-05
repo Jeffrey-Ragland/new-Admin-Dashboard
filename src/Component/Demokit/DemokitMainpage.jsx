@@ -1,22 +1,23 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import xymaLogo from '../Assets/xyma - Copy.png';
-import homePageCover from '../Assets/homePage.png';
+import React from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import xymaLogo from "../Assets/xyma - Copy.png";
+import homePageCover from "../Assets/homePage.png";
 import { BsThermometerSun } from "react-icons/bs";
 import { BiWater } from "react-icons/bi";
 import { RiOilLine } from "react-icons/ri";
-const DemokitMainpage = () => {
 
+// mac commit
+const DemokitMainpage = () => {
   const handleProjectChange = async (projectName) => {
     try {
       await axios.post("http://34.93.162.58:4000/sensor/updateProcessControl", {
-      // await axios.post("http://localhost:4000/sensor/updateProcessControl", {
+        // await axios.post("http://localhost:4000/sensor/updateProcessControl", {
         projectName,
       });
-    } catch(error) {
-      console.error('Error updating project', error);
-    };
+    } catch (error) {
+      console.error("Error updating project", error);
+    }
   };
 
   return (
@@ -73,9 +74,9 @@ const DemokitMainpage = () => {
 
         <div>
           <div className="flex justify-center mb-4 text-6xl xl:text-7xl 2xl:text-8xl">
-            <RiOilLine/>
+            <RiOilLine />
           </div>
-            <Link to="/ports">
+          <Link to="/ports">
             <button
               className="py-2 px-6 2xl:py-4 w-40 2xl:w-80 rounded-md hover:scale-110 duration-200  border border-white hover:border-4"
               style={{
@@ -84,7 +85,7 @@ const DemokitMainpage = () => {
             >
               PoRTS
             </button>
-          </Link> 
+          </Link>
         </div>
         <div>
           <div className="flex justify-center mb-4 text-6xl xl:text-7xl 2xl:text-8xl">
@@ -105,6 +106,6 @@ const DemokitMainpage = () => {
       </div>
     </div>
   );
-}
+};
 
-export default DemokitMainpage
+export default DemokitMainpage;
