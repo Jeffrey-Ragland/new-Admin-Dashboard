@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -29,6 +29,8 @@ import {
   scales,
 } from "chart.js";
 
+import zoomPlugin from "chartjs-plugin-zoom";
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -36,10 +38,11 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  zoomPlugin
 );
 
-const DemokitZtar = (dataFromApp) => {
+const DemokitZtar = ({ dataFromApp }) => {
   const [activeStatus, setActiveStatus] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -67,11 +70,8 @@ const DemokitZtar = (dataFromApp) => {
 
   // line chart data
   useEffect(() => {
-    if (
-      Array.isArray(dataFromApp.dataFromApp) &&
-      dataFromApp.dataFromApp.length > 0
-    ) {
-      const reversedData = [...dataFromApp.dataFromApp].reverse();
+    if (Array.isArray(dataFromApp) && dataFromApp.length > 0) {
+      const reversedData = [...dataFromApp].reverse();
 
       const lineLabels = reversedData.map((item) => {
         const createdAt = new Date(item.createdAt).toLocaleString("en-GB");
@@ -87,55 +87,73 @@ const DemokitZtar = (dataFromApp) => {
             data: levelData,
             borderColor: "rgb(255, 255, 0)",
             backgroundColor: "rgba(255, 255, 0, 0.2)",
+            borderWidth: 1.25,
           },
         ],
       });
     }
   }, [dataFromApp]);
 
-  const lineOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "top",
-        labels: {
-          color: "white",
-          font: {
-            size: 8,
+  const lineOptions = useMemo(
+    () => ({
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false,
+          // position: "top",
+          // labels: {
+          //   color: "white",
+          //   font: {
+          //     size: 8,
+          //   },
+          // },
+        },
+        zoom: {
+          pan: {
+            enabled: true,
+            mode: "x",
+          },
+          zoom: {
+            enabled: true,
+            mode: "x",
+            wheel: {
+              enabled: window.innerWidth >= 768,
+            },
+            pinch: {
+              enabled: true,
+            },
           },
         },
       },
-    },
-    scales: {
-      x: {
-        ticks: {
-          color: "white",
-          font: {
-            size: 6,
+      scales: {
+        x: {
+          ticks: {
+            color: "white",
+            font: {
+              size: 6,
+            },
+          },
+        },
+        y: {
+          ticks: {
+            color: "white",
+            font: {
+              size: 6,
+            },
           },
         },
       },
-      y: {
-        ticks: {
-          color: "white",
-          font: {
-            size: 6,
-          },
-        },
-      },
-    },
-  };
+    }),
+    []
+  );
 
   // bar chart data
   const barData = {
     labels: ["Level"],
     datasets: [
       {
-        data: [
-          dataFromApp.dataFromApp.length > 0 &&
-            dataFromApp.dataFromApp[0].Level,
-        ],
+        data: [dataFromApp.length > 0 && dataFromApp[0].Level],
         borderColor: ["rgb(255, 255, 0)"],
         backgroundColor: ["rgba(255, 255, 0, 0.5)"],
         borderWidth: 1,
@@ -184,9 +202,9 @@ const DemokitZtar = (dataFromApp) => {
 
   // for activity status
   useEffect(() => {
-    if (dataFromApp.dataFromApp.length > 0) {
+    if (dataFromApp.length > 0) {
       const currentDate = new Date();
-      const lastDataEntry = dataFromApp.dataFromApp[0];
+      const lastDataEntry = dataFromApp[0];
 
       if (lastDataEntry && lastDataEntry.createdAt) {
         const lastDataTime = new Date(lastDataEntry.createdAt);
@@ -250,13 +268,11 @@ const DemokitZtar = (dataFromApp) => {
       // table
       doc.autoTable({
         head: [["S.No", "Level"]],
-        body: filteredReportData.map(
-          ({ Level, createdAt }, index) => [
-            index + 1,
-            Level,
-            new Date(createdAt).toLocaleString("en-GB"),
-          ]
-        ),
+        body: filteredReportData.map(({ Level, createdAt }, index) => [
+          index + 1,
+          Level,
+          new Date(createdAt).toLocaleString("en-GB"),
+        ]),
         startY: 40,
         headerStyles: {
           fillColor: [222, 121, 13],
@@ -308,9 +324,11 @@ const DemokitZtar = (dataFromApp) => {
       <div className="flex justify-between items-center gap-2 xl:h-[8%]">
         <img src={xymaLogo} alt="logo" className="max-h-10 2xl:max-h-12" />
         <div className="hidden md:block text-xl 2xl:text-2xl font-normal md:font-medium text-center">
-          Ztar - Ultrasonic level measurement sensor
+          {/* Ztar - Ultrasonic level measurement sensor */}
+          Cero Scns - Level Measurement Sensor
         </div>
-        <div className="md:hidden font-medium text-xl">Ztar</div>
+        {/* <div className="md:hidden font-medium text-xl">Ztar</div> */}
+        <div className="md:hidden font-medium text-xl">Cero Scns</div>
         <Link to="/">
           <button
             className=" py-1 pb-2 px-4 font-medium text-sm 2xl:text-lg rounded-md hover:scale-110 duration-200"
@@ -323,14 +341,19 @@ const DemokitZtar = (dataFromApp) => {
         </Link>
       </div>
 
-      <center className="md:hidden font-medium text-sm">
+      {/* <center className="md:hidden font-medium text-sm">
         Ultrasonic level measurement sensor
+      </center> */}
+
+      <center className="md:hidden font-medium text-sm">
+        Level Measurement Sensor
       </center>
 
       <div className="xl:h-[92%] flex flex-col-reverse xl:flex-row gap-4 xl:gap-2">
         {/* 3d model - left section */}
         <div className="h-[300px] md:h-[500px] xl:h-auto w-full xl:w-1/3 flex justify-center items-center border border-white bg-white/5 rounded-md mb-4 xl:mb-0">
-          <ThreeDModelZtar />
+          {/* <ThreeDModelZtar /> */}
+          3d - model
         </div>
 
         {/* right section */}
@@ -347,11 +370,10 @@ const DemokitZtar = (dataFromApp) => {
                 }}
               >
                 <BiWater className="text-6xl xl:text-7xl 2xl:text-8xl" />
-                <div className="flex flex-col text-base 2xl:text-2xl">
-                  <div>Liquid Level</div>
+                <div className="flex flex-col items-center text-base 2xl:text-2xl">
+                  <div>Level</div>
                   <div className="text-2xl md:text-3xl 2xl:text-6xl text-green-400">
-                    {dataFromApp.dataFromApp.length > 0 &&
-                      dataFromApp.dataFromApp[0].Level}
+                    {dataFromApp.length > 0 && dataFromApp[0].Level} mm
                   </div>
                 </div>
               </div>
@@ -364,10 +386,10 @@ const DemokitZtar = (dataFromApp) => {
                     <div>Last&nbsp;Update:</div>
                   </div>
                   <div className="text-sm 2xl:text-base font-normal">
-                    {dataFromApp.dataFromApp.length > 0 &&
-                      new Date(
-                        dataFromApp.dataFromApp[0].createdAt
-                      ).toLocaleString("en-GB")}
+                    {dataFromApp.length > 0 &&
+                      new Date(dataFromApp[0].createdAt).toLocaleString(
+                        "en-GB"
+                      )}
                   </div>
                 </div>
 
@@ -412,8 +434,8 @@ const DemokitZtar = (dataFromApp) => {
                 </thead>
 
                 <tbody className="text-sm 2xl:text-base text-gray-600">
-                  {dataFromApp.dataFromApp.length > 0 &&
-                    dataFromApp.dataFromApp.map((data, index) => (
+                  {dataFromApp.length > 0 &&
+                    dataFromApp.map((data, index) => (
                       <tr
                         key={index}
                         className={`${index % 2 === 0 ? "" : "bg-stone-200"}`}
@@ -434,9 +456,9 @@ const DemokitZtar = (dataFromApp) => {
             {/* line graph */}
             <div className="border border-white bg-white/5 rounded-md w-full xl:w-[70%] px-2 pb-2 h-[250px] md:h-[300px] lg:h-[400px] xl:h-full flex flex-col">
               <div>
-                <center className="font-medium">
+                {/* <center className="font-medium">
                   Liquid Level Measurement
-                </center>
+                </center> */}
                 <div className="flex items-center px-2 py-1 text-sm font-medium">
                   <div className="mr-2">Set Limit:</div>
                   <input
@@ -548,6 +570,6 @@ const DemokitZtar = (dataFromApp) => {
       </div>
     </div>
   );
-}
+};
 
-export default DemokitZtar
+export default DemokitZtar;
