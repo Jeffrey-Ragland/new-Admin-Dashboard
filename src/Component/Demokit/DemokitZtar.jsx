@@ -83,7 +83,8 @@ const DemokitZtar = ({ dataFromApp }) => {
         labels: lineLabels,
         datasets: [
           {
-            label: "Level",
+            // label: "Level",
+            label: "Thickness",
             data: levelData,
             borderColor: "rgb(255, 255, 0)",
             backgroundColor: "rgba(255, 255, 0, 0.2)",
@@ -150,7 +151,8 @@ const DemokitZtar = ({ dataFromApp }) => {
 
   // bar chart data
   const barData = {
-    labels: ["Level"],
+    // labels: ["Level"],
+    labels: ["Thickness"],
     datasets: [
       {
         data: [dataFromApp.length > 0 && dataFromApp[0].Level],
@@ -267,7 +269,8 @@ const DemokitZtar = ({ dataFromApp }) => {
     if (filteredReportData && filteredReportData.length > 0) {
       // table
       doc.autoTable({
-        head: [["S.No", "Level"]],
+        // head: [["S.No", "Level"]],
+        head: [["S.No", "Thickness"]],
         body: filteredReportData.map(({ Level, createdAt }, index) => [
           index + 1,
           Level,
@@ -325,7 +328,7 @@ const DemokitZtar = ({ dataFromApp }) => {
         <img src={xymaLogo} alt="logo" className="max-h-10 2xl:max-h-12" />
         <div className="hidden md:block text-xl 2xl:text-2xl font-normal md:font-medium text-center">
           {/* Ztar - Ultrasonic level measurement sensor */}
-          Cero Scns - Level Measurement Sensor
+          Cero Scns - Thickness Measurement Sensor
         </div>
         {/* <div className="md:hidden font-medium text-xl">Ztar</div> */}
         <div className="md:hidden font-medium text-xl">Cero Scns</div>
@@ -346,7 +349,7 @@ const DemokitZtar = ({ dataFromApp }) => {
       </center> */}
 
       <center className="md:hidden font-medium text-sm">
-        Level Measurement Sensor
+        Thickness Measurement Sensor
       </center>
 
       <div className="xl:h-[92%] flex flex-col-reverse xl:flex-row gap-4 xl:gap-2">
@@ -371,7 +374,8 @@ const DemokitZtar = ({ dataFromApp }) => {
               >
                 <BiWater className="text-6xl xl:text-7xl 2xl:text-8xl" />
                 <div className="flex flex-col items-center text-base 2xl:text-2xl">
-                  <div>Level</div>
+                  {/* <div>Level</div> */}
+                  <div>Thickness</div>
                   <div className="text-2xl md:text-3xl 2xl:text-6xl text-green-400">
                     {dataFromApp.length > 0 && dataFromApp[0].Level} mm
                   </div>
@@ -428,7 +432,8 @@ const DemokitZtar = ({ dataFromApp }) => {
                 >
                   <tr>
                     <th className="px-2">S.No</th>
-                    <th className="px-2">Level</th>
+                    {/* <th className="px-2">Level</th> */}
+                    <th className="px-2">Thickness</th>
                     <th className="px-2">Updated&nbsp;At</th>
                   </tr>
                 </thead>
