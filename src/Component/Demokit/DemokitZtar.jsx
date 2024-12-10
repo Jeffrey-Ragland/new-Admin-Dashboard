@@ -329,7 +329,7 @@ const DemokitZtar = ({ dataFromApp }) => {
         <img src={xymaLogo} alt="logo" className="max-h-10 2xl:max-h-12" />
         <div className="hidden md:block text-xl 2xl:text-2xl font-normal md:font-medium text-center">
           {/* Ztar - Ultrasonic level measurement sensor */}
-          Cero Sens - Thickness Measurement Sensor
+          CEROSENS - Thickness Measurement Sensor
         </div>
         {/* <div className="md:hidden font-medium text-xl">Ztar</div> */}
         <div className="md:hidden font-medium text-xl">CEROSENS</div>
