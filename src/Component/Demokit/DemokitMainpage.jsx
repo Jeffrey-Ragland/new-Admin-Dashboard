@@ -100,7 +100,7 @@ const DemokitMainpage = () => {
               onClick={() => handleProjectChange("ztar")}
             >
               {/* Ztar */}
-              Cero Scns
+              Cero Sens
             </button>
           </Link>
         </div>

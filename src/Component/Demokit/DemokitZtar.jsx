@@ -329,7 +329,7 @@ const DemokitZtar = ({ dataFromApp }) => {
         <img src={xymaLogo} alt="logo" className="max-h-10 2xl:max-h-12" />
         <div className="hidden md:block text-xl 2xl:text-2xl font-normal md:font-medium text-center">
           {/* Ztar - Ultrasonic level measurement sensor */}
-          Cero Scns - Thickness Measurement Sensor
+          Cero Sens - Thickness Measurement Sensor
         </div>
         {/* <div className="md:hidden font-medium text-xl">Ztar</div> */}
         <div className="md:hidden font-medium text-xl">Cero Scns</div>
@@ -377,7 +377,7 @@ const DemokitZtar = ({ dataFromApp }) => {
                 <div className="flex flex-col items-center text-base 2xl:text-2xl">
                   {/* <div>Level</div> */}
                   <div>Thickness</div>
-                  <div className="text-2xl md:text-3xl 2xl:text-6xl text-green-400">
+                  <div className="text-2xl md:text-3xl 2xl:text-5xl text-green-400">
                     {dataFromApp.length > 0 && dataFromApp[0].Level} mm
                   </div>
                 </div>
