@@ -362,7 +362,7 @@ const getDemokitUtmapsModelLimit = async() => {
 // console.log('model limit in app', demokitUtmapsModelLimit);
 // console.log('utmaps data', utmapsData);
 
-// ports
+// por
 const getDemokitPortsData = async () => {
   try {
     const projectNumber = localStorage.getItem("projectNumber");
