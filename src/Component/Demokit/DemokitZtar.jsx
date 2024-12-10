@@ -332,7 +332,7 @@ const DemokitZtar = ({ dataFromApp }) => {
           Cero Sens - Thickness Measurement Sensor
         </div>
         {/* <div className="md:hidden font-medium text-xl">Ztar</div> */}
-        <div className="md:hidden font-medium text-xl">Cero Scns</div>
+        <div className="md:hidden font-medium text-xl">CEROSENS</div>
         <Link to="/">
           <button
             className=" py-1 pb-2 px-4 font-medium text-sm 2xl:text-lg rounded-md hover:scale-110 duration-200"
