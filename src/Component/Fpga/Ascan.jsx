@@ -53,7 +53,7 @@ const Ascan = () => {
     const btn_sts = localStorage.getItem("btn_sts");
     try {
       const drp_data = await axios.get(
-        "http://34.93.162.58:4000/sensor/ASCAN_PROJECT_LIST"
+        "https://database.xyma.live/sensor/ASCAN_PROJECT_LIST"
       );
       if (drp_data.data) {
         const dropdown_value = drp_data.data.data;
@@ -62,7 +62,7 @@ const Ascan = () => {
       if (parseInt(btn_sts) == 1) {
         try {
           const ascan_resposne = await axios.get(
-            `http://34.93.162.58:4000/sensor/BPCL_READ?`
+            `https://database.xyma.live/sensor/BPCL_READ?`
           );
           if (ascan_resposne.data) {
             setAscan(ascan_resposne.data);
@@ -116,7 +116,7 @@ const Ascan = () => {
       try {
         console.log("fulldate = ", fulldate);
         const ascan_resposne = await axios.get(
-          `http://34.93.162.58:4000/sensor/BPCL_READ?fromdate=${fulldate}&project=${value}`
+          `https://database.xyma.live/sensor/BPCL_READ?fromdate=${fulldate}&project=${value}`
         );
         console.log(ascan_data);
         if (ascan_resposne.data) {
@@ -248,7 +248,7 @@ const Ascan = () => {
     try {
       if (projectName) {
         const response = await fetch(
-          "http://34.93.162.58:4000/sensor/ASCAN_PROJECT_ADD",
+          "https://database.xyma.live/sensor/ASCAN_PROJECT_ADD",
           {
             method: "POST",
             headers: {
@@ -279,7 +279,7 @@ const Ascan = () => {
     } else {
       console.log("project name ===", value1);
       const response = await fetch(
-        "http://34.93.162.58:4000/sensor/ASCAN_PROJECT_DELETE",
+        "https://database.xyma.live/sensor/ASCAN_PROJECT_DELETE",
         {
           method: "POST",
           headers: {
@@ -308,7 +308,7 @@ const Ascan = () => {
     ) {
       if (value != "None") {
         const response = await fetch(
-          "http://34.93.162.58:4000/sensor/SETTINGS_PAGE",
+          "https://database.xyma.live/sensor/SETTINGS_PAGE",
           {
             method: "POST",
             headers: {
